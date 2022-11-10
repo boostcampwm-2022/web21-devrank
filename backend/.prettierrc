@@ -6,5 +6,17 @@
   "printWidth": 120,
   "arrowParens": "always",
   "endOfLine": "auto",
-  "bracketSameLine": false
+  "bracketSameLine": false,
+  "importOrderParserPlugins": ["typescript", "decorators-legacy"],
+  "importOrder": [
+    "^@",
+    "^~",
+    "^[a-z]",
+    "^\\.\\.(?!/?$)",
+    "^\\.\\./?$",
+    "^\\./(?=.*/)(?!/?$)",
+    "^\\.(?!/?$)",
+    "^\\./?$"
+  ],
+  "importOrderSortSpecifiers": true
 }
