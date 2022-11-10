@@ -1,0 +1,22 @@
+{
+  "tabWidth": 2,
+  "semi": true,
+  "singleQuote": true,
+  "trailingComma": "all",
+  "printWidth": 120,
+  "arrowParens": "always",
+  "endOfLine": "auto",
+  "bracketSameLine": false,
+  "importOrderParserPlugins": ["typescript"],
+  "importOrder": [
+    "^@",
+    "^~",
+    "^[a-z]",
+    "^\\.\\.(?!/?$)",
+    "^\\.\\./?$",
+    "^\\./(?=.*/)(?!/?$)",
+    "^\\.(?!/?$)",
+    "^\\./?$"
+  ],
+  "importOrderSortSpecifiers": true
+}
