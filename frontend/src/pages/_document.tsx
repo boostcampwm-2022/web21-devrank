@@ -1,4 +1,4 @@
-import Document, { DocumentContext, Html, Head, Main, NextScript } from 'next/document';
+import Document, { DocumentContext, Head, Html, Main, NextScript } from 'next/document';
 import { ServerStyleSheet } from 'styled-components';
 
 export default class MyDocument extends Document {
@@ -32,6 +32,7 @@ export default class MyDocument extends Document {
           />
           <meta name="robots" content="index, follow" />
           <link rel="icon" href="/favicon.ico" />
+          <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css"></link>
           <title>Devrank</title>
         </Head>
         <body>
