@@ -1,19 +1,15 @@
 import { NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { UserRepository } from './repositories/user.repository';
+import { UserRepository } from './user.repository';
+import { User } from './user.schema';
 
 export class UserService {
-  constructor(
-    @InjectModel('User') private readonly userModel: Model<User>,
-    private readonly userRepository: UserRepository,
-  ) {}
+  constructor(private readonly userRepository: UserRepository) {}
 
-  async getAll(): Promise<User[]> {
+  async getAll(): Promise<any> {
     return this.userRepository.getAll();
   }
 
-  async getById(id: string): Promise<User> {
+  async getById(id: string): Promise<any> {
     const user = await this.userRepository.getById(id);
     if (!user) {
       throw new NotFoundException('User not found');
@@ -21,11 +17,11 @@ export class UserService {
     return user;
   }
 
-  async create(user: User): Promise<User> {
+  async create(user: User): Promise<any> {
     return this.userRepository.create(user);
   }
 
-  async update(id: string, user: User): Promise<User> {
+  async update(id: string, user: User): Promise<any> {
     return this.userRepository.update(id, user);
   }
 }
