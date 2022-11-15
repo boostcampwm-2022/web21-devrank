@@ -6,6 +6,13 @@ module.exports = {
     '@storybook/addon-links',
     '@storybook/addon-essentials',
     '@storybook/addon-interactions',
+    {
+      name: '@storybook/addon-docs',
+      options: {
+        sourceLoaderOptions: null,
+        transcludeMarkdown: true,
+      },
+    },
     'storybook-addon-styled-component-theme/dist/preset',
   ],
   webpackFinal: async (config) => {
