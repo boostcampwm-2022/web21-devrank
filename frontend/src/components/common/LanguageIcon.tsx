@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { LanguageIconProps } from '@components/common/types';
+import { LanguageIconProps } from '@types';
 import { languageToURL } from '@utils/utils';
 
 function LanguageIcon({ language, width = 50, height = 50 }: LanguageIconProps) {
