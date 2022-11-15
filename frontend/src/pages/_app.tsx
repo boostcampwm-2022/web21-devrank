@@ -1,5 +1,6 @@
 import { appWithTranslation } from 'next-i18next';
 import type { AppProps } from 'next/app';
+import Head from 'next/head';
 import { ThemeProvider } from 'styled-components';
 import { Noto_Sans_KR } from '@next/font/google';
 import Layout from '@components/Layout';
@@ -12,14 +13,19 @@ const notoSansKR = Noto_Sans_KR({
 
 function App({ Component, pageProps }: AppProps) {
   return (
-    <ThemeProvider theme={theme}>
-      <GlobalStyles />
-      <div className={notoSansKR.className}>
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
-      </div>
-    </ThemeProvider>
+    <>
+      <Head>
+        <title>Devrank</title>
+      </Head>
+      <ThemeProvider theme={theme}>
+        <GlobalStyles />
+        <div className={notoSansKR.className}>
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </div>
+      </ThemeProvider>
+    </>
   );
 }
 
