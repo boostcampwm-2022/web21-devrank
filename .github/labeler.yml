@@ -1,0 +1,5 @@
+':gear: backend':
+- any: ['backend/**/*']
+
+':art: frontend':
+- any: ['frontend/**/*']
