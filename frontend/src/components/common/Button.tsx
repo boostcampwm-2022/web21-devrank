@@ -13,12 +13,12 @@ export default Button;
 
 const StyledButton = styled.button<StyledButtonProps>`
   ${({ theme }) => theme.common.flexCenter};
-  font-size: ${({ theme }) => theme.fontSize.md};
+  font-size: ${({ theme }) => theme.fontSize.sm};
   background-color: ${({ theme }) => theme.colors.black2};
-  border: 1px solid ${({ theme }) => theme.colors.gray2};
+  border: 1px solid ${({ theme }) => theme.colors.gray1};
   border-radius: 8px;
-  width: 120px;
-  height: 48px;
+  width: 95px;
+  height: 40px;
 
   ${(props) =>
     props.size === 'sm' &&
@@ -27,10 +27,6 @@ const StyledButton = styled.button<StyledButtonProps>`
       width: 80px;
       height: 36px;
     `}
-
-  &:hover {
-    background-color: ${({ theme }) => theme.colors.black3};
-  }
 
   &:disabled {
     background-color: ${({ theme }) => theme.colors.gray4};
