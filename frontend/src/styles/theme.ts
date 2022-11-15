@@ -89,16 +89,23 @@ const common = {
     `,
 };
 
+const component = {
+  headerHeight: '176px',
+  footerHeight: '176px',
+};
+
 export type ColorsTypes = typeof colors;
 export type FontSizeTypes = typeof fontSize;
 export type FontWeightTypes = typeof fontWeight;
 export type CommonTypes = typeof common;
+export type ComponentTypes = typeof component;
 
 const theme: DefaultTheme = {
   colors,
   fontSize,
   fontWeight,
   common,
+  component,
 };
 
 export default theme;
