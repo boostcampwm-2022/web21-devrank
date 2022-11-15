@@ -1,11 +1,18 @@
 import { NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { Octokit } from '@octokit/rest';
 import { Model } from 'mongoose';
 import { UserRepository } from './user.repository';
 import { User } from './user.schema';
 
 export class UserService {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    @InjectModel('User') private readonly userModel: Model<User>,
+    private readonly userRepository: UserRepository,
+  ) {}
+  octokit = new Octokit({
+    auth: process.env.GITHUB_ACCESS_TOKEN,
+  });
 
   async findAll(): Promise<User[]> {
     return this.userRepository.findAll();
@@ -27,6 +34,13 @@ export class UserService {
     return this.userRepository.update(id, user);
   }
 
+  async updateRepositories(id: number): Promise<User> {
+    const user = await this.userRepository.findOneByGithubId(id);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const res = await this.octokit.repos.listForUser({ username: user.username });
+    user.repositories = res.data;
     return this.userRepository.update(id, user);
   }
 }
