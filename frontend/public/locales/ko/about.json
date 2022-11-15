@@ -1,0 +1,9 @@
+{
+  "overview": "Hi, We are Devrank!\\n\\nDevrank는 등급 시스템을 통해 Github 활동을 조금 더 재미있게 할 수 있게 유도하기 위해 만들어진 서비스입니다.\\n지루할 수 있는 Github 활동을 게임과 유사한 등급 시스템을 통해 성취감을 느낄 수 있다고 생각합니다.\\n\\n지금 바로 Devrank에서 자신의 순위를 확인하고 Github 활동을 열심히 해서 높은 순위를 달성해보세요!",
+  "key-feature-heading": "주요 기능",
+  "key-feature-1": "개발자의 기본 정보 및 레포지토리 목록",
+  "key-feature-2": "사용자 정보를 통한 프로그래밍 언어 통계 및 활동 시간대 그래프 시각화",
+  "key-feature-3": "Repository, Commit 등을 기반으로 한 랭킹 페이지(등급은 하루 4번 업데이트 됩니다)",
+  "rank-system-heading": "Devrank 등급 시스템",
+  "score-calucate-method-heading": "점수 계산 방식"
+}

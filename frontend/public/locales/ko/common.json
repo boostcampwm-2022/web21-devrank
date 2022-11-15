@@ -1,0 +1,13 @@
+{
+  "login-button": "로그인",
+  "my-profile": "내 프로필",
+  "logout": "로그아웃",
+  "current-locale": "한국어",
+  "table-tier": "티어",
+  "table-user": "사용자",
+  "table-score": "점수",
+  "table-programming-lang": "언어",
+  "table-user-num": "사용자수",
+  "table-views": "조회수",
+  "table-tech-stack": "기술스택"
+}

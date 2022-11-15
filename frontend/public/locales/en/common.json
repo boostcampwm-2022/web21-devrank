@@ -1,0 +1,13 @@
+{
+  "login-button": "Login",
+  "my-profile": "Profile",
+  "logout": "Logout",
+  "current-locale": "English",
+  "table-tier": "Tier",
+  "table-user": "User",
+  "table-score": "Score",
+  "table-programming-lang": "Lang",
+  "table-user-num": "User number",
+  "table-views": "Views",
+  "table-tech-stack": "Tech Stack"
+}
