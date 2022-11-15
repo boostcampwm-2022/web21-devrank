@@ -1,26 +1,20 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UserRepository } from 'src/user/user.repository';
+import { JwtPayload } from '../types';
 
-export interface JwtPayload {
-  sub: string;
-  username: string;
-}
-
-// PassportStrategy에서 custom error 던지는 방법 찾기
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
-  @Inject(UserRepository)
-  private readonly userRepository: UserRepository;
-  // if access token expired, client need to call '/refresh'
-  constructor() {
+export class JwtAuthStrategy extends PassportStrategy(Strategy, 'jwt') {
+  constructor(private readonly configService: ConfigService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: process.env.JWT_ACCESS_SECRET,
+      ignoreExpiration: true,
     });
   }
-  // request.user
+
   async validate(payload: JwtPayload) {
     return payload;
   }
