@@ -1,24 +1,80 @@
+import { User } from '@apps/user/user.schema';
+import { UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { CookieOptions } from 'express';
+import { Request } from 'express';
+import jwt from 'jsonwebtoken';
+import { UserService } from 'src/user/user.service';
+import { GithubProfile, JwtPayload } from './types';
+
 export class AuthService {
-  githubLoginCallback() {
-    // 1. auth code 받는다
-    // 2. access token 받는다
-    // 3. 정보 받아와서 DB에 저장한다
-    // 4. 서버측 jwt 발급해서 response
+  constructor(private readonly configService: ConfigService, private readonly userService: UserService) {}
+
+  async login(githubProfile: GithubProfile): Promise<User> {
+    const user = await this.userService.findOneByGithubId(githubProfile.id);
+
+    if (user) {
+      return user;
+    }
+
+    const newUser = new User();
+    newUser.id = githubProfile.id;
+    newUser.username = githubProfile.username;
+    newUser.following = githubProfile.following;
+    newUser.followers = githubProfile.followers;
+    newUser.avatarUrl = githubProfile.avatarUrl;
+    newUser.name = githubProfile.name;
+    newUser.email = githubProfile.email;
+    newUser.bio = githubProfile.bio;
+    newUser.company = githubProfile.company;
+    newUser.location = githubProfile.location;
+    newUser.blogUrl = githubProfile.blogUrl;
+
+    return await this.userService.create(newUser);
+  }
+
+  refreshNewToken(refreshToken: string): string {
+    try {
+      const { id } = jwt.verify(refreshToken, this.configService.get('JWT_REFRESH_SECRET')) as JwtPayload;
+      return this.issueAccessToken(id);
+    } catch {
+      throw new UnauthorizedException({ message: 'invalid token.' });
+    }
+  }
+
+  issueAccessToken(id: number): string {
+    return jwt.sign({ id }, this.configService.get('JWT_ACCESS_SECRET'), {
+      expiresIn: this.configService.get('JWT_ACCESS_EXPIRATION'),
+    });
+  }
+
+  issueRefreshToken(id: number) {
+    return jwt.sign({ id }, process.env.JWT_REFRESH_SECRET, { expiresIn: process.env.JWT_REFRESH_EXPIRATION });
+  }
+
+  extractRefreshToken(request: Request) {
+    return request?.cookies?.[this.configService.get('REFRESH_TOKEN_KEY')];
+  }
+
+  checkRefreshToken(refreshToken: string) {
+    try {
+      jwt.verify(refreshToken, this.configService.get('JWT_REFRESH_SECRET'));
+    } catch {
+      return false;
+    }
     return true;
   }
 
-  refreshNewToken() {
-    // 1. GET /refresh-token  // GET? or POST?
-    // 2. cookie에 있는 refresh token 검증
-    // 3. 성공 시 새 access token 발급, 실패 시 Unauthorized Error
-    return true;
-  }
+  getCookieOption = (): CookieOptions => {
+    const oneHour = 60 * 60 * 1000;
+    const maxAge = 7 * 24 * oneHour; // 7days
 
-  issueAccessToken() {
-    return true;
-  }
+    if (this.configService.get('NODE_ENV') === 'prod') {
+      return { httpOnly: true, secure: true, sameSite: 'lax', maxAge };
+    } else if (this.configService.get('NODE_ENV') === 'alpha') {
+      return { httpOnly: true, secure: true, sameSite: 'none', maxAge };
+    }
 
-  issueRefreshToken() {
-    return true;
-  }
+    return { httpOnly: true, maxAge };
+  };
 }

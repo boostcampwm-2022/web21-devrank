@@ -11,8 +11,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     if (!(exception instanceof HttpException)) {
       logger.error(`${request.url} ${exception.name} ${exception.message}`);
-      //TODO: slack에 에러 로그 전달
-      //errorHook(exception.name, exception.message);
+      // TODO: slack에 에러 로그 전달
+      // errorHook(exception.name, exception.message);
       exception = new InternalServerErrorException('Unknown Error');
     }
 

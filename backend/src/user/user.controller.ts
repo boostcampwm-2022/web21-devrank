@@ -9,16 +9,16 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get all users' })
-  @ApiResponse({ status: 200, description: 'Return all users.' })
-  async getAll(): Promise<User[]> {
-    return this.userService.getAll();
+  @ApiOperation({ summary: '모든 유저 정보 가져오기' })
+  @ApiResponse({ status: 200, description: '모든 유저 정보' })
+  async findAll(): Promise<User[]> {
+    return this.userService.findAll();
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get user by id' })
-  @ApiResponse({ status: 200, description: 'Return the user.' })
-  async getById(@Param('id') id: string): Promise<User> {
-    return this.userService.getById(id);
+  @ApiOperation({ summary: '특정 유저 정보 가져오기' })
+  @ApiResponse({ status: 200, description: '유저 정보' })
+  async findOneByGithubId(@Param('id') id: number): Promise<User> {
+    return this.userService.findOneByGithubId(id);
   }
 }
