@@ -7,16 +7,19 @@
   "arrowParens": "always",
   "endOfLine": "auto",
   "bracketSameLine": false,
-  "importOrderParserPlugins": ["typescript"],
+  "importOrderParserPlugins": ["typescript", "jsx"],
   "importOrder": [
-    "^@",
-    "^~",
-    "^[a-z]",
-    "^\\.\\.(?!/?$)",
-    "^\\.\\./?$",
-    "^\\./(?=.*/)(?!/?$)",
-    "^\\.(?!/?$)",
-    "^\\./?$"
+    "^next",
+    "^[a-z_\\-]+",
+    "<THIRD_PARTY_MODULES>",
+    "^@components/(.*)$",
+    "^@contexts/(.*)$",
+    "^@hooks/(.*)$",
+    "^@apis/(.*)$",
+    "^@types/(.*)$",
+    "^@styles/(.*)$",
+    "^@utils/(.*)$",
+    "^~"
   ],
   "importOrderSortSpecifiers": true
 }
