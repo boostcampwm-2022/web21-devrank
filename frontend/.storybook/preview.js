@@ -1,5 +1,6 @@
 import GlobalStyles from '../src/styles/globalStyles';
 import theme from '../src/styles/theme';
+import { themes } from '@storybook/theming';
 import { ThemeProvider } from 'styled-components';
 
 export const decorators = [
@@ -18,5 +19,8 @@ export const parameters = {
       color: /(background|color)$/i,
       date: /Date$/,
     },
+  },
+  docs: {
+    theme: themes.dark,
   },
 };
