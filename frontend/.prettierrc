@@ -10,6 +10,7 @@
   "importOrderParserPlugins": ["typescript", "jsx"],
   "importOrder": [
     "^next",
+    "^[a-z_\\-]+",
     "<THIRD_PARTY_MODULES>",
     "^@components/(.*)$",
     "^@contexts/(.*)$",

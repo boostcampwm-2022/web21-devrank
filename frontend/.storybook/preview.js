@@ -1,7 +1,7 @@
+import { ThemeProvider } from 'styled-components';
 import GlobalStyles from '../src/styles/globalStyles';
 import theme from '../src/styles/theme';
 import { themes } from '@storybook/theming';
-import { ThemeProvider } from 'styled-components';
 
 export const decorators = [
   (Story) => (
