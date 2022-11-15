@@ -5,11 +5,11 @@ import { User } from './user.schema';
 export class UserRepository {
   constructor(@InjectModel(User.name) private readonly userModel: Model<User>) {}
 
-  async getAll(): Promise<any[]> {
+  async findAll(): Promise<User[]> {
     return this.userModel.find().exec();
   }
 
-  async getById(id: string): Promise<User> {
+  async findOneByGithubId(id: number): Promise<User> {
     return this.userModel.findById(id).exec();
   }
 
@@ -18,7 +18,7 @@ export class UserRepository {
     return newUser.save();
   }
 
-  async update(id: string, user: User): Promise<User> {
+  async update(id: number, user: User): Promise<User> {
     return this.userModel.findByIdAndUpdate(id, user, { new: true }).exec();
   }
 }
