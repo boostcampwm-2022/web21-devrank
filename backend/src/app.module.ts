@@ -3,11 +3,18 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
+import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), MongooseModule.forRoot(process.env.DB_URL)],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    MongooseModule.forRoot(process.env.DB_URL),
+    AuthModule,
+    UserModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
