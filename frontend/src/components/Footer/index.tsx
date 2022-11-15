@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import { DEVRANK_REPOSITORY_URL } from '@utils/constants';
 
 function Footer() {
   const { t } = useTranslation('footer');
@@ -10,7 +11,7 @@ function Footer() {
       <p>{t('copyright')}</p>
       <p>
         <span>{t('contribute')}</span>
-        <a href="https://github.com/boostcampwm-2022/web21-devrank">
+        <a href={DEVRANK_REPOSITORY_URL}>
           <Image src="/icons/github.svg" alt="github icon" width={24} height={24} quality={100} />
         </a>
       </p>
