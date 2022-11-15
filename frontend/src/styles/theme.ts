@@ -44,8 +44,9 @@ const colors = {
 };
 
 const fontSize = {
-  xl: 32 + 'px',
-  lg: 24 + 'px',
+  xxl: 32 + 'px',
+  xl: 24 + 'px',
+  lg: 20 + 'px',
   md: 16 + 'px',
   sm: 14 + 'px',
   xs: 12 + 'px',
@@ -90,7 +91,7 @@ const common = {
 };
 
 const component = {
-  headerHeight: '176px',
+  headerHeight: '80px',
   footerHeight: '176px',
 };
 
