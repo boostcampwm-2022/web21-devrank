@@ -1,5 +1,5 @@
 import 'styled-components';
-import { ColorsTypes, CommonTypes, FontSizeTypes, FontWeightTypes } from '@styles/theme';
+import { ColorsTypes, CommonTypes, ComponentTypes, FontSizeTypes, FontWeightTypes } from '@styles/theme';
 
 declare module 'styled-components' {
   export interface DefaultTheme {
@@ -7,5 +7,6 @@ declare module 'styled-components' {
     fontSize: FontSizeTypes;
     fontWeight: FontWeightTypes;
     common: CommonTypes;
+    component: ComponentTypes;
   }
 }

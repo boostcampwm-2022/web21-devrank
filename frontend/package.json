@@ -7,10 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "storybook": "start-storybook -p 6006",
+    "storybook": "start-storybook -p 6006 -s ./public",
     "build-storybook": "build-storybook"
   },
   "dependencies": {
+    "@next/font": "^13.0.3",
     "@tanstack/react-query": "^4.16.1",
     "@types/node": "18.11.9",
     "@types/react": "18.0.25",
