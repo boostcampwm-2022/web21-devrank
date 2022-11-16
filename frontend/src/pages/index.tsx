@@ -1,16 +1,43 @@
+import { GetStaticProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { LocaleProps } from '@types';
+import Image from 'next/image';
+import styled from 'styled-components';
+import Searchbar from '@components/common/Searchbar';
 
 function Home() {
-  return <div>home</div>;
+  return (
+    <Container>
+      <h2>
+        <Image src="/icons/logo-main.svg" alt="Devrank 로고" width={550} height={230} quality={100} />
+      </h2>
+      <Searchbar
+        type="text"
+        width={600}
+        value=""
+        placeholder="유저를 검색해주세요"
+        submitAlign="right"
+        onChange={(e) => {}}
+        onSubmit={(e) => {}}
+      />
+    </Container>
+  );
 }
 
 export default Home;
 
-export const getStaticProps = async ({ locale }: LocaleProps) => {
+export const getStaticProps: GetStaticProps = async (context) => {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ['common', 'footer', 'header'])),
+      ...(await serverSideTranslations(context.locale as string, ['common', 'footer', 'header'])),
     },
   };
 };
+
+const Container = styled.div`
+  ${({ theme }) => theme.common.flexCenterColumn};
+  padding: 100px 50px;
+
+  h2 {
+    margin-bottom: 100px;
+  }
+`;
