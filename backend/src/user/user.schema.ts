@@ -13,7 +13,7 @@ export class User extends Document {
   // 필수 정보
   @Prop({ required: true })
   @IsInt()
-  id: number;
+  id: string;
 
   @Prop({ required: true })
   @IsString()
@@ -32,24 +32,31 @@ export class User extends Document {
   @IsString()
   avatarUrl: string;
 
+  @Prop()
   @IsString()
   name: string;
 
-  @IsEmail()
-  email: string;
-
-  @IsString()
-  bio: string;
-
+  @Prop()
   @IsString()
   company: string;
 
-  @IsString()
-  location: string;
-
+  @Prop()
   @IsString()
   blogUrl: string;
 
+  @Prop()
+  @IsString()
+  location: string;
+
+  @Prop()
+  @IsEmail()
+  email: string;
+
+  @Prop()
+  @IsString()
+  bio: string;
+
+  @Prop()
   @IsObject()
   repositories: RepositoryItem[];
   // Github API를 통해 계산된 정보 (for Ranking)
