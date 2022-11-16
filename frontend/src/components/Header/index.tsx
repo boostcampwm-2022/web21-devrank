@@ -2,15 +2,20 @@
 import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRef } from 'react'
+import { useContext } from 'react'
 import styled from 'styled-components';
-import { Button } from '@components/common';
-import Dropdown from '@components/common/Dropdown';
-import DropdownItem from '@components/common/DropdownItem';
+import {  Avatar, Button,Dropdown, DropdownItem } from '@components/common';
 import useDropdown from '@hooks/useDropdown';
+import { AuthContext } from '@contexts/authContext';
+
+interface StyledDropdownContainer {
+  left?: number,
+  bottom?: number,
+}
 
 function Header() {
   const { t } = useTranslation(['header', 'common']);
+  const  isLoggedIn = useContext(AuthContext);
 
   const { isOpen: languageIsOpen, toggleDropdown: toggleLanguageDropdown } = useDropdown();
   const { isOpen: profileIsOpen, toggleDropdown: toggleProfileDropdown } = useDropdown();
@@ -35,24 +40,30 @@ function Header() {
           <LanguageButton size='md' onClick={toggleLanguageDropdown}>
             <Image src="/icons/globe.svg" alt="언어 선택 버튼" width={25} height={25} />
             <span>{t('common:current-locale')}</span>
-            {languageIsOpen && <Dropdown>
+          </LanguageButton>
+          {languageIsOpen && <DropdownContainer  bottom={-100} left={0}>
+            <Dropdown>
               <DropdownItem>{t('common:language-ko')}</DropdownItem>
               <DropdownItem>{t('common:language-en')}</DropdownItem>
-            </Dropdown>}
-          </LanguageButton>
-          <Button size="md" onClick={toggleProfileDropdown}>
-            로그인
-            {profileIsOpen && <Dropdown>
+            </Dropdown>
+          </DropdownContainer>}
+          {isLoggedIn ? <Button size="md">
+            {t('common:login-button')}
+          </Button>:
+            <Avatar src='/profile-dummy.png' onClick={toggleProfileDropdown}/>
+          }
+          {profileIsOpen && <DropdownContainer bottom={-100} left={120}>
+            <Dropdown>
               <DropdownItem>
                 <Image src='/icons/profile.svg' alt="프로필 아이콘" width={17} height={17} quality={100}/>
-                내 프로필
+                {t('common:my-profile')}
               </DropdownItem>
               <DropdownItem>
                 <Image src='/icons/logout.svg' alt="로그아웃 아이콘" width={17} height={17} quality={100}/>
-                  로그아웃
+                {t('common:logout')}
               </DropdownItem>
-            </Dropdown>}
-          </Button>
+            </Dropdown>
+          </DropdownContainer>}
         </ButtonGroup>
       </nav>
     </Container>
@@ -91,6 +102,7 @@ const NavMenu = styled.ul`
 `;
 
 const ButtonGroup = styled.div`
+  position: relative;
   ${({ theme }) => theme.common.flexCenter};
 `;
 
@@ -99,9 +111,17 @@ const LanguageButton = styled(Button)`
   background-color: transparent;
   border: none;
   gap: 4px;
-  margin-right: 20px;
+  margin-right: 50px;
 
   span {
     line-height: 24px;
   }
+`;
+
+const DropdownContainer = styled.div<StyledDropdownContainer>`
+  position: absolute;
+  ${(props)=> `
+    bottom: ${props.bottom}px;
+    left: ${props.left}px;
+  `}
 `;
