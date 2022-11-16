@@ -1,11 +1,15 @@
+
 import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useContext } from 'react'
 import styled from 'styled-components';
-import { Button } from '@components/common';
+import {  Avatar, Button,Dropdown, DropdownItem } from '@components/common';
+import { AuthContext } from '@contexts/authContext';
 
 function Header() {
   const { t } = useTranslation(['header', 'common']);
+  const  isLoggedIn = useContext(AuthContext);
 
   return (
     <Container>
@@ -24,11 +28,33 @@ function Header() {
           </li>
         </NavMenu>
         <ButtonGroup>
-          <LanguageButton>
-            <Image src="/icons/globe.svg" alt="언어 선택 버튼" width={25} height={25} />
-            <span>{t('common:current-locale')}</span>
-          </LanguageButton>
-          <Button label={t('common:login-button')} size="md" onClick={(e) => console.log('')} />
+            <Dropdown trigger={
+              <LanguageButton size='md'>
+                <Image src="/icons/globe.svg" alt="언어 선택 버튼" width={25} height={25} />
+                <span>{t('common:current-locale')}</span>
+              </LanguageButton>
+            }>
+              <DropdownItem>{t('common:language-ko')}</DropdownItem>
+              <DropdownItem>{t('common:language-en')}</DropdownItem>
+            </Dropdown>
+          {isLoggedIn ? 
+          <Button size="md">
+            {t('common:login-button')}
+          </Button>
+            :
+            <Dropdown trigger={
+              <Avatar src='/profile-dummy.png'/>
+            }>
+              <DropdownItem>
+                <Image src='/icons/profile.svg' alt="프로필 아이콘" width={17} height={17} quality={100}/>
+                {t('common:my-profile')}
+              </DropdownItem>
+              <DropdownItem>
+                <Image src='/icons/logout.svg' alt="로그아웃 아이콘" width={17} height={17} quality={100}/>
+                {t('common:logout')}
+              </DropdownItem>
+          </Dropdown>
+          }
         </ButtonGroup>
       </nav>
     </Container>
@@ -40,7 +66,7 @@ export default Header;
 const Container = styled.header`
   background-color: ${({ theme }) => theme.colors.black2};
   width: 100%;
-  height ${({ theme }) => theme.component.headerHeight};
+  height: ${({ theme }) => theme.component.headerHeight};
 
   nav {
     ${({ theme }) => theme.common.flexSpaceBetween};
@@ -52,7 +78,7 @@ const Container = styled.header`
   }
 
   h1, li {
-    cursur: pointer;
+    cursor: pointer;
   }
 `;
 
@@ -60,24 +86,24 @@ const NavMenu = styled.ul`
   width: 65%;
   display: flex;
   align-items: center;
-  justify-contents: flex-start;
+  justify-content: flex-start;
   font-size: ${({ theme }) => theme.fontSize.lg};
   gap: 70px;
   padding-left: 60px;
 `;
 
 const ButtonGroup = styled.div`
+  position: relative;
   ${({ theme }) => theme.common.flexCenter};
+  gap: 40px;
 `;
 
-const LanguageButton = styled.button`
-  ${({ theme }) => theme.common.flexCenter};
+const LanguageButton = styled(Button)`
+  height: 58px;
   font-size: ${({ theme }) => theme.fontSize.md};
   background-color: transparent;
   border: none;
-  outline: none;
   gap: 4px;
-  margin-right: 20px;
 
   span {
     line-height: 24px;
