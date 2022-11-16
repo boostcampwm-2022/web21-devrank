@@ -1,10 +1,11 @@
-import { NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Octokit } from '@octokit/rest';
 import { Model } from 'mongoose';
 import { RepositoryRepository } from './repository.repository';
 import { Repository } from './repository.schema';
 
+@Injectable()
 export class RepositoryService {
   constructor(
     @InjectModel('Repository') private readonly repositoryModel: Model<Repository>,
