@@ -34,6 +34,7 @@ module.exports = {
 
     return config;
   },
+  staticDirs: ['../public'],
   framework: '@storybook/react',
   core: {
     builder: '@storybook/builder-webpack5',
