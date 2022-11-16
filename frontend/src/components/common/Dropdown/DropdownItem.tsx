@@ -13,6 +13,6 @@ ${({theme}) => theme.common.flexCenter};
   width: max-content;
   min-width: 95px;
   height: 35px;
-  padding: 20px 0px;
+  padding: 25px 10px;
   cursor: pointer;
 `;
