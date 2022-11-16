@@ -1,10 +1,12 @@
-import { NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Octokit } from '@octokit/rest';
 import { Model } from 'mongoose';
+import { UserDto } from './dto/user.dto';
 import { UserRepository } from './user.repository';
 import { User } from './user.schema';
 
+@Injectable()
 export class UserService {
   constructor(
     @InjectModel('User') private readonly userModel: Model<User>,
@@ -18,7 +20,7 @@ export class UserService {
     return this.userRepository.findAll();
   }
 
-  async findOneByGithubId(id: number): Promise<User> {
+  async findOneByGithubId(id: string): Promise<User> {
     const user = await this.userRepository.findOneByGithubId(id);
     if (!user) {
       throw new NotFoundException('User not found');
@@ -30,17 +32,17 @@ export class UserService {
     return this.userRepository.create(user);
   }
 
-  async update(id: number, user: User): Promise<User> {
-    return this.userRepository.update(id, user);
+  async createOrUpdate(user: UserDto): Promise<UserDto> {
+    return this.userRepository.createOrUpdate(user);
   }
 
-  async updateRepositories(id: number): Promise<User> {
+  async updateRepositories(id: string): Promise<UserDto> {
     const user = await this.userRepository.findOneByGithubId(id);
     if (!user) {
       throw new NotFoundException('User not found');
     }
     const res = await this.octokit.repos.listForUser({ username: user.username });
     user.repositories = res.data;
-    return this.userRepository.update(id, user);
+    return this.userRepository.createOrUpdate(user);
   }
 }
