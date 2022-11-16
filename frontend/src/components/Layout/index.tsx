@@ -16,12 +16,10 @@ function Layout({ children }: LayoutProps) {
 export default Layout;
 
 const Container = styled.div`
-  // min-width: 1200px;
   width: 100%;
-  height: 100vh;
 `;
 
 const Main = styled.main`
   width: 100%;
-  height: calc(100vh - ${({ theme }) => `(${theme.component.headerHeight} + ${theme.component.footerHeight})`});
+  min-height: calc(100vh - ${({ theme }) => `(${theme.component.headerHeight} + ${theme.component.footerHeight})`});
 `;
