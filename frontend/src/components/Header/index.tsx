@@ -1,11 +1,19 @@
+
 import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRef } from 'react'
 import styled from 'styled-components';
 import { Button } from '@components/common';
+import Dropdown from '@components/common/Dropdown';
+import DropdownItem from '@components/common/DropdownItem';
+import useDropdown from '@hooks/useDropdown';
 
 function Header() {
   const { t } = useTranslation(['header', 'common']);
+
+  const { isOpen: languageIsOpen, toggleDropdown: toggleLanguageDropdown } = useDropdown();
+  const { isOpen: profileIsOpen, toggleDropdown: toggleProfileDropdown } = useDropdown();
 
   return (
     <Container>
@@ -24,11 +32,27 @@ function Header() {
           </li>
         </NavMenu>
         <ButtonGroup>
-          <LanguageButton>
+          <LanguageButton size='md' onClick={toggleLanguageDropdown}>
             <Image src="/icons/globe.svg" alt="언어 선택 버튼" width={25} height={25} />
             <span>{t('common:current-locale')}</span>
+            {languageIsOpen && <Dropdown>
+              <DropdownItem>{t('common:language-ko')}</DropdownItem>
+              <DropdownItem>{t('common:language-en')}</DropdownItem>
+            </Dropdown>}
           </LanguageButton>
-          <Button label={t('common:login-button')} size="md" onClick={(e) => console.log('')} />
+          <Button size="md" onClick={toggleProfileDropdown}>
+            로그인
+            {profileIsOpen && <Dropdown>
+              <DropdownItem>
+                <Image src='/icons/profile.svg' alt="프로필 아이콘" width={17} height={17} quality={100}/>
+                내 프로필
+              </DropdownItem>
+              <DropdownItem>
+                <Image src='/icons/logout.svg' alt="로그아웃 아이콘" width={17} height={17} quality={100}/>
+                  로그아웃
+              </DropdownItem>
+            </Dropdown>}
+          </Button>
         </ButtonGroup>
       </nav>
     </Container>
@@ -40,7 +64,7 @@ export default Header;
 const Container = styled.header`
   background-color: ${({ theme }) => theme.colors.black2};
   width: 100%;
-  height ${({ theme }) => theme.component.headerHeight};
+  height: ${({ theme }) => theme.component.headerHeight};
 
   nav {
     ${({ theme }) => theme.common.flexSpaceBetween};
@@ -52,7 +76,7 @@ const Container = styled.header`
   }
 
   h1, li {
-    cursur: pointer;
+    cursor: pointer;
   }
 `;
 
@@ -60,7 +84,7 @@ const NavMenu = styled.ul`
   width: 65%;
   display: flex;
   align-items: center;
-  justify-contents: flex-start;
+  justify-content: flex-start;
   font-size: ${({ theme }) => theme.fontSize.lg};
   gap: 70px;
   padding-left: 60px;
@@ -70,12 +94,10 @@ const ButtonGroup = styled.div`
   ${({ theme }) => theme.common.flexCenter};
 `;
 
-const LanguageButton = styled.button`
-  ${({ theme }) => theme.common.flexCenter};
+const LanguageButton = styled(Button)`
   font-size: ${({ theme }) => theme.fontSize.md};
   background-color: transparent;
   border: none;
-  outline: none;
   gap: 4px;
   margin-right: 20px;
 
