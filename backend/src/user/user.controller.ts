@@ -1,5 +1,6 @@
-import { Controller, Get, Param } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Param, Req, Res } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Request } from 'express';
 import { UserDto } from './dto/user.dto';
 import { UserService } from './user.service';
 
@@ -23,6 +24,7 @@ export class UserController {
   }
 
   @Get('update-score/:githubId')
+  @ApiBearerAuth('accessToken')
   @ApiOperation({ summary: '특정 유저의 저장소 점수 업데이트' })
   @ApiResponse({ status: 200, description: '유저 정보' })
   async updateScore(@Param('githubId') githubId: string): Promise<UserDto> {
