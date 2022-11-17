@@ -10,10 +10,6 @@ export interface LayoutProps {
   children: React.ReactNode;
 }
 
-export interface LocaleProps {
-  locale: string;
-}
-
 export type ButtonSize = 'sm' | 'md';
 
 export type ButtonClickEvent = React.MouseEvent<HTMLButtonElement>;
@@ -28,7 +24,7 @@ export interface ButtonProps {
   /**
    * Button 내부 label 텍스트
    */
-  label: string;
+  children: React.ReactNode;
   /**
    * Button 크기 (sm => small, md => medium)
    */
@@ -40,9 +36,13 @@ export interface ButtonProps {
   /**
    * Button click시 실행되는 함수
    */
-  onClick: (e: ButtonClickEvent) => void;
+  onClick?: (e: ButtonClickEvent) => void;
 }
 
 export interface StyledButtonProps {
   size?: ButtonSize;
+}
+
+export interface DropdownProps {
+  children: React.ReactNode;
 }

@@ -1,24 +1,32 @@
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { UserDto } from './dto/user.dto';
 import { User } from './user.schema';
 
+@Injectable()
 export class UserRepository {
   constructor(@InjectModel(User.name) private readonly userModel: Model<User>) {}
 
-  async findAll(): Promise<User[]> {
+  async findAll(): Promise<UserDto[]> {
     return this.userModel.find().exec();
   }
 
-  async findOneByGithubId(id: number): Promise<User> {
-    return this.userModel.findById(id).exec();
+  async findOne(filter: object): Promise<UserDto> {
+    return this.userModel.findOne(filter).exec();
   }
 
-  async create(user: User): Promise<User> {
+  async findOneByGithubId(githubId: string): Promise<UserDto> {
+    return this.userModel.findOne({ username: githubId }).exec();
+  }
+
+  async create(user: UserDto): Promise<UserDto> {
     const newUser = new this.userModel(user);
     return newUser.save();
   }
 
-  async update(id: number, user: User): Promise<User> {
-    return this.userModel.findByIdAndUpdate(id, user, { new: true }).exec();
+  async createOrUpdate(user: UserDto): Promise<UserDto> {
+    const filter = { id: user.id };
+    return this.userModel.findOneAndUpdate(filter, user, { upsert: true }).exec();
   }
 }

@@ -1,68 +1,85 @@
-import { User } from '@apps/user/user.schema';
-import { UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import axios from 'axios';
 import { CookieOptions } from 'express';
 import { Request } from 'express';
-import jwt from 'jsonwebtoken';
-import { UserService } from 'src/user/user.service';
-import { GithubProfile, JwtPayload } from './types';
+import * as jwt from 'jsonwebtoken';
+import { AuthRepository } from './auth.repository';
+import { GithubProfile } from './types';
 
+@Injectable()
 export class AuthService {
-  constructor(private readonly configService: ConfigService, private readonly userService: UserService) {}
+  constructor(private readonly authRepository: AuthRepository, private readonly configService: ConfigService) {}
 
-  async login(githubProfile: GithubProfile): Promise<User> {
-    const user = await this.userService.findOneByGithubId(githubProfile.id);
-
-    if (user) {
-      return user;
+  async getGithubToken(code: string): Promise<string> {
+    const { data } = await axios.post(
+      'https://github.com/login/oauth/access_token',
+      {
+        code,
+        client_id: this.configService.get('GITHUB_CLIENT_ID'),
+        client_secret: this.configService.get('GITHUB_CLIENT_SECRET'),
+      },
+      {
+        headers: {
+          accept: 'application/json',
+        },
+      },
+    );
+    if (!data?.access_token) {
+      throw new BadRequestException('invalid authCode.');
     }
-
-    const newUser = new User();
-    newUser.id = githubProfile.id;
-    newUser.username = githubProfile.username;
-    newUser.following = githubProfile.following;
-    newUser.followers = githubProfile.followers;
-    newUser.avatarUrl = githubProfile.avatarUrl;
-    newUser.name = githubProfile.name;
-    newUser.email = githubProfile.email;
-    newUser.bio = githubProfile.bio;
-    newUser.company = githubProfile.company;
-    newUser.location = githubProfile.location;
-    newUser.blogUrl = githubProfile.blogUrl;
-
-    return await this.userService.create(newUser);
+    return data.access_token;
   }
 
-  refreshNewToken(refreshToken: string): string {
-    try {
-      const { id } = jwt.verify(refreshToken, this.configService.get('JWT_REFRESH_SECRET')) as JwtPayload;
-      return this.issueAccessToken(id);
-    } catch {
-      throw new UnauthorizedException({ message: 'invalid token.' });
-    }
+  async getGithubProfile(githubToken: string): Promise<GithubProfile> {
+    const { data: userInfo } = await axios.get('https://api.github.com/user', {
+      headers: {
+        Authorization: `Bearer ${githubToken}`,
+      },
+    });
+    return userInfo;
   }
 
-  issueAccessToken(id: number): string {
+  issueAccessToken(id: string): string {
     return jwt.sign({ id }, this.configService.get('JWT_ACCESS_SECRET'), {
       expiresIn: this.configService.get('JWT_ACCESS_EXPIRATION'),
     });
   }
 
-  issueRefreshToken(id: number) {
-    return jwt.sign({ id }, process.env.JWT_REFRESH_SECRET, { expiresIn: process.env.JWT_REFRESH_EXPIRATION });
+  issueRefreshToken(id: string): string {
+    return jwt.sign({ id }, this.configService.get('JWT_REFRESH_SECRET'), {
+      expiresIn: this.configService.get('JWT_REFRESH_EXPIRATION'),
+    });
   }
 
-  extractRefreshToken(request: Request) {
+  extractRefreshToken(request: Request): string | undefined {
     return request?.cookies?.[this.configService.get('REFRESH_TOKEN_KEY')];
   }
 
-  checkRefreshToken(refreshToken: string) {
+  checkRefreshToken(refreshToken: string): jwt.JwtPayload {
     try {
-      jwt.verify(refreshToken, this.configService.get('JWT_REFRESH_SECRET'));
+      return jwt.verify(refreshToken, this.configService.get('JWT_REFRESH_SECRET')) as jwt.JwtPayload;
     } catch {
-      return false;
+      throw new UnauthorizedException('invalid token.');
     }
-    return true;
+  }
+
+  async saveRefreshToken(id: string, refreshToken: string): Promise<void> {
+    await this.authRepository.create(id, refreshToken);
+  }
+
+  async replaceRefreshToken(id: string, refreshToken: string): Promise<string> {
+    const storedRefreshToken = await this.authRepository.findById(id);
+    if (refreshToken !== storedRefreshToken) {
+      throw new UnauthorizedException('invalid token.');
+    }
+    const newRefreshToken = this.issueRefreshToken(id);
+    await this.authRepository.create(id, newRefreshToken);
+    return newRefreshToken;
+  }
+
+  async deleteRefreshToken(id: string): Promise<void> {
+    await this.authRepository.delete(id);
   }
 
   getCookieOption = (): CookieOptions => {

@@ -12,7 +12,7 @@ function Footer() {
       <p>
         <span>{t('contribute')}</span>
         <a href={DEVRANK_REPOSITORY_URL}>
-          <Image src="/icons/github.svg" alt="github icon" width={24} height={24} quality={100} />
+          <Image src='/icons/github.svg' alt='github icon' width={24} height={24} quality={100} />
         </a>
       </p>
     </FooterContainer>

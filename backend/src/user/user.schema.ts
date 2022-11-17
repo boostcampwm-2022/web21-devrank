@@ -1,19 +1,16 @@
 import { Prop, Schema, SchemaFactory, SchemaOptions } from '@nestjs/mongoose';
-import { IsEmail, IsInt, IsObject, IsString } from 'class-validator';
+import { IsArray, IsEmail, IsInt, IsString } from 'class-validator';
 import { Document } from 'mongoose';
 
 const options: SchemaOptions = {
   timestamps: true,
 };
-interface RepositoryItem {
-  name: string;
-}
 @Schema(options)
 export class User extends Document {
   // 필수 정보
   @Prop({ required: true })
   @IsInt()
-  id: number;
+  id: string;
 
   @Prop({ required: true })
   @IsString()
@@ -27,31 +24,41 @@ export class User extends Document {
   @IsInt()
   followers: number;
 
+  @Prop({ required: true })
+  @IsInt()
+  score: number;
+
   // 선택적 정보
   @Prop({ default: 'default-image-path' })
   @IsString()
   avatarUrl: string;
 
+  @Prop()
   @IsString()
   name: string;
 
-  @IsEmail()
-  email: string;
-
-  @IsString()
-  bio: string;
-
+  @Prop()
   @IsString()
   company: string;
 
-  @IsString()
-  location: string;
-
+  @Prop()
   @IsString()
   blogUrl: string;
 
-  @IsObject()
-  repositories: RepositoryItem[];
+  @Prop()
+  @IsString()
+  location: string;
+
+  @Prop()
+  @IsEmail()
+  email: string;
+
+  @Prop()
+  @IsString()
+  bio: string;
+
+  @IsArray()
+  repositories: number[];
   // Github API를 통해 계산된 정보 (for Ranking)
 }
 

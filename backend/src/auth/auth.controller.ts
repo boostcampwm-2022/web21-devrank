@@ -1,63 +1,97 @@
-import { Controller, Delete, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { UserDto } from '@apps/user/dto/user.dto';
+import { UserService } from '@apps/user/user.service';
+import { BadRequestException, Body, Controller, Delete, Get, Post, Req, Res } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
-import { GithubAuthGuard } from './github-auth/github-auth.guard';
-import { AuthUser, ReqGithubProfile } from './auth.decorator';
+import { loginRequestDto } from './dto/login-request.dto';
 import { AuthService } from './auth.service';
 import { GithubProfile } from './types';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService, private readonly configService: ConfigService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService,
+    private readonly userService: UserService,
+  ) {}
 
   @Get('github')
-  @UseGuards(GithubAuthGuard)
-  @ApiOperation({
-    summary: '깃허브 로그인',
-    description: `
-      로그인이 되어있지 않은경우, 깃허브 로그인 페이지로 이동합니다
-      깃허브 로그인이 끝나면 지정된 프론트 페이지로 이동합니다.`,
-  })
-  @ApiOkResponse({ description: '깃허브 페이지' })
-  githubLogin(): void {
-    return;
+  @ApiOperation({ summary: '깃허브 로그인 페이지' })
+  @ApiOkResponse({ description: '로그인이 되어있지 않은 경우, 깃허브 로그인 페이지로 이동합니다.' })
+  github(@Res() response: Response): void {
+    response.redirect(
+      `https://github.com/login/oauth/authorize?client_id=${this.configService.get('GITHUB_CLIENT_ID')}`,
+    );
   }
 
-  @Get('github/callback')
-  @UseGuards(GithubAuthGuard)
-  @ApiOperation({ summary: 'Github OAuth Callback' })
-  @ApiOkResponse({ description: '로그인한 성공' })
-  async githubCallback(
-    @ReqGithubProfile() githubProfile: GithubProfile,
-    @Res({ passthrough: true }) response: Response,
-  ) {
-    const user = await this.authService.login(githubProfile);
+  @Post('login')
+  @ApiOperation({
+    summary: '깃허브 로그인',
+    description:
+      '클라이언트로부터 authCode를 받고 github accessToken을 얻어온 후, 정보를 받아와서 refresh token을 쿠키로 설정한 후 access token을 반환한다',
+  })
+  @ApiOkResponse({ description: '로그인 성공' })
+  async githubLogin(@Res() response: Response, @Body() body: loginRequestDto): Promise<void> {
+    const code = body?.code;
+    if (!code) {
+      throw new BadRequestException('need authCode.');
+    }
+    const githubToken = await this.authService.getGithubToken(code);
+    const userInfo: GithubProfile = await this.authService.getGithubProfile(githubToken);
+    const user: UserDto = {
+      id: userInfo.node_id,
+      username: userInfo.login,
+      following: userInfo.following,
+      followers: userInfo.followers,
+      avatarUrl: userInfo.avatar_url,
+      name: userInfo.name,
+      company: userInfo.company,
+      blogUrl: userInfo.blog,
+      location: userInfo.location,
+      bio: userInfo.bio,
+      email: userInfo.email,
+    };
+    await this.userService.createOrUpdate(user);
+
     const accessToken = this.authService.issueAccessToken(user.id);
     const refreshToken = this.authService.issueRefreshToken(user.id);
+    await this.authService.saveRefreshToken(user.id, refreshToken);
     const cookieOption = this.authService.getCookieOption();
+    const responseData = { username: user.username, avatarUrl: user.avatarUrl };
 
-    response.cookie(this.configService.get('REFRESH_TOKEN_KEY'), refreshToken, cookieOption);
-    return { accessToken };
+    response
+      .cookie(this.configService.get('REFRESH_TOKEN_KEY'), refreshToken, cookieOption)
+      .json({ accessToken, user: responseData });
   }
 
   @Post('refresh')
   @ApiOperation({ summary: '토큰 재발급' })
   @ApiOkResponse({ description: '토큰 재발급 성공' })
-  // TODO: 함수 반환 타입을 어떻게 처리해야할지 모르겠음
-  async refresh(@Req() request: Request) {
+  async refresh(@Req() request: Request, @Res() response: Response): Promise<void> {
     const refreshToken = this.authService.extractRefreshToken(request);
-    const accessToken = this.authService.refreshNewToken(refreshToken);
-    return { accessToken };
+    const { id } = this.authService.checkRefreshToken(refreshToken);
+    const newRefreshToken = await this.authService.replaceRefreshToken(id, refreshToken);
+    const accessToken = this.authService.issueAccessToken(id);
+    const user = await this.userService.findOneByFilter({ id: id });
+    const cookieOption = this.authService.getCookieOption();
+    const responseData = { username: user.username, avatarUrl: user.avatarUrl };
+
+    response
+      .cookie(this.configService.get('REFRESH_TOKEN_KEY'), newRefreshToken, cookieOption)
+      .json({ accessToken, user: responseData });
   }
 
   @Delete('logout')
   @ApiOperation({ summary: '로그아웃' })
   @ApiOkResponse({ description: '로그아웃 성공' })
-  logout(@Res({ passthrough: true }) response: Response): void {
+  async logout(@Req() request: Request, @Res({ passthrough: true }) response: Response): Promise<void> {
     const cookieOption = this.authService.getCookieOption();
-
+    const refreshToken = this.authService.extractRefreshToken(request);
+    if (refreshToken) {
+      await this.authService.deleteRefreshToken(refreshToken);
+    }
     response.clearCookie(this.configService.get('REFRESH_TOKEN_KEY'), cookieOption);
   }
 }
