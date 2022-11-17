@@ -1,18 +1,27 @@
 import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useContext } from 'react';
 import styled from 'styled-components';
+import { useQueryData } from '@hooks';
+import { useMutation } from '@tanstack/react-query';
 import { Avatar, Button, Dropdown, DropdownItem } from '@components/common';
-import { AuthContext } from '@contexts/authContext';
+import { requestUserLogout } from '@apis/auth';
 import { GITHUB_AUTH_REQUEST_URL } from '@utils/constants';
 
 function Header() {
+  const { mutate: logout } = useMutation({
+    mutationFn: requestUserLogout,
+  });
+  const { queryData: user, removeQueryData: removeUser } = useQueryData(['user']);
   const { t } = useTranslation(['header', 'common']);
-  const { auth } = useContext(AuthContext);
 
   const onClickLoginButton = () => {
     window.location.assign(GITHUB_AUTH_REQUEST_URL);
+  };
+
+  const onClickLogoutButton = () => {
+    logout();
+    removeUser();
   };
 
   return (
@@ -43,13 +52,13 @@ function Header() {
             <DropdownItem>{t('common:language-ko')}</DropdownItem>
             <DropdownItem>{t('common:language-en')}</DropdownItem>
           </Dropdown>
-          {auth.isLoggedIn ? (
+          {user ? (
             <Dropdown trigger={<Avatar src='/profile-dummy.png' />}>
               <DropdownItem>
                 <Image src='/icons/profile.svg' alt='프로필 아이콘' width={17} height={17} quality={100} />
                 {t('common:my-profile')}
               </DropdownItem>
-              <DropdownItem>
+              <DropdownItem onClick={onClickLogoutButton}>
                 <Image src='/icons/logout.svg' alt='로그아웃 아이콘' width={17} height={17} quality={100} />
                 {t('common:logout')}
               </DropdownItem>
