@@ -1,7 +1,10 @@
 import { GetStaticProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useRefresh } from '@hooks';
 
 function Home() {
+  useRefresh();
+
   return <div>home</div>;
 }
 

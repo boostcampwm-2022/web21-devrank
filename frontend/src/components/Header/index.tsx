@@ -12,7 +12,7 @@ function Header() {
   const { mutate: logout } = useMutation({
     mutationFn: requestUserLogout,
   });
-  const { queryData: user, removeQueryData: removeUser } = useQueryData(['user']);
+  const { queryData: userData, removeQueryData: removeUser } = useQueryData(['user']);
   const { t } = useTranslation(['header', 'common']);
 
   const onClickLoginButton = () => {
@@ -52,8 +52,8 @@ function Header() {
             <DropdownItem>{t('common:language-ko')}</DropdownItem>
             <DropdownItem>{t('common:language-en')}</DropdownItem>
           </Dropdown>
-          {user ? (
-            <Dropdown trigger={<Avatar src='/profile-dummy.png' />}>
+          {userData ? (
+            <Dropdown trigger={<Avatar src={userData.user.avatarUrl} />}>
               <DropdownItem>
                 <Image src='/icons/profile.svg' alt='프로필 아이콘' width={17} height={17} quality={100} />
                 {t('common:my-profile')}
