@@ -12,8 +12,8 @@ export class UserRepository {
     return this.userModel.find().exec();
   }
 
-  async findOneByGithubId(id: string): Promise<User> {
-    return this.userModel.findById(id).exec();
+  async findOneByGithubId(githubId: string): Promise<User> {
+    return this.userModel.findOne({ username: githubId }).exec();
   }
 
   async create(user: User): Promise<User> {
@@ -23,6 +23,6 @@ export class UserRepository {
 
   async createOrUpdate(user: UserDto): Promise<UserDto> {
     const filter = { id: user.id };
-    return this.userModel.findOneAndUpdate(filter, user, { upsert: true });
+    return this.userModel.findOneAndUpdate(filter, user, { upsert: true }).exec();
   }
 }
