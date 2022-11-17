@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 export interface LanguageIconProps {
   language: string;
@@ -49,5 +49,4 @@ export interface DropdownProps {
 
 export interface DropdownItemProps {
   children: React.ReactNode;
-  
 }

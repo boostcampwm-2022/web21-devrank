@@ -1,7 +1,6 @@
 import { GetStaticProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
-import axios from 'axios';
 import { useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import { Spinner } from '@components/common';
@@ -18,7 +17,7 @@ function Callback() {
 
     (async function () {
       try {
-        const response = await requestGithubLogin(code);
+        await requestGithubLogin(code);
         router.push('/');
         setAuth({
           isLoggedIn: true,

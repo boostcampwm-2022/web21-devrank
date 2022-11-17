@@ -3,7 +3,7 @@ import { ButtonProps, StyledButtonProps } from '@types';
 
 function Button({ children, size = 'md', disabled, onClick, ...props }: ButtonProps) {
   return (
-    <StyledButton type="button" size={size} disabled={disabled} onClick={onClick} {...props}>
+    <StyledButton type='button' size={size} disabled={disabled} onClick={onClick} {...props}>
       {children}
     </StyledButton>
   );
@@ -20,9 +20,9 @@ const StyledButton = styled.button<StyledButtonProps>`
   width: 95px;
   height: 40px;
 
-  position:relative;
+  position: relative;
 
-  z-index:10;
+  z-index: 10;
 
   ${(props) =>
     props.size === 'sm' &&

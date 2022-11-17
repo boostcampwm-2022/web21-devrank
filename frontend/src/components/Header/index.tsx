@@ -19,23 +19,23 @@ function Header() {
     <Container>
       <nav>
         <h1>
-          <Link href="/">
-            <Image src="/icons/devrank-logo.svg" alt="로고" width={196} height={43} priority />
+          <Link href='/'>
+            <Image src='/icons/devrank-logo.svg' alt='로고' width={196} height={43} priority />
           </Link>
         </h1>
         <NavMenu>
           <li>
-            <Link href="/about">{t('header:navigate-about')}</Link>
+            <Link href='/about'>{t('header:navigate-about')}</Link>
           </li>
           <li>
-            <Link href="/ranking">{t('header:navigate-ranking')}</Link>
+            <Link href='/ranking'>{t('header:navigate-ranking')}</Link>
           </li>
         </NavMenu>
         <ButtonGroup>
           <Dropdown
             trigger={
-              <LanguageButton size="md">
-                <Image src="/icons/globe.svg" alt="언어 선택 버튼" width={25} height={25} />
+              <LanguageButton size='md'>
+                <Image src='/icons/globe.svg' alt='언어 선택 버튼' width={25} height={25} />
                 <span>{t('common:current-locale')}</span>
               </LanguageButton>
             }
@@ -44,18 +44,18 @@ function Header() {
             <DropdownItem>{t('common:language-en')}</DropdownItem>
           </Dropdown>
           {auth.isLoggedIn ? (
-            <Dropdown trigger={<Avatar src="/profile-dummy.png" />}>
+            <Dropdown trigger={<Avatar src='/profile-dummy.png' />}>
               <DropdownItem>
-                <Image src="/icons/profile.svg" alt="프로필 아이콘" width={17} height={17} quality={100} />
+                <Image src='/icons/profile.svg' alt='프로필 아이콘' width={17} height={17} quality={100} />
                 {t('common:my-profile')}
               </DropdownItem>
               <DropdownItem>
-                <Image src="/icons/logout.svg" alt="로그아웃 아이콘" width={17} height={17} quality={100} />
+                <Image src='/icons/logout.svg' alt='로그아웃 아이콘' width={17} height={17} quality={100} />
                 {t('common:logout')}
               </DropdownItem>
             </Dropdown>
           ) : (
-            <Button size="md" onClick={onClickLoginButton}>
+            <Button size='md' onClick={onClickLoginButton}>
               {t('common:login-button')}
             </Button>
           )}

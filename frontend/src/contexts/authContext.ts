@@ -14,14 +14,4 @@ export interface AuthContextType {
   setAuth: (auth: AuthType) => void;
 }
 
-export const AuthContext = createContext<AuthContextType>({
-  auth: {
-    isLoggedIn: false,
-    user: {
-      id: '',
-      username: '',
-      avatarUrl: '',
-    },
-  },
-  setAuth: () => {},
-});
+export const AuthContext = createContext<AuthContextType>({} as AuthContextType);
