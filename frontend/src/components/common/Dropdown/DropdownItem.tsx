@@ -1,5 +1,5 @@
-import { DropdownItemProps } from '@types';
 import styled from 'styled-components';
+import { DropdownItemProps } from '@types';
 
 function DropdownItem({ children }: DropdownItemProps) {
   return <Container>{children}</Container>;
@@ -8,8 +8,8 @@ function DropdownItem({ children }: DropdownItemProps) {
 export default DropdownItem;
 
 const Container = styled.li`
-${({theme}) => theme.common.flexCenter};
-  gap:5px;
+  ${({ theme }) => theme.common.flexCenter};
+  gap: 5px;
   width: max-content;
   min-width: 95px;
   height: 35px;

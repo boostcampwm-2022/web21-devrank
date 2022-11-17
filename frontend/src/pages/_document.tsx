@@ -27,12 +27,12 @@ export default class MyDocument extends Document {
       <Html>
         <Head>
           <meta
-            name="description"
-            content="지루할 수 있는 Github 활동을 게임과 유사한 등급 시스템을 통해 조금 더 재미있게 할 수 있게 유도하기 위해 만들어진 서비스입니다."
+            name='description'
+            content='지루할 수 있는 Github 활동을 게임과 유사한 등급 시스템을 통해 조금 더 재미있게 할 수 있게 유도하기 위해 만들어진 서비스입니다.'
           />
-          <meta name="robots" content="index, follow" />
-          <link rel="icon" href="/favicon.ico" />
-          <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css" />
+          <meta name='robots' content='index, follow' />
+          <link rel='icon' href='/favicon.ico' />
+          <link rel='stylesheet' href='https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css' />
         </Head>
         <body>
           <Main />

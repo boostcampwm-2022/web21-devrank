@@ -17,11 +17,11 @@ Small.args = {
 export const Medium = Template.bind({});
 Medium.args = {
   size: 'md',
-  children: '버튼'
+  children: '버튼',
 };
 
 export const Disabled = Template.bind({});
 Disabled.args = {
   disabled: true,
-  children: '버튼'
+  children: '버튼',
 };
