@@ -8,15 +8,19 @@ import { User } from './user.schema';
 export class UserRepository {
   constructor(@InjectModel(User.name) private readonly userModel: Model<User>) {}
 
-  async findAll(): Promise<User[]> {
+  async findAll(): Promise<UserDto[]> {
     return this.userModel.find().exec();
   }
 
-  async findOneByGithubId(githubId: string): Promise<User> {
+  async findOne(filter: object): Promise<UserDto> {
+    return this.userModel.findOne(filter).exec();
+  }
+
+  async findOneByGithubId(githubId: string): Promise<UserDto> {
     return this.userModel.findOne({ username: githubId }).exec();
   }
 
-  async create(user: User): Promise<User> {
+  async create(user: UserDto): Promise<UserDto> {
     const newUser = new this.userModel(user);
     return newUser.save();
   }

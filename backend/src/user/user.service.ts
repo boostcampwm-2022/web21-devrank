@@ -18,19 +18,27 @@ export class UserService {
     auth: process.env.GITHUB_ACCESS_TOKEN,
   });
 
-  async findAll(): Promise<User[]> {
+  async findAll(): Promise<UserDto[]> {
     return this.userRepository.findAll();
   }
 
-  async findOneByGithubId(githubId: string): Promise<User> {
-    const user = await this.userRepository.findOneByGithubId(githubId);
+  async findOneByFilter(filter: object): Promise<UserDto> {
+    const user = await this.userRepository.findOne(filter);
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('user not found.');
     }
     return user;
   }
 
-  async create(user: User): Promise<User> {
+  async findOneByGithubId(githubId: string): Promise<UserDto> {
+    const user = await this.userRepository.findOneByGithubId(githubId);
+    if (!user) {
+      throw new NotFoundException('user not found');
+    }
+    return user;
+  }
+
+  async create(user: UserDto): Promise<UserDto> {
     return this.userRepository.create(user);
   }
 
@@ -50,7 +58,7 @@ export class UserService {
     const repositories = res.data.map((repo) => {
       return repo.id;
     });
-    user.repositories = repositories;
+    // user.repositories = repositories;
     return this.userRepository.createOrUpdate(user);
   }
 
