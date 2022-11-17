@@ -10,7 +10,7 @@ export class User extends Document {
   // 필수 정보
   @Prop({ required: true })
   @IsInt()
-  id: number;
+  id: string;
 
   @Prop({ required: true })
   @IsString()
@@ -33,23 +33,29 @@ export class User extends Document {
   @IsString()
   avatarUrl: string;
 
+  @Prop()
   @IsString()
   name: string;
 
-  @IsEmail()
-  email: string;
-
-  @IsString()
-  bio: string;
-
+  @Prop()
   @IsString()
   company: string;
 
+  @Prop()
+  @IsString()
+  blogUrl: string;
+
+  @Prop()
   @IsString()
   location: string;
 
+  @Prop()
+  @IsEmail()
+  email: string;
+
+  @Prop()
   @IsString()
-  blogUrl: string;
+  bio: string;
 
   @IsArray()
   repositories: number[];

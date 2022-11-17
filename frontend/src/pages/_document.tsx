@@ -33,7 +33,6 @@ export default class MyDocument extends Document {
           <meta name="robots" content="index, follow" />
           <link rel="icon" href="/favicon.ico" />
           <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css" />
-          <title>Devrank</title>
         </Head>
         <body>
           <Main />

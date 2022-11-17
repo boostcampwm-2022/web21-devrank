@@ -9,5 +9,7 @@
   "table-programming-lang": "언어",
   "table-user-num": "사용자수",
   "table-views": "조회수",
-  "table-tech-stack": "기술스택"
+  "table-tech-stack": "기술스택",
+  "language-ko": "한국어",
+  "language-en": "영어"
 }

@@ -11,6 +11,7 @@ const GlobalStyles = createGlobalStyle`
 
     button, input{
         cursor: pointer;
+        font-family: inherit;
     }
 
     body {

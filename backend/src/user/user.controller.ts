@@ -18,7 +18,7 @@ export class UserController {
   @Get(':id')
   @ApiOperation({ summary: '특정 유저 정보 가져오기' })
   @ApiResponse({ status: 200, description: '유저 정보' })
-  async findOneByGithubId(@Param('id') id: number): Promise<User> {
+  async findOneByGithubId(@Param('id') id: string): Promise<User> {
     return this.userService.findOneByGithubId(id);
   }
 
