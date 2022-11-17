@@ -1,32 +1,24 @@
 import { GetStaticProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
-import { useContext, useEffect } from 'react';
 import styled from 'styled-components';
+import { useQuery } from '@tanstack/react-query';
 import { Spinner } from '@components/common';
-import { AuthContext } from '@contexts/authContext';
 import { requestGithubLogin } from '@apis/auth';
 
 function Callback() {
   const router = useRouter();
-  const { setAuth } = useContext(AuthContext);
 
-  useEffect(() => {
-    if (!router.isReady) return;
-    const code = router.query.code as string;
-
-    (async function () {
-      try {
-        await requestGithubLogin(code);
-        router.push('/');
-        setAuth({
-          isLoggedIn: true,
-        });
-      } catch (err) {
-        console.error(err);
-      }
-    })();
-  }, [router.isReady]);
+  useQuery(['user'], () => requestGithubLogin(router.query.code as string), {
+    cacheTime: Infinity,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    enabled: !!router.query.code,
+    select: (data) => data.user,
+    onSuccess: () => {
+      router.push('/');
+    },
+  });
 
   return (
     <Container>

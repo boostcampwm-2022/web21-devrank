@@ -7,3 +7,7 @@ export const requestGithubLogin = async (code: string) => {
 
   return data;
 };
+
+export const requestUserLogout = async () => {
+  await axiosInstance.delete('/api/auth/logout');
+};
