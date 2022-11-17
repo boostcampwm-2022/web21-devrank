@@ -1,8 +1,13 @@
 import styled from 'styled-components';
-import { DropdownItemProps } from '@types';
+import { ClickEvent } from '@types';
 
-function DropdownItem({ children }: DropdownItemProps) {
-  return <Container>{children}</Container>;
+interface DropdownItemProps {
+  children: React.ReactNode;
+  onClick?: (e: ClickEvent) => void;
+}
+
+function DropdownItem({ children, onClick }: DropdownItemProps) {
+  return <Container onClick={onClick}>{children}</Container>;
 }
 
 export default DropdownItem;

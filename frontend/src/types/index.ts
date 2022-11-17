@@ -10,10 +10,6 @@ export interface LayoutProps {
   children: React.ReactNode;
 }
 
-export interface LocaleProps {
-  locale: string;
-}
-
 export type ButtonSize = 'sm' | 'md';
 
 export type ButtonClickEvent = React.MouseEvent<HTMLButtonElement>;
@@ -44,9 +40,5 @@ export interface StyledButtonProps {
 }
 
 export interface DropdownProps {
-  children: React.ReactNode;
-}
-
-export interface DropdownItemProps {
   children: React.ReactNode;
 }
