@@ -12,6 +12,10 @@ export class AuthRepository {
   }
 
   async create(id: string, newRefreshToken: string): Promise<void> {
-    await this.redis.set(id, newRefreshToken, 'EX', parseInt(this.configService.get('JWT_REFRESH_EXPIRATION'))); // ttl
+    await this.redis.set(id, newRefreshToken, 'EX', parseInt(this.configService.get('JWT_REFRESH_EXPIRATION')));
+  }
+
+  async delete(id: string) {
+    await this.redis.del(id);
   }
 }
