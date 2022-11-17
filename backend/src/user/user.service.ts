@@ -22,8 +22,8 @@ export class UserService {
     return this.userRepository.findAll();
   }
 
-  async findOneByGithubId(id: string): Promise<User> {
-    const user = await this.userRepository.findOneByGithubId(id);
+  async findOneByGithubId(githubId: string): Promise<User> {
+    const user = await this.userRepository.findOneByGithubId(githubId);
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -69,8 +69,8 @@ export class UserService {
     return this.userRepository.update(id, user);
   }*/
 
-  async updateScore(id: string, githubToken: string): Promise<UserDto> {
-    const user = await this.userRepository.findOneByGithubId(id);
+  async updateScore(githubId: string, githubToken: string): Promise<UserDto> {
+    const user = await this.userRepository.findOneByGithubId(githubId);
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -80,13 +80,14 @@ export class UserService {
     const res: any = await octokit.request('GET /users/{username}', {
       username: user.username,
     });
-    const userId = res.data.user.id;
+    const userId = res.node_id;
     const res2: any = await octokit.graphql(
       `query repositories($username: String!, $id: ID) {
         user(login: $username) {
           repositories(
             first: 100
             isFork: false
+            privacy: PUBLIC
             orderBy: {field: STARGAZERS, direction: DESC}
           ) {
             nodes {
@@ -98,11 +99,6 @@ export class UserService {
                       totalCount
                       nodes {
                         committedDate
-                        author {
-                          user {
-                            login
-                          }
-                        }
                       }
                     }
                   }
@@ -128,18 +124,20 @@ export class UserService {
         }
       }`,
       {
-        username: 'Yaminyam',
+        username: user.username,
         id: userId,
       },
     );
-    const repositories = res2.data.user.repositories.nodes;
+    console.log(res2);
+    const repositories = res2.user.repositories.nodes;
     const score = repositories.reduce((acc, repository) => {
       const totalScore =
         ((repository.stargazers.totalCount * 2 + repository.forks.totalCount) *
           repository.defaultBranchRef.target.history.totalCount) /
         1000;
+      console.log(repository.name, totalScore);
       return acc + totalScore;
-    });
+    }, 0);
     user.score = score;
     return this.userRepository.createOrUpdate(user);
   }
