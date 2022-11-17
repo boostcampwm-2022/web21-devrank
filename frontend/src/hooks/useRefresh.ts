@@ -6,9 +6,6 @@ function useRefresh() {
     refetchOnMount: false,
     retry: false,
     cacheTime: Infinity,
-    onSuccess: (data) => {
-      console.log(data);
-    },
   });
 }
 
