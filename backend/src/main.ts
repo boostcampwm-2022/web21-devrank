@@ -17,7 +17,10 @@ async function bootstrap() {
     .setTitle('Devrank')
     .setDescription(`Devrank API Docs  - ${configService.get('NODE_ENV')} environment`)
     .setVersion('1.0.0')
-    .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' }, 'access-token')
+    .addBearerAuth(
+      { in: 'Header', type: 'http', name: 'Authorization', scheme: 'Bearer', bearerFormat: 'Bearer' },
+      'accessToken',
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
