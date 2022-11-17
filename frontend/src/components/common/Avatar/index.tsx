@@ -30,6 +30,7 @@ const Container = styled.div<StyledContainerProps>`
   width: 58px;
   height: 58px;
   cursor: pointer;
+  overflow: hidden;
 
   position: relative;
 
