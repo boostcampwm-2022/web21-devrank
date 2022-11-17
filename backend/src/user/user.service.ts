@@ -2,8 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Octokit } from '@octokit/rest';
 import { Model } from 'mongoose';
-import { RepositoryService } from './repository.service';
 import { UserDto } from './dto/user.dto';
+import { RepositoryService } from './repository.service';
 import { UserRepository } from './user.repository';
 import { User } from './user.schema';
 
@@ -35,6 +35,9 @@ export class UserService {
   }
 
   async createOrUpdate(user: UserDto): Promise<UserDto> {
+    if (!user.score) {
+      user.score = 0;
+    }
     return this.userRepository.createOrUpdate(user);
   }
 
@@ -48,8 +51,7 @@ export class UserService {
       return repo.id;
     });
     user.repositories = repositories;
-    this.repositoryService.updateRepositoryScore(id, githubToken);
-    return this.userRepository.update(id, user);
+    return this.userRepository.createOrUpdate(user);
   }
 
   /*async updateScore(id: number): Promise<User> {
@@ -67,7 +69,7 @@ export class UserService {
     return this.userRepository.update(id, user);
   }*/
 
-  async updateScore(id: number, githubToken: string): Promise<User> {
+  async updateScore(id: string, githubToken: string): Promise<UserDto> {
     const user = await this.userRepository.findOneByGithubId(id);
     if (!user) {
       throw new NotFoundException('User not found');
@@ -139,6 +141,6 @@ export class UserService {
       return acc + totalScore;
     });
     user.score = score;
-    return this.userRepository.update(id, user);
+    return this.userRepository.createOrUpdate(user);
   }
 }
