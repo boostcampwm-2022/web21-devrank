@@ -21,4 +21,12 @@ export class UserController {
   async findOneByGithubId(@Param('id') id: number): Promise<User> {
     return this.userService.findOneByGithubId(id);
   }
+
+  @Get('update-score/:id')
+  @ApiOperation({ summary: '특정 유저의 저장소 점수 업데이트' })
+  @ApiResponse({ status: 200, description: '유저 정보' })
+  async updateScore(@Param('id') id: number): Promise<User> {
+    const githubToken = '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';
+    return this.userService.updateScore(id, githubToken);
+  }
 }

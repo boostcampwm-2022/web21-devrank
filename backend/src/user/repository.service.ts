@@ -1,6 +1,6 @@
 import { NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Octokit } from '@octokit/rest';
+import { Octokit } from '@octokit/core';
 import { Model } from 'mongoose';
 import { RepositoryRepository } from './repository.repository';
 import { Repository } from './repository.schema';
@@ -26,7 +26,10 @@ export class RepositoryService {
     const octokit = new Octokit({
       auth: githubToken,
     });
-    const res = await octokit.repos.get({ owner: repository.owner, repo: repository.name });
+    const res = await octokit.request('GET /repos/{owner}/{repo}', {
+      owner: repository.owner,
+      repo: repository.name,
+    });
     repository.stargazers_count = res.data.stargazers_count;
     repository.forks_count = res.data.forks_count;
     repository.score = res.data.stargazers_count + res.data.forks_count;
