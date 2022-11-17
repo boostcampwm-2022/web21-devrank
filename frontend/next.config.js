@@ -16,6 +16,15 @@ const nextConfig = {
 
     return config;
   },
+  async rewrites() {
+    // api path proxy 설정
+    return [
+      {
+        source: '/api/:path*',
+        destination: `${process.env.NEXT_PUBLIC_API_URL}/:path*`,
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       // 외부 이미지 허용
