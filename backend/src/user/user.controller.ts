@@ -1,7 +1,6 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserDto } from './dto/user.dto';
-import { User } from './user.schema';
 import { UserService } from './user.service';
 
 @ApiTags('User')
@@ -12,14 +11,14 @@ export class UserController {
   @Get()
   @ApiOperation({ summary: '모든 유저 정보 가져오기' })
   @ApiResponse({ status: 200, description: '모든 유저 정보' })
-  async findAll(): Promise<User[]> {
+  async findAll(): Promise<UserDto[]> {
     return this.userService.findAll();
   }
 
   @Get(':githubId')
   @ApiOperation({ summary: '특정 유저 정보 가져오기' })
   @ApiResponse({ status: 200, description: '유저 정보' })
-  async findOneByGithubId(@Param('githubId') githubId: string): Promise<User> {
+  async findOneByGithubId(@Param('githubId') githubId: string): Promise<UserDto> {
     return this.userService.findOneByGithubId(githubId);
   }
 
