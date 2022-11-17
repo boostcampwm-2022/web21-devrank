@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import { CookieOptions } from 'express';
@@ -46,13 +46,13 @@ export class AuthService {
     });
   }
 
-  issueRefreshToken(id: string) {
+  issueRefreshToken(id: string): string {
     return jwt.sign({ id }, this.configService.get('JWT_REFRESH_SECRET'), {
       expiresIn: this.configService.get('JWT_REFRESH_EXPIRATION'),
     });
   }
 
-  extractRefreshToken(request: Request) {
+  extractRefreshToken(request: Request): string | undefined {
     return request?.cookies?.[this.configService.get('REFRESH_TOKEN_KEY')];
   }
 
@@ -76,6 +76,10 @@ export class AuthService {
     const newRefreshToken = this.issueRefreshToken(id);
     await this.authRepository.create(id, newRefreshToken);
     return newRefreshToken;
+  }
+
+  async deleteRefreshToken(id: string): Promise<void> {
+    await this.authRepository.delete(id);
   }
 
   getCookieOption = (): CookieOptions => {
