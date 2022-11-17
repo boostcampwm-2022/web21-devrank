@@ -49,8 +49,16 @@ function Header() {
               </LanguageButton>
             }
           >
-            <DropdownItem>{t('common:language-ko')}</DropdownItem>
-            <DropdownItem>{t('common:language-en')}</DropdownItem>
+            <DropdownItem>
+              <Link href='/' locale='ko'>
+                {t('common:language-ko')}
+              </Link>
+            </DropdownItem>
+            <DropdownItem>
+              <Link href='/' locale='en'>
+                {t('common:language-en')}
+              </Link>
+            </DropdownItem>
           </Dropdown>
           {userData ? (
             <Dropdown trigger={<Avatar src={userData.user.avatarUrl} />}>
