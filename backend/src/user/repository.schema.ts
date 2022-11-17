@@ -5,9 +5,6 @@ import { Document } from 'mongoose';
 const options: SchemaOptions = {
   timestamps: true,
 };
-interface RepositoryItem {
-  name: string;
-}
 @Schema(options)
 export class Repository extends Document {
   // 필수 정보

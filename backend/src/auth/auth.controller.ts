@@ -4,6 +4,7 @@ import { BadRequestException, Body, Controller, Delete, Post, Req, Res } from '@
 import { ConfigService } from '@nestjs/config';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
+import { loginRequestDto } from './dto/login-request.dto';
 import { AuthService } from './auth.service';
 import { GithubProfile } from './types';
 
@@ -23,11 +24,12 @@ export class AuthController {
       클라이언트로부터 authCode를 받고 github accessToken을 얻어온 후, 정보를 받아와서 refresh token을 쿠키로 설정한 후 access token을 반환한다`,
   })
   @ApiOkResponse({ description: '로그인 성공' })
-  async githubLogin(@Res() response: Response, @Body('code') code: string): Promise<void> {
+  async githubLogin(@Res() response: Response, @Body() code: loginRequestDto): Promise<void> {
     if (!code) {
       throw new BadRequestException('need authCode.');
     }
-    const githubToken = await this.authService.getGithubToken(code);
+    console.log(code);
+    const githubToken = await this.authService.getGithubToken(code.code);
     const userInfo: GithubProfile = await this.authService.getGithubProfile(githubToken);
     const user: UserDto = {
       id: userInfo.node_id,

@@ -3,6 +3,7 @@ export class UserDto {
   username: string;
   following: number;
   followers: number;
+  score?: number;
   avatarUrl?: string;
   name?: string;
   company?: string;
