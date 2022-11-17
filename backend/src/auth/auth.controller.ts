@@ -1,6 +1,6 @@
 import { UserDto } from '@apps/user/dto/user.dto';
 import { UserService } from '@apps/user/user.service';
-import { BadRequestException, Body, Controller, Delete, Post, Req, Res } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Post, Req, Res } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
@@ -17,11 +17,20 @@ export class AuthController {
     private readonly userService: UserService,
   ) {}
 
+  @Get('github')
+  @ApiOperation({ summary: '깃허브 로그인 페이지' })
+  @ApiOkResponse({ description: '로그인이 되어있지 않은 경우, 깃허브 로그인 페이지로 이동합니다.' })
+  github(@Res() response: Response): void {
+    response.redirect(
+      `https://github.com/login/oauth/authorize?client_id=${this.configService.get('GITHUB_CLIENT_ID')}`,
+    );
+  }
+
   @Post('login')
   @ApiOperation({
     summary: '깃허브 로그인',
-    description: `
-      클라이언트로부터 authCode를 받고 github accessToken을 얻어온 후, 정보를 받아와서 refresh token을 쿠키로 설정한 후 access token을 반환한다`,
+    description:
+      '클라이언트로부터 authCode를 받고 github accessToken을 얻어온 후, 정보를 받아와서 refresh token을 쿠키로 설정한 후 access token을 반환한다',
   })
   @ApiOkResponse({ description: '로그인 성공' })
   async githubLogin(@Res() response: Response, @Body() body: loginRequestDto): Promise<void> {
@@ -77,7 +86,7 @@ export class AuthController {
   @Delete('logout')
   @ApiOperation({ summary: '로그아웃' })
   @ApiOkResponse({ description: '로그아웃 성공' })
-  async logout(@Res() request: Request, @Res({ passthrough: true }) response: Response): Promise<void> {
+  async logout(@Req() request: Request, @Res({ passthrough: true }) response: Response): Promise<void> {
     const cookieOption = this.authService.getCookieOption();
     const refreshToken = this.authService.extractRefreshToken(request);
     if (refreshToken) {
