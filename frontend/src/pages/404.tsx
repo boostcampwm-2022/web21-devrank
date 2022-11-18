@@ -1,12 +1,14 @@
 import { GetStaticProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Image from 'next/image';
+import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { useRefresh } from '@hooks';
 import { Button } from '@components/common';
 import { aldrich, lineSeedKR } from '@utils/fonts';
 
 function NotFound() {
+  const router = useRouter();
   useRefresh();
 
   return (
@@ -17,7 +19,7 @@ function NotFound() {
       </div>
       <strong>404 - PAGE NOT FOUND</strong>
       <p className={lineSeedKR.className}>찾고 있는 페이지가 없어졌거나 일시적으로 사용할 수 없습니다.</p>
-      <HomeButton>GO TO MAIN PAGE</HomeButton>
+      <HomeButton onClick={() => router.push('/')}>GO TO MAIN PAGE</HomeButton>
     </Container>
   );
 }
