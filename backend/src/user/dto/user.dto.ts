@@ -11,4 +11,5 @@ export class UserDto {
   location?: string;
   bio?: string;
   email?: string;
+  repositories?: number[];
 }
