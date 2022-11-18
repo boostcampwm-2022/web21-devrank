@@ -11,7 +11,7 @@ function Home() {
   return (
     <Container>
       <h2>
-        <Image src='/icons/logo-main.svg' alt='Devrank 로고' width={550} height={230} quality={100} />
+        <Image src='/icons/logo-main.svg' alt='Devrank 로고' width={550} height={230} quality={100} priority />
       </h2>
       <Searchbar
         type='text'
