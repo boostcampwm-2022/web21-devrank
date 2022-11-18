@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Octokit } from '@octokit/rest';
+import { Octokit } from '@octokit/core';
 import { Model } from 'mongoose';
 import { UserDto } from './dto/user.dto';
 import { RepositoryService } from './repository.service';
@@ -54,11 +54,13 @@ export class UserService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    const res = await this.octokit.repos.listForUser({ username: user.username });
+    const res = await this.octokit.request('GET /users/{username}/repos', {
+      username: user.username,
+    });
     const repositories = res.data.map((repo) => {
       return repo.id;
     });
-    // user.repositories = repositories;
+    user.repositories = repositories;
     return this.userRepository.createOrUpdate(user);
   }
 
