@@ -159,7 +159,7 @@ const Content = styled.div`
   grid-gap: 1rem;
 `;
 
-const Title = styled.h1`
+const Title = styled.h2`
   font-size: ${({ theme }) => theme.fontSize.xl};
   margin-bottom: 0.5rem;
 `;
