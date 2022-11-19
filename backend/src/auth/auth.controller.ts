@@ -1,10 +1,12 @@
 import { UserDto } from '@apps/user/dto/user.dto';
 import { UserService } from '@apps/user/user.service';
-import { BadRequestException, Body, Controller, Delete, Get, Post, Req, Res } from '@nestjs/common';
+import { CurrentUser } from '@libs/common/decorators/current-user.decodator';
+import { BadRequestException, Body, Controller, Delete, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { loginRequestDto } from './dto/login-request.dto';
+import { RefreshGuard } from './guards/refresh-auth.guard';
 import { AuthService } from './auth.service';
 import { GithubProfile } from './types';
 
@@ -69,14 +71,14 @@ export class AuthController {
   @Post('refresh')
   @ApiOperation({ summary: '토큰 재발급' })
   @ApiOkResponse({ description: '토큰 재발급 성공' })
-  async refresh(@Req() request: Request, @Res() response: Response): Promise<void> {
-    const refreshToken = this.authService.extractRefreshToken(request);
-    const { id } = this.authService.checkRefreshToken(refreshToken);
+  @UseGuards(RefreshGuard)
+  async refresh(@CurrentUser() user: any, @Res() response: Response): Promise<void> {
+    const { id, refreshToken } = user;
     const newRefreshToken = await this.authService.replaceRefreshToken(id, refreshToken);
     const accessToken = this.authService.issueAccessToken(id);
-    const user = await this.userService.findOneByFilter({ id: id });
+    const userData = await this.userService.findOneByFilter({ id: id });
     const cookieOption = this.authService.getCookieOption();
-    const responseData = { username: user.username, avatarUrl: user.avatarUrl };
+    const responseData = { username: userData.username, avatarUrl: userData.avatarUrl };
 
     response
       .cookie(this.configService.get('REFRESH_TOKEN_KEY'), newRefreshToken, cookieOption)
