@@ -11,7 +11,3 @@ export interface GithubProfile {
   email?: string;
   bio?: string;
 }
-
-export interface JwtPayload {
-  id: string;
-}
