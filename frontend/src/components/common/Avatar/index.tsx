@@ -20,9 +20,8 @@ function Avatar({ src, size = 'md', name, onClick }: AvatarProps) {
     <Container>
       <ImageContainer size={size} onClick={onClick}>
         <Image src={src} alt='프로필 이미지' fill />
-        {name}
       </ImageContainer>
-      {name}
+      {name && <span>{name}</span>}
     </Container>
   );
 }
@@ -30,11 +29,10 @@ function Avatar({ src, size = 'md', name, onClick }: AvatarProps) {
 export default Avatar;
 
 const Container = styled.div`
-  width: max-content;
   ${({ theme }) => theme.common.flexCenter};
-  gap: 12px;
   font-size: ${({ theme }) => theme.fontSize.lg};
-  padding-right: 12px;
+  width: max-content;
+  gap: 12px;
 `;
 
 const ImageContainer = styled.div<StyledContainerProps>`
