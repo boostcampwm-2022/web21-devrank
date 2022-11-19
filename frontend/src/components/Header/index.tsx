@@ -1,6 +1,7 @@
 import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { useQueryData } from '@hooks';
 import { useMutation } from '@tanstack/react-query';
@@ -14,6 +15,7 @@ function Header() {
   });
   const { queryData: userData, removeQueryData: removeUser } = useQueryData(['user']);
   const { t } = useTranslation(['header', 'common']);
+  const router = useRouter();
 
   const onClickLoginButton = () => {
     localStorage.setItem('login-pathname', window.location.pathname);
@@ -51,12 +53,12 @@ function Header() {
             }
           >
             <DropdownItem>
-              <Link href='/' locale='ko'>
+              <Link href={router.pathname} locale='ko'>
                 {t('common:language-ko')}
               </Link>
             </DropdownItem>
             <DropdownItem>
-              <Link href='/' locale='en'>
+              <Link href={router.pathname} locale='en'>
                 {t('common:language-en')}
               </Link>
             </DropdownItem>
