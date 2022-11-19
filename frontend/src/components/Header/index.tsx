@@ -16,6 +16,7 @@ function Header() {
   const { t } = useTranslation(['header', 'common']);
 
   const onClickLoginButton = () => {
+    localStorage.setItem('login-pathname', window.location.pathname);
     window.location.assign(GITHUB_AUTH_REQUEST_URL);
   };
 
