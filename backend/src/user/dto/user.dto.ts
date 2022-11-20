@@ -3,7 +3,8 @@ export class UserDto {
   username: string;
   following: number;
   followers: number;
-  score?: number;
+  commitsScore?: number;
+  followersScore?: number;
   avatarUrl?: string;
   name?: string;
   company?: string;
@@ -11,4 +12,5 @@ export class UserDto {
   location?: string;
   bio?: string;
   email?: string;
+  repositories?: number[];
 }

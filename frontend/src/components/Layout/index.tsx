@@ -21,5 +21,6 @@ const Container = styled.div`
 
 const Main = styled.main`
   width: 100%;
+  height: 100%;
   min-height: calc(100vh - ${({ theme }) => `(${theme.component.headerHeight} + ${theme.component.footerHeight})`});
 `;

@@ -6,6 +6,7 @@ module.exports = {
     '@storybook/addon-links',
     '@storybook/addon-essentials',
     '@storybook/addon-interactions',
+    'storybook-addon-styled-component-theme/dist/preset',
     {
       name: '@storybook/addon-docs',
       options: {
@@ -13,13 +14,14 @@ module.exports = {
         transcludeMarkdown: true,
       },
     },
-    'storybook-addon-styled-component-theme/dist/preset',
+    {
+      name: 'storybook-addon-next',
+      options: {
+        nextConfigPath: path.resolve(__dirname, '../next.config.js'),
+      },
+    },
   ],
   webpackFinal: async (config) => {
-    config.module.rules.unshift({
-      test: /\.svg$/,
-      use: ['@svgr/webpack'],
-    });
     config.resolve.modules = [path.resolve(__dirname, '..'), 'node_modules', 'src/styles'];
     config.resolve.alias = {
       ...config.resolve.alias,

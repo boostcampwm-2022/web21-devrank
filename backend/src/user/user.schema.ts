@@ -26,7 +26,11 @@ export class User extends Document {
 
   @Prop({ required: true })
   @IsInt()
-  score: number;
+  commitsScore: number;
+
+  @Prop({ required: true })
+  @IsInt()
+  followersScore: number;
 
   // 선택적 정보
   @Prop({ default: 'default-image-path' })

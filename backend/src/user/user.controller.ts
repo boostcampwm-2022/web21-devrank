@@ -1,6 +1,5 @@
-import { Controller, Get, Param, Req, Res } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Request } from 'express';
 import { UserDto } from './dto/user.dto';
 import { UserService } from './user.service';
 
@@ -29,6 +28,8 @@ export class UserController {
   @ApiResponse({ status: 200, description: '유저 정보' })
   async updateScore(@Param('githubId') githubId: string): Promise<UserDto> {
     const githubToken = '';
-    return this.userService.updateScore(githubId, githubToken);
+    this.userService.updateFollowersScore(githubId, githubToken);
+    this.userService.updateCommitsScore(githubId, githubToken);
+    return this.userService.findOneByGithubId(githubId);
   }
 }
