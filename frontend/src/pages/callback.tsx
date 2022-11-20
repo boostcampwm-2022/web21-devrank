@@ -16,6 +16,12 @@ function Callback() {
     enabled: !!router.query.code,
     select: (data) => data.user,
     onSuccess: () => {
+      const loginPathname = localStorage.getItem('login-pathname');
+      if (loginPathname) router.push(loginPathname);
+      else router.push('/');
+    },
+    onError: (err) => {
+      console.error(err);
       router.push('/');
     },
   });
