@@ -15,7 +15,14 @@ function NotFound() {
     <Container className={aldrich.className}>
       <div>
         <h2>Oops!</h2>
-        <CubeImage src='/icons/cube-large.svg' alt='큐브 이미지' width={220} height={250} quality={100} priority />
+        <CubeImage
+          src='/icons/cube-large-background.svg'
+          alt='큐브 이미지'
+          width={220}
+          height={250}
+          quality={100}
+          priority
+        />
       </div>
       <strong>404 - PAGE NOT FOUND</strong>
       <p className={lineSeedKR.className}>찾고 있는 페이지가 없어졌거나 일시적으로 사용할 수 없습니다.</p>
