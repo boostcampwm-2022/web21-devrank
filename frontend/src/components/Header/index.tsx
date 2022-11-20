@@ -63,22 +63,24 @@ function Header() {
               </Link>
             </DropdownItem>
           </Dropdown>
-          {userData ? (
-            <Dropdown trigger={<Avatar src={userData.user.avatarUrl} />}>
-              <DropdownItem>
-                <Image src='/icons/profile.svg' alt='프로필 아이콘' width={17} height={17} quality={100} />
-                {t('common:my-profile')}
-              </DropdownItem>
-              <DropdownItem onClick={onClickLogoutButton}>
-                <Image src='/icons/logout.svg' alt='로그아웃 아이콘' width={17} height={17} quality={100} />
-                {t('common:logout')}
-              </DropdownItem>
-            </Dropdown>
-          ) : (
-            <Button size='md' onClick={onClickLoginButton}>
-              {t('common:login-button')}
-            </Button>
-          )}
+          <div className='button-right'>
+            {userData ? (
+              <Dropdown trigger={<Avatar src={userData.user.avatarUrl} />}>
+                <DropdownItem>
+                  <Image src='/icons/profile.svg' alt='프로필 아이콘' width={17} height={17} quality={100} />
+                  {t('common:my-profile')}
+                </DropdownItem>
+                <DropdownItem onClick={onClickLogoutButton}>
+                  <Image src='/icons/logout.svg' alt='로그아웃 아이콘' width={17} height={17} quality={100} />
+                  {t('common:logout')}
+                </DropdownItem>
+              </Dropdown>
+            ) : (
+              <Button size='md' onClick={onClickLoginButton}>
+                {t('common:login-button')}
+              </Button>
+            )}
+          </div>
         </ButtonGroup>
       </nav>
     </Container>
@@ -108,26 +110,29 @@ const Container = styled.header`
 `;
 
 const NavMenu = styled.ul`
-  width: 65%;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
+  ${({ theme }) => theme.common.flexRow};
   font-size: ${({ theme }) => theme.fontSize.lg};
-  gap: 70px;
+  width: 65%;
   padding-left: 60px;
+  gap: 70px;
 `;
 
 const ButtonGroup = styled.div`
-  position: relative;
   ${({ theme }) => theme.common.flexCenter};
+  position: relative;
   gap: 40px;
+
+  .button-right {
+    ${({ theme }) => theme.common.flexCenter};
+    width: 80px;
+  }
 `;
 
 const LanguageButton = styled(Button)`
-  height: 58px;
   font-size: ${({ theme }) => theme.fontSize.md};
   background-color: transparent;
   border: none;
+  height: 58px;
   gap: 4px;
 
   span {
