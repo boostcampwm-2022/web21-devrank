@@ -165,11 +165,11 @@ export const getStaticProps: GetStaticProps = async (context) => {
 const Container = styled.div`
   ${({ theme }) => theme.common.flexCenterColumn};
   padding: 100px 50px;
+  margin: 0 auto;
 
   h2 {
     margin-bottom: 100px;
   }
-  /* width: 1080px; */
 `;
 
 const Content = styled.div`
