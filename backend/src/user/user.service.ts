@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Octokit } from '@octokit/rest';
+import { Octokit } from '@octokit/core';
 import { Model } from 'mongoose';
 import { UserDto } from './dto/user.dto';
 import { RepositoryService } from './repository.service';
@@ -14,9 +14,6 @@ export class UserService {
     private readonly userRepository: UserRepository,
     private readonly repositoryService: RepositoryService,
   ) {}
-  octokit = new Octokit({
-    auth: process.env.GITHUB_ACCESS_TOKEN,
-  });
 
   async findAll(): Promise<UserDto[]> {
     return this.userRepository.findAll();
@@ -43,22 +40,30 @@ export class UserService {
   }
 
   async createOrUpdate(user: UserDto): Promise<UserDto> {
-    if (!user.score) {
-      user.score = 0;
+    if (!user.commitsScore) {
+      user.commitsScore = 0;
+    }
+    if (!user.followersScore) {
+      user.followersScore = 0;
     }
     return this.userRepository.createOrUpdate(user);
   }
 
-  async updateRepositories(id: string): Promise<UserDto> {
+  async updateRepositories(id: string, githubToken: string): Promise<UserDto> {
     const user = await this.userRepository.findOneByGithubId(id);
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    const res = await this.octokit.repos.listForUser({ username: user.username });
+    const octokit = new Octokit({
+      auth: githubToken,
+    });
+    const res = await octokit.request('GET /users/{username}/repos', {
+      username: user.username,
+    });
     const repositories = res.data.map((repo) => {
       return repo.id;
     });
-    // user.repositories = repositories;
+    user.repositories = repositories;
     return this.userRepository.createOrUpdate(user);
   }
 
@@ -77,7 +82,22 @@ export class UserService {
     return this.userRepository.update(id, user);
   }*/
 
-  async updateScore(githubId: string, githubToken: string): Promise<UserDto> {
+  async updateFollowersScore(id: string, githubToken: string): Promise<UserDto> {
+    const user = await this.userRepository.findOneByGithubId(id);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const octokit = new Octokit({
+      auth: githubToken,
+    });
+    const res = await octokit.request('GET /users/{username}/followers', {
+      username: user.username,
+    });
+    user.followersScore = res.data.length;
+    return this.userRepository.createOrUpdate(user);
+  }
+
+  async updateCommitsScore(githubId: string, githubToken: string): Promise<UserDto> {
     const user = await this.userRepository.findOneByGithubId(githubId);
     if (!user) {
       throw new NotFoundException('User not found');
@@ -146,7 +166,7 @@ export class UserService {
       console.log(repository.name, totalScore);
       return acc + totalScore;
     }, 0);
-    user.score = score;
+    user.commitsScore = score;
     return this.userRepository.createOrUpdate(user);
   }
 }
