@@ -5,8 +5,10 @@ import { BadRequestException, Body, Controller, Delete, Get, Post, Req, Res, Use
 import { ConfigService } from '@nestjs/config';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
-import { loginRequestDto } from './dto/login-request.dto';
+import { LoginRequestDto } from './dto/login-request.dto';
+import { LoginResponseDto } from './dto/login-response-dto';
 import { RefreshGuard } from './guards/refresh-auth.guard';
+import { Payload } from './types/payload.interface';
 import { AuthService } from './auth.service';
 import { GithubProfile } from './types';
 
@@ -21,7 +23,7 @@ export class AuthController {
 
   @Get('github')
   @ApiOperation({ summary: '깃허브 로그인 페이지' })
-  @ApiOkResponse({ description: '로그인이 되어있지 않은 경우, 깃허브 로그인 페이지로 이동합니다.' })
+  @ApiOkResponse({ status: 302, description: '로그인이 되어있지 않은 경우, 깃허브 로그인 페이지로 이동합니다.' })
   github(@Res() response: Response): void {
     response.redirect(
       `https://github.com/login/oauth/authorize?client_id=${this.configService.get('GITHUB_CLIENT_ID')}`,
@@ -34,8 +36,12 @@ export class AuthController {
     description:
       '클라이언트로부터 authCode를 받고 github accessToken을 얻어온 후, 정보를 받아와서 refresh token을 쿠키로 설정한 후 access token을 반환한다',
   })
-  @ApiOkResponse({ description: '로그인 성공' })
-  async githubLogin(@Res() response: Response, @Body() body: loginRequestDto): Promise<void> {
+  @ApiOkResponse({
+    status: 200,
+    description: '로그인 성공',
+    type: LoginResponseDto,
+  })
+  async githubLogin(@Res() response: Response, @Body() body: LoginRequestDto): Promise<void> {
     const code = body?.code;
     if (!code) {
       throw new BadRequestException('need authCode.');
@@ -61,32 +67,41 @@ export class AuthController {
     const refreshToken = this.authService.issueRefreshToken(user.id);
     await this.authService.saveRefreshToken(user.id, refreshToken);
     const cookieOption = this.authService.getCookieOption();
-    const responseData = { username: user.username, avatarUrl: user.avatarUrl };
+    const responseData: LoginResponseDto = {
+      accessToken,
+      id: user.id,
+      username: user.username,
+      avatarUrl: user.avatarUrl,
+    };
 
-    response
-      .cookie(this.configService.get('REFRESH_TOKEN_KEY'), refreshToken, cookieOption)
-      .json({ accessToken, user: responseData });
+    response.cookie(this.configService.get('REFRESH_TOKEN_KEY'), refreshToken, cookieOption).json(responseData);
   }
 
   @Post('refresh')
-  @ApiOperation({ summary: '토큰 재발급' })
-  @ApiOkResponse({ description: '토큰 재발급 성공' })
+  @ApiOperation({
+    summary: '토큰 재발급',
+    description:
+      'cookie에 있는 refresh token을 이용해서 새로운 refresh token을 쿠키로 설정하고, access token과 유저 데이터를 반환',
+  })
+  @ApiOkResponse({
+    status: 200,
+    description: '토큰 재발급 성공',
+    type: LoginResponseDto,
+  })
   @UseGuards(RefreshGuard)
-  async refresh(@CurrentUser() user: any, @Res() response: Response): Promise<void> {
-    const { id, refreshToken } = user;
+  async refresh(@CurrentUser() currentUser: Payload, @Res() response: Response): Promise<void> {
+    const { id, refreshToken } = currentUser;
     const newRefreshToken = await this.authService.replaceRefreshToken(id, refreshToken);
     const accessToken = this.authService.issueAccessToken(id);
-    const userData = await this.userService.findOneByFilter({ id: id });
+    const user = await this.userService.findOneByFilter({ id: id });
     const cookieOption = this.authService.getCookieOption();
-    const responseData = { username: userData.username, avatarUrl: userData.avatarUrl };
+    const responseData: LoginResponseDto = { accessToken, id, username: user.username, avatarUrl: user.avatarUrl };
 
-    response
-      .cookie(this.configService.get('REFRESH_TOKEN_KEY'), newRefreshToken, cookieOption)
-      .json({ accessToken, user: responseData });
+    response.cookie(this.configService.get('REFRESH_TOKEN_KEY'), newRefreshToken, cookieOption).json(responseData);
   }
 
   @Delete('logout')
-  @ApiOperation({ summary: '로그아웃' })
+  @ApiOperation({ summary: '로그아웃', description: '클라이언트에 저장된 쿠키를 삭제하고, Redis에서도 삭제한다' })
   @ApiOkResponse({ description: '로그아웃 성공' })
   async logout(@Req() request: Request, @Res({ passthrough: true }) response: Response): Promise<void> {
     const cookieOption = this.authService.getCookieOption();

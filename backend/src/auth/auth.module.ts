@@ -1,5 +1,6 @@
 import { UserModule } from '@apps/user/user.module';
 import { RedisModule } from '@liaoliaots/nestjs-redis';
+import { EXPIRATION } from '@libs/const';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
@@ -16,7 +17,7 @@ import { AuthService } from './auth.service';
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get('JWT_ACCESS_SECRET'),
-        signOptions: { expiresIn: configService.get('JWT_ACCESS_EXPIRATION') },
+        signOptions: { expiresIn: EXPIRATION.ACCESS_TOKEN },
       }),
     }),
     UserModule,

@@ -1,3 +1,4 @@
+import { EXPIRATION } from '@libs/const';
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
@@ -42,13 +43,13 @@ export class AuthService {
 
   issueAccessToken(id: string): string {
     return jwt.sign({ id }, this.configService.get('JWT_ACCESS_SECRET'), {
-      expiresIn: parseInt(this.configService.get('JWT_ACCESS_EXPIRATION')),
+      expiresIn: EXPIRATION.ACCESS_TOKEN,
     });
   }
 
   issueRefreshToken(id: string): string {
     return jwt.sign({ id }, this.configService.get('JWT_REFRESH_SECRET'), {
-      expiresIn: parseInt(this.configService.get('JWT_REFRESH_EXPIRATION')),
+      expiresIn: EXPIRATION.REFRESH_TOKEN,
     });
   }
 
@@ -83,7 +84,7 @@ export class AuthService {
   }
 
   getCookieOption = (): CookieOptions => {
-    const maxAge = parseInt(this.configService.get('JWT_REFRESH_EXPIRATION')) * 1000;
+    const maxAge = EXPIRATION.REFRESH_TOKEN * 1000;
 
     if (this.configService.get('NODE_ENV') === 'prod') {
       return { httpOnly: true, secure: true, sameSite: 'lax', maxAge };
