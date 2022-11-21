@@ -1,4 +1,5 @@
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
+import { EXPIRATION } from '@libs/const';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
@@ -12,7 +13,7 @@ export class AuthRepository {
   }
 
   async create(id: string, newRefreshToken: string): Promise<void> {
-    await this.redis.set(id, newRefreshToken, 'EX', parseInt(this.configService.get('JWT_REFRESH_EXPIRATION')));
+    await this.redis.set(id, newRefreshToken, 'EX', EXPIRATION.REFRESH_TOKEN);
   }
 
   async delete(id: string) {
