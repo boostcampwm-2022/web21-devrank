@@ -1,7 +1,8 @@
 import Image from 'next/image';
+import { CubeRankType } from '@type/common';
 
 interface CubeIconProps {
-  tier: string;
+  tier: CubeRankType;
 }
 
 function CubeIcon({ tier }: CubeIconProps) {
