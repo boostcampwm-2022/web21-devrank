@@ -8,8 +8,9 @@ export default {
 
 const Template: ComponentStory<typeof Filterbar> = (args) => <Filterbar {...args} />;
 
-export const Basic = Template.bind({});
+export const Default = Template.bind({});
 
-Basic.args = {
-  active: 'yellow',
+export const Filtered = Template.bind({});
+Filtered.args = {
+  active: 'orange',
 };
