@@ -12,7 +12,7 @@ interface StyledFilterItemProps {
   active: boolean;
 }
 
-function Filterbar({ active, setActive }: FilterbarProps) {
+function Filterbar({ active = CUBE_RANK.ALL, setActive }: FilterbarProps) {
   return (
     <Container>
       {Object.entries(CUBE_RANK).map(([k, tier]) => (
