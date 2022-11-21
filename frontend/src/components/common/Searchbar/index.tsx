@@ -53,8 +53,8 @@ function Searchbar({
   return (
     <Form width={width} submitAlign={submitAlign} onSubmit={onSubmit}>
       <Input type={type} value={value} placeholder={placeholder} onChange={onChange} {...props} />
-      <SearchButton type="submit">
-        <Image src="/icons/search.svg" alt="검색버튼" width={24} height={24} />
+      <SearchButton type='submit'>
+        <Image src='/icons/search.svg' alt='검색버튼' width={24} height={24} />
       </SearchButton>
     </Form>
   );
