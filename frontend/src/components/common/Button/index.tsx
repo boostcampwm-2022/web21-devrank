@@ -1,5 +1,5 @@
 import styled, { css } from 'styled-components';
-import { ButtonProps, StyledButtonProps } from '@types';
+import { ButtonProps, StyledButtonProps } from '@type';
 
 function Button({ children, size = 'md', disabled, onClick, ...props }: ButtonProps) {
   return (

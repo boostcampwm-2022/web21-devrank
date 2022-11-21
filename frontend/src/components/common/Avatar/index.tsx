@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import styled, { css } from 'styled-components';
-import { ClickEvent } from '@types';
+import { ClickEvent } from '@type';
 
 type AvatarSize = 'sm' | 'md' | 'lg';
 

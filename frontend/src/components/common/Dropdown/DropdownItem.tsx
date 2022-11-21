@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { ClickEvent } from '@types';
+import { ClickEvent } from '@type';
 
 interface DropdownItemProps {
   children: React.ReactNode;

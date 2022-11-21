@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import type { LayoutProps } from '@types';
+import type { LayoutProps } from '@type';
 import Footer from '@components/Footer';
 import Header from '@components/Header';
 
