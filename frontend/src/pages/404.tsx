@@ -43,7 +43,8 @@ export const getStaticProps: GetStaticProps = async (context) => {
 
 const Container = styled.div`
   ${({ theme }) => theme.common.flexCenterColumn};
-  height: 100%;
+  padding: 150px 0px;
+  flex: 1;
 
   div {
     position: relative;

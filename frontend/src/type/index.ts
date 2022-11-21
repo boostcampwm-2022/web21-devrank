@@ -16,6 +16,10 @@ export type ButtonClickEvent = React.MouseEvent<HTMLButtonElement>;
 
 export type ClickEvent = React.MouseEvent<HTMLElement>;
 
+export type InputChangeEvent = React.ChangeEvent<HTMLInputElement>;
+
+export type FormEvent = React.FormEvent<HTMLFormElement>;
+
 export interface ButtonProps {
   /**
    * Button 내부 label 텍스트

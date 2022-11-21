@@ -1,20 +1,37 @@
 import { GetStaticProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import Image from 'next/image';
 import styled from 'styled-components';
 import { useRefresh } from '@hooks';
 import Ranking from '@components/Ranking';
 import { Avatar, LanguageIcon } from '@components/common';
 import CubeIcon from '@components/common/CubeIcon';
+import Searchbar from '@components/common/Searchbar';
 import { mockDaily, mockLanguage, mockOverall, mockRising } from '@utils/mockData';
 
 function Home() {
   useRefresh();
-
-  const { t } = useTranslation('index');
+  const { t } = useTranslation(['index', 'common']);
 
   return (
     <Container>
+      <h2>
+        <Image src='/icons/logo-main.svg' alt='Devrank 로고' width={550} height={230} quality={100} priority />
+      </h2>
+      <Searchbar
+        type='text'
+        width={600}
+        value=''
+        placeholder={t('index:search-placeholder')}
+        submitAlign='right'
+        onChange={(e) => {
+          console.log(e);
+        }}
+        onSubmit={(e) => {
+          console.log(e);
+        }}
+      />
       <Content>
         <OverallRanking>
           <Title>{t('index:overall-ranking')}</Title>
@@ -24,10 +41,10 @@ function Home() {
             columnAlignList={['left', 'left', 'left', 'right']}
           >
             <Ranking.Head>
-              <Ranking.Element>티어</Ranking.Element>
+              <Ranking.Element>{t('common:table-tier')}</Ranking.Element>
               <Ranking.Element>#</Ranking.Element>
-              <Ranking.Element>사용자</Ranking.Element>
-              <Ranking.Element>점수</Ranking.Element>
+              <Ranking.Element>{t('common:table-user')}</Ranking.Element>
+              <Ranking.Element>{t('common:table-score')}</Ranking.Element>
             </Ranking.Head>
             {mockOverall.map(({ tier, user, score }, index) => (
               <Ranking.Row key={user.id}>
@@ -55,10 +72,10 @@ function Home() {
             columnAlignList={['left', 'left', 'left', 'right']}
           >
             <Ranking.Head>
-              <Ranking.Element>티어</Ranking.Element>
+              <Ranking.Element>{t('common:table-tier')}</Ranking.Element>
               <Ranking.Element>#</Ranking.Element>
-              <Ranking.Element>사용자</Ranking.Element>
-              <Ranking.Element>점수</Ranking.Element>
+              <Ranking.Element>{t('common:table-user')}</Ranking.Element>
+              <Ranking.Element>{t('common:table-score')}</Ranking.Element>
             </Ranking.Head>
             {mockRising.map(({ tier, user, score }, index) => (
               <Ranking.Row key={user.id}>
@@ -86,10 +103,10 @@ function Home() {
             columnAlignList={['left', 'left', 'left', 'right']}
           >
             <Ranking.Head>
-              <Ranking.Element>티어</Ranking.Element>
+              <Ranking.Element>{t('common:table-tier')}</Ranking.Element>
               <Ranking.Element>#</Ranking.Element>
-              <Ranking.Element>사용자</Ranking.Element>
-              <Ranking.Element>조회수</Ranking.Element>
+              <Ranking.Element>{t('common:table-user')}</Ranking.Element>
+              <Ranking.Element>{t('common:table-views')}</Ranking.Element>
             </Ranking.Head>
             {mockDaily.map(({ tier, user, view }, index) => (
               <Ranking.Row key={user.id}>
@@ -113,9 +130,9 @@ function Home() {
           <Title>{t('index:most-programming-lang-top-3')}</Title>
           <Ranking width={512} columnWidthList={['13%', '56%', '31%']} columnAlignList={['left', 'left', 'right']}>
             <Ranking.Head>
-              <Ranking.Element>언어</Ranking.Element>
+              <Ranking.Element>{t('common:table-programming-lang')}</Ranking.Element>
               <Ranking.Element />
-              <Ranking.Element>사용자수</Ranking.Element>
+              <Ranking.Element>{t('common:table-user-num')}</Ranking.Element>
             </Ranking.Head>
             {mockLanguage.map(({ language, count }) => (
               <Ranking.Row key={language}>
@@ -146,20 +163,26 @@ export const getStaticProps: GetStaticProps = async (context) => {
 };
 
 const Container = styled.div`
-  width: 1080px;
+  ${({ theme }) => theme.common.flexCenterColumn};
+  padding: 100px 50px;
+  margin: 0 auto;
+
+  h2 {
+    margin-bottom: 100px;
+  }
 `;
 
 const Content = styled.div`
-  width: 100%;
   display: grid;
   grid-template-areas:
     'a b'
     'a c'
     'a d';
   grid-gap: 1rem;
+  margin-top: 50px;
 `;
 
-const Title = styled.h2`
+const Title = styled.h3`
   font-size: ${({ theme }) => theme.fontSize.xl};
   margin-bottom: 0.5rem;
 `;
