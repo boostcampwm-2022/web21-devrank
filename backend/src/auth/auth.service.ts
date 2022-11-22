@@ -70,7 +70,7 @@ export class AuthService {
   }
 
   async replaceRefreshToken(id: string, refreshToken: string, githubToken: string): Promise<string> {
-    const storedRefreshToken = await this.authRepository.findById(id);
+    const storedRefreshToken = await this.authRepository.findRefreshTokenById(id);
     if (refreshToken !== storedRefreshToken) {
       throw new UnauthorizedException('invalid token.');
     }

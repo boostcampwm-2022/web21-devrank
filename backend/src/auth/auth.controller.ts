@@ -25,8 +25,13 @@ export class AuthController {
   @ApiOperation({ summary: '깃허브 로그인 페이지' })
   @ApiOkResponse({ status: 302, description: '로그인이 되어있지 않은 경우, 깃허브 로그인 페이지로 이동합니다.' })
   github(@Res() response: Response): void {
+    const scope = {
+      read: 'user',
+    };
     response.redirect(
-      `https://github.com/login/oauth/authorize?client_id=${this.configService.get('GITHUB_CLIENT_ID')}`,
+      `https://github.com/login/oauth/authorize?client_id=${this.configService.get(
+        'GITHUB_CLIENT_ID',
+      )}&${new URLSearchParams(scope).toString()}`,
     );
   }
 

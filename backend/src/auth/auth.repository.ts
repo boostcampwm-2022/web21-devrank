@@ -8,7 +8,7 @@ import Redis from 'ioredis';
 export class AuthRepository {
   constructor(@InjectRedis() private readonly redis: Redis, private readonly configService: ConfigService) {}
 
-  async findById(id: string): Promise<string> {
+  async findRefreshTokenById(id: string): Promise<string> {
     return await this.redis.get(id);
   }
 
