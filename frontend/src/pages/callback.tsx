@@ -28,7 +28,7 @@ function Callback() {
 
   return (
     <Container>
-      <Spinner width={60} height={60} />
+      <Spinner size={60} />
     </Container>
   );
 }

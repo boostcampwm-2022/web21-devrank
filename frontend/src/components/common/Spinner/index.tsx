@@ -2,17 +2,13 @@ import styled, { css, keyframes } from 'styled-components';
 
 interface SpinnerProps {
   /**
-   * Spinner의 너비를 설정합니다.
+   * Spinner의 사이즈를 설정합니다.
    */
-  width: number;
-  /**
-   * Spinner의 높이를 설정합니다.
-   */
-  height: number;
+  size: number;
 }
 
-function Spinner({ width, height }: SpinnerProps) {
-  return <StyledSpinner width={width} height={height} />;
+function Spinner({ size }: SpinnerProps) {
+  return <StyledSpinner size={size} />;
 }
 
 export default Spinner;
@@ -33,9 +29,9 @@ const StyledSpinner = styled.div<SpinnerProps>`
   animation: ${rotation} 1s linear infinite;
 
   ${(props) =>
-    props.width &&
+    props.size &&
     css`
-      width: ${props.width}px;
-      height: ${props.height}px;
+      width: ${props.size}px;
+      height: ${props.size}px;
     `}
 `;
