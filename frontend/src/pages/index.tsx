@@ -36,7 +36,7 @@ function Home() {
         <OverallRanking>
           <Title>{t('index:overall-ranking')}</Title>
           <Ranking
-            width={512}
+            width={'512px'}
             columnWidthList={['12%', '8%', '58%', '20%']}
             columnAlignList={['left', 'left', 'left', 'right']}
           >
@@ -67,7 +67,7 @@ function Home() {
         <RisingRanking>
           <Title>{t('index:rising-user-top-3')}</Title>
           <Ranking
-            width={512}
+            width={'512px'}
             columnWidthList={['12%', '8%', '58%', '20%']}
             columnAlignList={['left', 'left', 'left', 'right']}
           >
@@ -98,7 +98,7 @@ function Home() {
         <DailyRanking>
           <Title>{t('index:daily-views-top-3')}</Title>
           <Ranking
-            width={512}
+            width={'512px'}
             columnWidthList={['12%', '8%', '58%', '20%']}
             columnAlignList={['left', 'left', 'left', 'right']}
           >
@@ -128,7 +128,7 @@ function Home() {
         </DailyRanking>
         <LanguageRanking>
           <Title>{t('index:most-programming-lang-top-3')}</Title>
-          <Ranking width={512} columnWidthList={['13%', '56%', '31%']} columnAlignList={['left', 'left', 'right']}>
+          <Ranking width={'512px'} columnWidthList={['13%', '56%', '31%']} columnAlignList={['left', 'left', 'right']}>
             <Ranking.Head>
               <Ranking.Element>{t('common:table-programming-lang')}</Ranking.Element>
               <Ranking.Element />
