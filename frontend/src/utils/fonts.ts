@@ -14,17 +14,17 @@ export const aldrich = Aldrich({
 export const lineSeedKR = localFont({
   src: [
     {
-      path: '../../public/fonts/LineSeedKR-Th.woff2',
+      path: '../../public/fonts/line-seed-kr-thin.woff2',
       weight: '100',
       style: 'normal',
     },
     {
-      path: '../../public/fonts/LineSeedKR-Rg.woff2',
+      path: '../../public/fonts/line-seed-kr-regular.woff2',
       weight: '400',
       style: 'normal',
     },
     {
-      path: '../../public/fonts/LineSeedKR-Bd.woff2',
+      path: '../../public/fonts/line-seed-kr-bold.woff2',
       weight: '700',
       style: 'normal',
     },
