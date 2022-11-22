@@ -21,7 +21,7 @@ function ranking() {
         <Searchbar
           type='text'
           value=''
-          placeholder='사용자명'
+          placeholder={t('ranking:search-placeholder')}
           width={200}
           submitAlign='left'
           onChange={(e) => {}}
