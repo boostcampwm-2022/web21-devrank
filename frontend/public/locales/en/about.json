@@ -1,5 +1,7 @@
 {
-  "overview": "Hi, We are Devrank!\\n\\nDevrank is a service designed to encourage Github activities to be a little more fun through the rating system.I think you can feel a sense of accomplishment through a game-like rating system for Github activities that can be boring.\\n지루할 수 있는 Github 활동을 게임과 유사한 등급 시스템을 통해 성취감을 느낄 수 있다고 생각합니다.\\n\\nCheck out your ranking in Devrank today and work hard on your Github activities to achieve a high ranking!",
+  "overview-1": "Devrank is a service designed to encourage Github activities to be a little more fun through the rating system.",
+  "overview-2": "I think you can feel a sense of accomplishment through a game-like rating system for Github activities that can be boring.",
+  "overview-3": "Check out your ranking in Devrank today and work hard on your Github activities to achieve a high ranking!",
   "key-feature-heading": "Key Features",
   "key-feature-1": "Developer's Basic Information and Repository List",
   "key-feature-2": "Visualize programming language statistics and activity time graphs based on user information",
