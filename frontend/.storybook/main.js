@@ -7,6 +7,7 @@ module.exports = {
     '@storybook/addon-essentials',
     '@storybook/addon-interactions',
     'storybook-addon-styled-component-theme/dist/preset',
+    'storybook-addon-i18next/register',
     {
       name: '@storybook/addon-docs',
       options: {
@@ -22,6 +23,14 @@ module.exports = {
     },
   ],
   webpackFinal: async (config) => {
+    config.resolve.fallback = {
+      fs: false,
+      tls: false,
+      net: false,
+      module: false,
+      assert: false,
+      path: require.resolve('path-browserify'),
+    };
     config.resolve.modules = [path.resolve(__dirname, '..'), 'node_modules', 'src/styles'];
     config.resolve.alias = {
       ...config.resolve.alias,
