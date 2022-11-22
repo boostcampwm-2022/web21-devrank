@@ -25,8 +25,13 @@ export class AuthController {
   @ApiOperation({ summary: '깃허브 로그인 페이지' })
   @ApiOkResponse({ status: 302, description: '로그인이 되어있지 않은 경우, 깃허브 로그인 페이지로 이동합니다.' })
   github(@Res() response: Response): void {
+    const scope = {
+      read: 'user',
+    };
     response.redirect(
-      `https://github.com/login/oauth/authorize?client_id=${this.configService.get('GITHUB_CLIENT_ID')}`,
+      `https://github.com/login/oauth/authorize?client_id=${this.configService.get(
+        'GITHUB_CLIENT_ID',
+      )}&${new URLSearchParams(scope).toString()}`,
     );
   }
 
@@ -63,8 +68,8 @@ export class AuthController {
     };
     await this.userService.createOrUpdate(user);
 
-    const accessToken = this.authService.issueAccessToken(user.id);
-    const refreshToken = this.authService.issueRefreshToken(user.id);
+    const accessToken = this.authService.issueAccessToken(user.id, githubToken);
+    const refreshToken = this.authService.issueRefreshToken(user.id, githubToken);
     await this.authService.saveRefreshToken(user.id, refreshToken);
     const cookieOption = this.authService.getCookieOption();
     const responseData: LoginResponseDto = {
@@ -90,9 +95,9 @@ export class AuthController {
   })
   @UseGuards(RefreshGuard)
   async refresh(@CurrentUser() currentUser: Payload, @Res() response: Response): Promise<void> {
-    const { id, refreshToken } = currentUser;
-    const newRefreshToken = await this.authService.replaceRefreshToken(id, refreshToken);
-    const accessToken = this.authService.issueAccessToken(id);
+    const { id, githubToken, refreshToken } = currentUser;
+    const newRefreshToken = await this.authService.replaceRefreshToken(id, refreshToken, githubToken);
+    const accessToken = this.authService.issueAccessToken(id, githubToken);
     const user = await this.userService.findOneByFilter({ id: id });
     const cookieOption = this.authService.getCookieOption();
     const responseData: LoginResponseDto = { accessToken, id, username: user.username, avatarUrl: user.avatarUrl };
