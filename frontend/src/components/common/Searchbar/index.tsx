@@ -87,11 +87,16 @@ const Input = styled.input`
   width: 100%;
   border: none;
   outline: none;
+  line-height: 16px;
 
-  &::placeholder,
-  &::-webkit-input-placeholder,
+  &::placeholder {
+    color: ${({ theme }) => theme.colors.gray6};
+  }
+  &::-webkit-input-placeholder {
+    color: ${({ theme }) => theme.colors.gray6};
+  }
   &:-ms-input-placeholder {
-    color: ${({ theme }) => theme.colors.gray1};
+    color: ${({ theme }) => theme.colors.gray6};
   }
 `;
 
