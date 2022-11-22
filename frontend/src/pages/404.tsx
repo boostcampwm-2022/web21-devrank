@@ -1,4 +1,5 @@
 import { GetStaticProps } from 'next';
+import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
@@ -10,6 +11,8 @@ import { aldrich, lineSeedKR } from '@utils/fonts';
 function NotFound() {
   const router = useRouter();
   useRefresh();
+
+  const { t } = useTranslation(['404']);
 
   return (
     <Container className={aldrich.className}>
@@ -25,7 +28,7 @@ function NotFound() {
         />
       </div>
       <strong>404 - PAGE NOT FOUND</strong>
-      <p className={lineSeedKR.className}>찾고 있는 페이지가 없어졌거나 일시적으로 사용할 수 없습니다.</p>
+      <p className={lineSeedKR.className}>{t('404-information')}</p>
       <HomeButton onClick={() => router.push('/')}>GO TO MAIN PAGE</HomeButton>
     </Container>
   );
@@ -36,7 +39,7 @@ export default NotFound;
 export const getStaticProps: GetStaticProps = async (context) => {
   return {
     props: {
-      ...(await serverSideTranslations(context.locale as string, ['common', 'footer', 'header'])),
+      ...(await serverSideTranslations(context.locale as string, ['common', 'footer', 'header', '404'])),
     },
   };
 };
