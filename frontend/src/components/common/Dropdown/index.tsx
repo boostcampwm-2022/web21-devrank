@@ -61,6 +61,8 @@ const Options = styled.ul`
   border-radius: 10px;
   padding: 0 5px;
 
+  z-index: 10;
+
   li {
     border-top: 1px solid ${({ theme }) => theme.colors.gray1};
 
