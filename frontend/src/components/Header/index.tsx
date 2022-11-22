@@ -5,7 +5,8 @@ import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { useQueryData } from '@hooks';
 import { useIsFetching, useMutation } from '@tanstack/react-query';
-import { Avatar, Button, Dropdown, DropdownItem } from '@components/common';
+import { Avatar, Button } from '@components/common';
+import Dropdown from '@components/common/Dropdown';
 import { requestUserLogout } from '@apis/auth';
 import { GITHUB_AUTH_REQUEST_URL } from '@utils/constants';
 
@@ -54,30 +55,30 @@ function Header() {
               </LanguageButton>
             }
           >
-            <DropdownItem>
+            <Dropdown.Item>
               <Link href={router.pathname} locale='ko'>
                 한국어
               </Link>
-            </DropdownItem>
-            <DropdownItem>
+            </Dropdown.Item>
+            <Dropdown.Item>
               <Link href={router.pathname} locale='en'>
                 English
               </Link>
-            </DropdownItem>
+            </Dropdown.Item>
           </Dropdown>
           <div className='button-right'>
             {isFetching ? (
               <div>로딩중...</div>
             ) : userData ? (
               <Dropdown trigger={<Avatar src={userData.avatarUrl} />}>
-                <DropdownItem>
+                <Dropdown.Item>
                   <Image src='/icons/profile.svg' alt='프로필 아이콘' width={17} height={17} quality={100} />
                   {t('common:my-profile')}
-                </DropdownItem>
-                <DropdownItem onClick={onClickLogoutButton}>
+                </Dropdown.Item>
+                <Dropdown.Item onClick={onClickLogoutButton}>
                   <Image src='/icons/logout.svg' alt='로그아웃 아이콘' width={17} height={17} quality={100} />
                   {t('common:logout')}
-                </DropdownItem>
+                </Dropdown.Item>
               </Dropdown>
             ) : (
               <Button size='md' onClick={onClickLoginButton}>
