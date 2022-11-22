@@ -1,24 +1,22 @@
 import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useState } from 'react';
 import styled from 'styled-components';
 import { CubeRankType } from '@type/common';
 import Filterbar from '@components/Filterbar';
 import Ranking from '@components/Ranking';
 import { Avatar, CubeIcon, LanguageIcon, Searchbar } from '@components/common';
+import { CUBE_RANK } from '@utils/constants';
 import { mockRanking } from '@utils/mockData';
 
 function ranking() {
   const { t } = useTranslation(['ranking', 'common']);
+  const [active, setActive] = useState<CubeRankType>(CUBE_RANK.ALL);
 
   return (
     <Container>
-      <Filterbar
-        active='all'
-        setActive={(active) => {
-          console.log(active);
-        }}
-      />
+      <Filterbar active={active} setActive={setActive} />
       <SearchbarContainer>
         <Searchbar
           type='text'

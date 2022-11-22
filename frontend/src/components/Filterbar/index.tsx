@@ -1,4 +1,5 @@
 import { useTranslation } from 'next-i18next';
+import { Dispatch, SetStateAction } from 'react';
 import styled, { css } from 'styled-components';
 import { CubeRankType } from '@type/common';
 import { CubeIcon } from '@components/common';
@@ -6,7 +7,7 @@ import { CUBE_RANK } from '@utils/constants';
 
 interface FilterbarProps {
   active: CubeRankType;
-  setActive: (active: CubeRankType) => void;
+  setActive: Dispatch<SetStateAction<CubeRankType>>;
 }
 
 interface StyledFilterItemProps {
