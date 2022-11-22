@@ -65,7 +65,7 @@ function Header() {
           </Dropdown>
           <div className='button-right'>
             {userData ? (
-              <Dropdown trigger={<Avatar src={userData.user.avatarUrl} />}>
+              <Dropdown trigger={<Avatar src={userData.avatarUrl} />}>
                 <DropdownItem>
                   <Image src='/icons/profile.svg' alt='프로필 아이콘' width={17} height={17} quality={100} />
                   {t('common:my-profile')}
