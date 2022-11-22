@@ -54,12 +54,12 @@ function Header() {
           >
             <DropdownItem>
               <Link href={router.pathname} locale='ko'>
-                {t('common:language-ko')}
+                한국어
               </Link>
             </DropdownItem>
             <DropdownItem>
               <Link href={router.pathname} locale='en'>
-                {t('common:language-en')}
+                English
               </Link>
             </DropdownItem>
           </Dropdown>
