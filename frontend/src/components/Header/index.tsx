@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { useQueryData } from '@hooks';
-import { useMutation } from '@tanstack/react-query';
+import { useIsFetching, useMutation } from '@tanstack/react-query';
 import { Avatar, Button, Dropdown, DropdownItem } from '@components/common';
 import { requestUserLogout } from '@apis/auth';
 import { GITHUB_AUTH_REQUEST_URL } from '@utils/constants';
@@ -16,6 +16,8 @@ function Header() {
   const { queryData: userData, removeQueryData: removeUser } = useQueryData(['user']);
   const { t } = useTranslation(['header', 'common']);
   const router = useRouter();
+
+  const isFetching = useIsFetching(['user']);
 
   const onClickLoginButton = () => {
     localStorage.setItem('login-pathname', window.location.pathname);
@@ -64,7 +66,9 @@ function Header() {
             </DropdownItem>
           </Dropdown>
           <div className='button-right'>
-            {userData ? (
+            {isFetching ? (
+              <div>로딩중...</div>
+            ) : userData ? (
               <Dropdown trigger={<Avatar src={userData.avatarUrl} />}>
                 <DropdownItem>
                   <Image src='/icons/profile.svg' alt='프로필 아이콘' width={17} height={17} quality={100} />
