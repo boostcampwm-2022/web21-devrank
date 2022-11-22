@@ -16,3 +16,38 @@ export const CUBE_RANK = {
   ORANGE: 'orange',
   RED: 'red',
 } as const;
+
+export const DEVELOPER_INFORMATION = [
+  {
+    name: '장우석',
+    github: '',
+    blog: '',
+    career: '1년',
+    field: 'Backend',
+    introduction: '안녕하세요. 장우석입니다.',
+  },
+  {
+    name: '강시온',
+    github: '',
+    blog: '',
+    career: '?년',
+    field: 'Backend',
+    introduction: '안녕하세요. 강시온입니다.',
+  },
+  {
+    name: '정윤규',
+    github: '',
+    blog: '',
+    career: '1년',
+    field: 'Frontend',
+    introduction: '안녕하세요. 정윤규입니다.',
+  },
+  {
+    name: '정성윤',
+    github: '',
+    blog: '',
+    career: '1년',
+    field: 'Frontend',
+    introduction: '안녕하세요. 정성윤입니다.',
+  },
+];

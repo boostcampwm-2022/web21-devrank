@@ -5,6 +5,7 @@ import Image from 'next/image';
 import React from 'react';
 import styled from 'styled-components';
 import { CubeIcon } from '@components/common';
+import { CUBE_RANK, DEVELOPER_INFORMATION } from '@utils/constants';
 
 function About() {
   const { t } = useTranslation(['tier', 'about']);
@@ -29,49 +30,24 @@ function About() {
       <Content>
         <Title>{t('about:key-feature-heading')}</Title>
         <FeatureList>
-          <div>&middot; {t('about:key-feature-1')}</div>
-          <div>&middot; {t('about:key-feature-2')}</div>
-          <div>&middot; {t('about:key-feature-3')}</div>
+          <li>&middot; {t('about:key-feature-1')}</li>
+          <li>&middot; {t('about:key-feature-2')}</li>
+          <li>&middot; {t('about:key-feature-3')}</li>
         </FeatureList>
       </Content>
       <Content>
         <Title>{t('about:rank-system-heading')}</Title>
         <RankSystem>
-          <Rank>
-            <CubeIcon tier='yellow' />
-            <Strong>{t('tier:yellow')}</Strong>
-            <p>0~100</p>
-          </Rank>
-          <Rank>
-            <CubeIcon tier='green' />
-            <Strong>{t('tier:green')}</Strong>
-            <p>101~200</p>
-          </Rank>
-          <Rank>
-            <CubeIcon tier='mint' />
-            <Strong>{t('tier:mint')}</Strong>
-            <p>201~300</p>
-          </Rank>
-          <Rank>
-            <CubeIcon tier='blue' />
-            <Strong>{t('tier:blue')}</Strong>
-            <p>301~400</p>
-          </Rank>
-          <Rank>
-            <CubeIcon tier='purple' />
-            <Strong>{t('tier:purple')}</Strong>
-            <p>401~500</p>
-          </Rank>
-          <Rank>
-            <CubeIcon tier='orange' />
-            <Strong>{t('tier:orange')}</Strong>
-            <p>501~600</p>
-          </Rank>
-          <Rank>
-            <CubeIcon tier='red' />
-            <Strong>{t('tier:red')}</Strong>
-            <p>601~</p>
-          </Rank>
+          {Object.values(CUBE_RANK).map((tier) => {
+            if (tier === CUBE_RANK.ALL) return;
+            return (
+              <Rank key={tier}>
+                <CubeIcon tier={tier} />
+                <Strong>{t(`tier:${tier}`)}</Strong>
+                <p>101~200</p>
+              </Rank>
+            );
+          })}
         </RankSystem>
       </Content>
       <Content>
@@ -79,62 +55,22 @@ function About() {
       </Content>
       <Content>
         <Title>Developed By</Title>
-        <Profile>
-          <Name>
-            장우석
-            <div>
-              <Image src='/icons/github.svg' alt='깃허브 아이콘' width={20} height={20} quality={100} />
-              <Image src='/icons/link.svg' alt='링크 아이콘' width={20} height={20} quality={100} />
-            </div>
-          </Name>
-          <Description>
-            <div>&middot; 개발경력 : 1년</div>
-            <div>&middot; 담당 : Backend</div>
-            <div>&middot; 자기소개</div>
-          </Description>
-        </Profile>
-        <Profile>
-          <Name>
-            강시온
-            <div>
-              <Image src='/icons/github.svg' alt='깃허브 아이콘' width={20} height={20} quality={100} />
-              <Image src='/icons/link.svg' alt='링크 아이콘' width={20} height={20} quality={100} />
-            </div>
-          </Name>
-          <Description>
-            <div>&middot; 개발경력 : ?년</div>
-            <div>&middot; 담당 : Backend</div>
-            <div>&middot; 자기소개</div>
-          </Description>
-        </Profile>
-        <Profile>
-          <Name>
-            정윤규
-            <div>
-              <Image src='/icons/github.svg' alt='깃허브 아이콘' width={20} height={20} quality={100} />
-              <Image src='/icons/link.svg' alt='링크 아이콘' width={20} height={20} quality={100} />
-            </div>
-          </Name>
-          <Description>
-            <div>&middot; 개발경력 : 1년</div>
-            <div>&middot; 담당 : Frontend</div>
-            <div>&middot; 자기소개</div>
-          </Description>
-        </Profile>
-        <Profile>
-          <Name>
-            정성윤
-            <div>
-              <Image src='/icons/github.svg' alt='깃허브 아이콘' width={20} height={20} quality={100} />
-              <Image src='/icons/link.svg' alt='링크 아이콘' width={20} height={20} quality={100} />
-            </div>
-          </Name>
-          <Description>
-            <div>&middot; 개발경력 : 1년</div>
-            <div>&middot; 담당 : Frontend</div>
-            <div>&middot; 자기소개</div>
-          </Description>
-        </Profile>
+        {DEVELOPER_INFORMATION.map(({ name, github, blog, introduction, field, career }) => (
+          <Profile key={name}>
+            <Name>
+              {name}
+              <div>
+                <Image src='/icons/github.svg' alt='깃허브 아이콘' width={20} height={20} quality={100} />
+                <Image src='/icons/link.svg' alt='링크 아이콘' width={20} height={20} quality={100} />
+              </div>
+            </Name>
+            <Description>
+              <li>&middot; 개발경력 : {career}</li>
+              <li>&middot; 담당 : {field}</li>
+              <li>&middot; {introduction}</li>
+            </Description>
+          </Profile>
+        ))}
       </Content>
     </Container>
   );
@@ -192,9 +128,7 @@ const FeatureList = styled.ul`
 `;
 
 const RankSystem = styled.ul`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  ${({ theme }) => theme.common.flexCenterColumn}
   gap: 5px;
   margin-top: 30px;
   width: 100%;
@@ -240,4 +174,8 @@ const Description = styled.div`
   ${({ theme }) => theme.common.flexColumn}
   gap: 14px;
   margin-left: 25px;
+
+  li {
+    list-style: none;
+  }
 `;
