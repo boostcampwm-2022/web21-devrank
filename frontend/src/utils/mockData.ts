@@ -38,7 +38,7 @@ export const mockOverall = [
   {
     tier: 'yellow',
     user: {
-      id: '111',
+      id: '000',
       username: '장우석',
       avatarUrl: 'https://avatars.githubusercontent.com/u/46099115?v=4',
     },

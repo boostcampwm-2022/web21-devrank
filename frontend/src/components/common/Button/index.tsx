@@ -1,5 +1,30 @@
 import styled, { css } from 'styled-components';
-import { ButtonProps, StyledButtonProps } from '@type';
+import { ButtonClickEvent } from '@type/common';
+
+type ButtonSize = 'sm' | 'md';
+
+interface ButtonProps {
+  /**
+   * Button 내부 label 텍스트
+   */
+  children: React.ReactNode;
+  /**
+   * Button 크기 (sm => small, md => medium)
+   */
+  size?: ButtonSize;
+  /**
+   * Button 동작 여부
+   */
+  disabled?: boolean;
+  /**
+   * Button click시 실행되는 함수
+   */
+  onClick?: (e: ButtonClickEvent) => void;
+}
+
+interface StyledButtonProps {
+  size?: ButtonSize;
+}
 
 function Button({ children, size = 'md', disabled, onClick, ...props }: ButtonProps) {
   return (

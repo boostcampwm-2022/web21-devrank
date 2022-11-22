@@ -16,7 +16,7 @@ interface ElementProps {
 }
 
 interface RankingProps {
-  width: number;
+  width: string;
   columnWidthList: string[];
   columnAlignList: TextAlignType[];
   children?: React.ReactNode;

@@ -1,9 +1,20 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+import { ClickEvent } from '@type/common';
+
+interface ItemProps {
+  children: React.ReactNode;
+  onClick?: (e: ClickEvent) => void;
+}
 
 interface DropdownProps {
+  /** 드롭다운을 동작시킬 컴포넌트를 지정한다. */
   trigger: React.ReactNode;
   children: React.ReactNode;
+}
+
+function Item({ children, onClick }: ItemProps) {
+  return <ItemContainer onClick={onClick}>{children}</ItemContainer>;
 }
 
 function Dropdown({ trigger, children }: DropdownProps) {
@@ -32,10 +43,13 @@ function Dropdown({ trigger, children }: DropdownProps) {
   );
 }
 
+Dropdown.Item = Item;
+
 export default Dropdown;
 
 const Container = styled.div`
   position: relative;
+  width: max-content;
 `;
 const Options = styled.ul`
   position: absolute;
@@ -54,4 +68,14 @@ const Options = styled.ul`
       border: none;
     }
   }
+`;
+
+const ItemContainer = styled.li`
+  ${({ theme }) => theme.common.flexCenter};
+  gap: 5px;
+  width: max-content;
+  min-width: 95px;
+  height: 35px;
+  padding: 25px 10px;
+  cursor: pointer;
 `;

@@ -10,18 +10,15 @@ const Template: ComponentStory<typeof Spinner> = (args) => <Spinner {...args} />
 
 export const Small = Template.bind({});
 Small.args = {
-  width: 50,
-  height: 50,
+  size: 50,
 };
 
 export const Medium = Template.bind({});
 Medium.args = {
-  width: 100,
-  height: 100,
+  size: 100,
 };
 
 export const Large = Template.bind({});
 Large.args = {
-  width: 200,
-  height: 200,
+  size: 200,
 };

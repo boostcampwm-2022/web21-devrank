@@ -39,7 +39,7 @@ module.exports = {
       '@utils': path.resolve(__dirname, '../src/utils/'),
       '@apis': path.resolve(__dirname, '../src/apis/'),
       '@hooks': path.resolve(__dirname, '../src/hooks/'),
-      '@types': path.resolve(__dirname, '../src/types/'),
+      '@type': path.resolve(__dirname, '../src/type/'),
       '@contexts': path.resolve(__dirname, '../src/contexts/'),
     };
 

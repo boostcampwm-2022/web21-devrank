@@ -41,7 +41,7 @@ const OverallTemplate: ComponentStory<typeof Ranking> = (args) => (
 
 export const Overall = OverallTemplate.bind({});
 Overall.args = {
-  width: 512,
+  width: '512px',
   columnWidthList: ['12%', '8%', '58%', '20%'],
   columnAlignList: ['left', 'left', 'left', 'right'],
 };
