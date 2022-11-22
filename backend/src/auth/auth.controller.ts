@@ -63,8 +63,8 @@ export class AuthController {
     };
     await this.userService.createOrUpdate(user);
 
-    const accessToken = this.authService.issueAccessToken(user.id);
-    const refreshToken = this.authService.issueRefreshToken(user.id);
+    const accessToken = this.authService.issueAccessToken(user.id, githubToken);
+    const refreshToken = this.authService.issueRefreshToken(user.id, githubToken);
     await this.authService.saveRefreshToken(user.id, refreshToken);
     const cookieOption = this.authService.getCookieOption();
     const responseData: LoginResponseDto = {
@@ -90,9 +90,9 @@ export class AuthController {
   })
   @UseGuards(RefreshGuard)
   async refresh(@CurrentUser() currentUser: Payload, @Res() response: Response): Promise<void> {
-    const { id, refreshToken } = currentUser;
-    const newRefreshToken = await this.authService.replaceRefreshToken(id, refreshToken);
-    const accessToken = this.authService.issueAccessToken(id);
+    const { id, githubToken, refreshToken } = currentUser;
+    const newRefreshToken = await this.authService.replaceRefreshToken(id, refreshToken, githubToken);
+    const accessToken = this.authService.issueAccessToken(id, githubToken);
     const user = await this.userService.findOneByFilter({ id: id });
     const cookieOption = this.authService.getCookieOption();
     const responseData: LoginResponseDto = { accessToken, id, username: user.username, avatarUrl: user.avatarUrl };

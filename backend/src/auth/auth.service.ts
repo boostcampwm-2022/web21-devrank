@@ -41,14 +41,14 @@ export class AuthService {
     return userInfo;
   }
 
-  issueAccessToken(id: string): string {
-    return jwt.sign({ id }, this.configService.get('JWT_ACCESS_SECRET'), {
+  issueAccessToken(id: string, githubToken: string): string {
+    return jwt.sign({ id, githubToken }, this.configService.get('JWT_ACCESS_SECRET'), {
       expiresIn: EXPIRATION.ACCESS_TOKEN,
     });
   }
 
-  issueRefreshToken(id: string): string {
-    return jwt.sign({ id }, this.configService.get('JWT_REFRESH_SECRET'), {
+  issueRefreshToken(id: string, githubToken: string): string {
+    return jwt.sign({ id, githubToken }, this.configService.get('JWT_REFRESH_SECRET'), {
       expiresIn: EXPIRATION.REFRESH_TOKEN,
     });
   }
@@ -69,12 +69,12 @@ export class AuthService {
     await this.authRepository.create(id, refreshToken);
   }
 
-  async replaceRefreshToken(id: string, refreshToken: string): Promise<string> {
+  async replaceRefreshToken(id: string, refreshToken: string, githubToken: string): Promise<string> {
     const storedRefreshToken = await this.authRepository.findById(id);
     if (refreshToken !== storedRefreshToken) {
       throw new UnauthorizedException('invalid token.');
     }
-    const newRefreshToken = this.issueRefreshToken(id);
+    const newRefreshToken = this.issueRefreshToken(id, githubToken);
     await this.authRepository.create(id, newRefreshToken);
     return newRefreshToken;
   }
