@@ -120,7 +120,7 @@ function Home() {
                   <Avatar src='/profile-dummy.png' name={user.username} />
                 </Ranking.Element>
                 <Ranking.Element>
-                  <GrayText>{view.toLocaleString()}회</GrayText>
+                  <GrayText>{view.toLocaleString()}</GrayText>
                 </Ranking.Element>
               </Ranking.Row>
             ))}
@@ -141,7 +141,7 @@ function Home() {
                 </Ranking.Element>
                 <Ranking.Element>{language}</Ranking.Element>
                 <Ranking.Element>
-                  <GrayText>{count}명</GrayText>
+                  <GrayText>{count}</GrayText>
                 </Ranking.Element>
               </Ranking.Row>
             ))}
@@ -178,7 +178,7 @@ const Content = styled.div`
     'a b'
     'a c'
     'a d';
-  grid-gap: 1rem;
+  grid-gap: 1.37rem;
   margin-top: 50px;
 `;
 
