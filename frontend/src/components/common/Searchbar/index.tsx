@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import styled, { css } from 'styled-components';
-import { FormEvent, InputChangeEvent } from '@type';
+import { FormEvent, InputChangeEvent } from '@type/common';
 
 type SubmitAlign = 'left' | 'right';
 

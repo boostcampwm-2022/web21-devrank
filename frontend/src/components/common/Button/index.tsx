@@ -1,5 +1,5 @@
 import styled, { css } from 'styled-components';
-import { ButtonClickEvent } from '@type';
+import { ButtonClickEvent } from '@type/common';
 
 type ButtonSize = 'sm' | 'md';
 
