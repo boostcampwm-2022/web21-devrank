@@ -1,3 +1,4 @@
+import { useTranslation } from 'next-i18next';
 import styled, { css } from 'styled-components';
 import { CubeRankType } from '@type/common';
 import { CubeIcon } from '@components/common';
@@ -13,12 +14,14 @@ interface StyledFilterItemProps {
 }
 
 function Filterbar({ active = CUBE_RANK.ALL, setActive }: FilterbarProps) {
+  const { t } = useTranslation('tier');
+
   return (
     <Container>
       {Object.entries(CUBE_RANK).map(([k, tier]) => (
         <FilterItem key={k} active={active === tier} onClick={() => setActive(tier)}>
           <CubeIcon tier={tier} />
-          <Label>{tier}</Label>
+          <Label>{t(tier)}</Label>
         </FilterItem>
       ))}
     </Container>
