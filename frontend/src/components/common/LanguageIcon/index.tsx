@@ -1,6 +1,11 @@
 import Image from 'next/image';
-import { LanguageIconProps } from '@type';
 import { languageToURL } from '@utils/utils';
+
+interface LanguageIconProps {
+  language: string;
+  width?: number;
+  height?: number;
+}
 
 function LanguageIcon({ language, width = 50, height = 50 }: LanguageIconProps) {
   const iconImgSrc = languageToURL(language.toLocaleLowerCase());
