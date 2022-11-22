@@ -1,6 +1,7 @@
 import { GetStaticProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 import styled from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
 import { Spinner } from '@components/common';
@@ -25,6 +26,14 @@ function Callback() {
       router.push('/');
     },
   });
+
+  useEffect(() => {
+    if (router.isReady && router.query.error) {
+      const loginPathname = localStorage.getItem('login-pathname');
+      if (loginPathname) router.push(loginPathname);
+      else router.push('/');
+    }
+  }, [router]);
 
   return (
     <Container>
