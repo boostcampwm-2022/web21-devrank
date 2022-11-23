@@ -7,14 +7,13 @@ const options: SchemaOptions = {
 };
 @Schema(options)
 export class User extends Document {
-  // 필수 정보
   @Prop({ required: true })
   @IsInt()
   id: string;
 
   @Prop({ required: true })
   @IsString()
-  username: string; // Github API : login
+  username: string;
 
   @Prop({ required: true })
   @IsInt()
@@ -32,7 +31,14 @@ export class User extends Document {
   @IsNumber()
   followersScore: number;
 
-  // 선택적 정보
+  @Prop({ default: 0 })
+  @IsInt()
+  views: number;
+
+  @Prop({ default: 0 })
+  @IsNumber()
+  scoreDifference: number;
+
   @Prop({ default: 'default-image-path' })
   @IsString()
   avatarUrl: string;

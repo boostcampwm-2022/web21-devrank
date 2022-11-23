@@ -156,6 +156,14 @@ export class UserService {
     return users;
   }
 
+  async getMostRisingRankings(): Promise<UserDto[]> {
+    return this.userRepository.getMostRisingRankings();
+  }
+
+  async getMostViewedRankings(): Promise<UserDto[]> {
+    return this.userRepository.getgetMostViewedRankings();
+  }
+
   async getRankingsByUsername(username: string): Promise<UserDto[]> {
     const users = await this.userRepository.findAllByUsername(username);
     users.sort((a, b) => {

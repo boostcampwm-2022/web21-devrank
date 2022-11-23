@@ -33,4 +33,12 @@ export class UserRepository {
   async findAllByUsername(username: string): Promise<UserDto[]> {
     return this.userModel.find({ username: { $regex: username, $options: 'i' } }).exec();
   }
+
+  async getMostRisingRankings(): Promise<UserDto[]> {
+    return this.userModel.find().sort({ scoreDifference: -1 }).limit(3).exec();
+  }
+
+  async getgetMostViewedRankings(): Promise<UserDto[]> {
+    return this.userModel.find().sort({ views: -1 }).limit(3).exec();
+  }
 }

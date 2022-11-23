@@ -56,4 +56,15 @@ export class UserController {
     return new ResponseRankingsDto().of(rankings);
   }
 
+  async getMostRisingRankings(): Promise<ResponseRankingsDto> {
+    const users = await this.userService.getMostRisingRankings();
+    const rankings = users.map((user) => new ResponseRankingDto().of(user));
+    return new ResponseRankingsDto().of(rankings);
+  }
+
+  async getMostViewedRankings(): Promise<ResponseRankingsDto> {
+    const users = await this.userService.getMostViewedRankings();
+    const rankings = users.map((user) => new ResponseRankingDto().of(user));
+    return new ResponseRankingsDto().of(rankings);
+  }
 }
