@@ -1,10 +1,9 @@
 import { Payload } from '@apps/auth/types';
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import { BadRequestException, Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { RealIP } from 'nestjs-real-ip';
 import { CurrentUser } from '../../libs/common/decorators/current-user.decodator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { ResponseRankingDto } from './dto/response-ranking.dto';
-import { ResponseRankingsDto } from './dto/response-rankings.dto';
 import { UserDto } from './dto/user.dto';
 import { UserService } from './user.service';
 
@@ -20,51 +19,29 @@ export class UserController {
     return this.userService.findAll();
   }
 
-  @Get('rankings')
-  @ApiOperation({ summary: '전체 랭킹 가져오기' })
-  @ApiResponse({ status: 200, description: '전체 랭킹', type: ResponseRankingsDto })
-  async getRankings(): Promise<ResponseRankingsDto> {
-    const users = await this.userService.getRankings();
-    const rankings = users.map((user) => new ResponseRankingDto().of(user));
-    return new ResponseRankingsDto().of(rankings);
-  }
-
-  @Get('find/:githubId')
+  @Get(':username')
   @ApiOperation({ summary: '특정 유저 정보 가져오기' })
-  @ApiResponse({ status: 200, description: '유저 정보' })
-  async findOneByGithubId(@Param('githubId') githubId: string): Promise<UserDto> {
-    return this.userService.findOneByGithubId(githubId);
+  @ApiResponse({
+    status: 200,
+    description: '특정 유저의 정보를 가져오고, 금일 조회하지 않은 IP주소라면 조회수도 +1 업데이트',
+  })
+  async findOneByUsername(@RealIP() ip: string, @Param('username') username: string): Promise<UserDto> {
+    return this.userService.findUserWithUpdateViews(ip, username);
   }
 
-  @Get('update-score/:githubId')
+  @Patch(':username')
   @ApiBearerAuth('accessToken')
   @ApiOperation({ summary: '특정 유저의 점수 업데이트' })
   @ApiResponse({ status: 200, description: '유저 정보' })
-  @UseGuards(JwtAuthGuard)
-  async updateScore(@CurrentUser() currentUser: Payload, @Param('githubId') githubId: string): Promise<UserDto> {
+  @UseGuards(JwtAuthGuard) // 유저 정보 업데이트 가드 없어도 될 거 같은데?
+  async updateScore(@CurrentUser() currentUser: Payload, @Param('username') username: string): Promise<UserDto> {
+    if ((await this.userService.findUpdateScoreTimeToLive(username)) > 0) {
+      throw new BadRequestException('user score has been updated recently.');
+    }
     const { githubToken } = currentUser;
-    await this.userService.updateScore(githubId, githubToken);
-    return this.userService.findOneByGithubId(githubId);
-  }
-
-  @Get('rankings/:githubId')
-  @ApiOperation({ summary: '특정 유저들의 랭킹 가져오기' })
-  @ApiResponse({ status: 200, description: '특정 유저들의 랭킹', type: ResponseRankingsDto })
-  async getRankingsByUsername(@Param('username') username: string): Promise<ResponseRankingsDto> {
-    const users = await this.userService.getRankingsByUsername(username);
-    const rankings = users.map((user) => new ResponseRankingDto().of(user));
-    return new ResponseRankingsDto().of(rankings);
-  }
-
-  async getMostRisingRankings(): Promise<ResponseRankingsDto> {
-    const users = await this.userService.getMostRisingRankings();
-    const rankings = users.map((user) => new ResponseRankingDto().of(user));
-    return new ResponseRankingsDto().of(rankings);
-  }
-
-  async getMostViewedRankings(): Promise<ResponseRankingsDto> {
-    const users = await this.userService.getMostViewedRankings();
-    const rankings = users.map((user) => new ResponseRankingDto().of(user));
-    return new ResponseRankingsDto().of(rankings);
+    await this.userService.updateScore(username, githubToken);
+    const UPDATE_DELAY_TIME = 120;
+    this.userService.setUpdateScoreDelayTime(username, UPDATE_DELAY_TIME);
+    return this.userService.findOneByUsername(username);
   }
 }

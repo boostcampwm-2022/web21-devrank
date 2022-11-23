@@ -12,5 +12,8 @@ export class UserDto {
   location?: string;
   bio?: string;
   email?: string;
+  dailyViews?: number;
+  scoreDifference?: number;
+  updateDelayTime?: number;
   repositories?: number[];
 }
