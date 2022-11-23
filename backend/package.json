@@ -37,6 +37,7 @@
     "ioredis": "^5.2.4",
     "mongoose": "^6.7.2",
     "morgan": "^1.10.0",
+    "nestjs-real-ip": "^2.2.0",
     "passport": "^0.6.0",
     "passport-github2": "^0.1.12",
     "passport-jwt": "^4.0.0",
