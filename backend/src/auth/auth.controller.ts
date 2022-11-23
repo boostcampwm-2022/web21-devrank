@@ -8,8 +8,8 @@ import { Request, Response } from 'express';
 import { LoginRequestDto } from './dto/login-request.dto';
 import { LoginResponseDto } from './dto/login-response-dto';
 import { RefreshGuard } from './guards/refresh-auth.guard';
-import { Payload } from './types/payload.interface';
 import { AuthService } from './auth.service';
+import { Payload } from './types';
 import { GithubProfile } from './types';
 
 @ApiTags('Auth')
