@@ -56,7 +56,7 @@ export class UserService {
     return this.userRepository.createOrUpdate(user);
   }
 
-  async findUserWithUpdateViews(ip: string, username: string): Promise<UserDto> {
+  async findOneWithUpdateViews(ip: string, username: string): Promise<UserDto> {
     const updateDelayTime = await this.userRepository.findUpdateScoreTimeToLive(username);
     if (await this.userRepository.isDuplicatedRequestIp(ip, username)) {
       const user = await this.userRepository.findOneByUsername(username);
