@@ -1,12 +1,11 @@
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import { EXPIRATION } from '@libs/const';
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
 
 @Injectable()
 export class AuthRepository {
-  constructor(@InjectRedis() private readonly redis: Redis, private readonly configService: ConfigService) {}
+  constructor(@InjectRedis() private readonly redis: Redis) {}
 
   async findRefreshTokenById(id: string): Promise<string> {
     return await this.redis.get(id);
