@@ -38,7 +38,7 @@ export class UserController {
   @ApiOperation({ summary: '특정 유저의 점수 업데이트' })
   @ApiResponse({ status: 200, description: '유저 정보' })
   async updateScore(@Param('githubId') githubId: string): Promise<UserDto> {
-    const githubToken = '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';
+    const githubToken = '';
     await this.userService.updateScore(githubId, githubToken);
     return this.userService.findOneByGithubId(githubId);
   }
