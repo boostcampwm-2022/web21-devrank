@@ -26,7 +26,7 @@ export class UserController {
     description: '특정 유저의 정보를 가져오고, 금일 조회하지 않은 IP주소라면 조회수도 +1 업데이트',
   })
   async findOneByUsername(@RealIP() ip: string, @Param('username') username: string): Promise<UserDto> {
-    return this.userService.findUserWithUpdateViews(ip, username);
+    return this.userService.findOneWithUpdateViews(ip, username);
   }
 
   @Patch(':username')
