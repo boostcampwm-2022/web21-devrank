@@ -1,42 +1,31 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
 import { Octokit } from '@octokit/core';
-import { Model } from 'mongoose';
 import { UserDto } from './dto/user.dto';
 import { RepositoryService } from './repository.service';
 import { UserRepository } from './user.repository';
-import { User } from './user.schema';
 
 @Injectable()
 export class UserService {
-  constructor(
-    @InjectModel('User') private readonly userModel: Model<User>,
-    private readonly userRepository: UserRepository,
-    private readonly repositoryService: RepositoryService,
-  ) {}
+  constructor(private readonly userRepository: UserRepository, private readonly repositoryService: RepositoryService) {}
 
   async findAll(): Promise<UserDto[]> {
     return this.userRepository.findAll();
   }
 
   async findOneByFilter(filter: object): Promise<UserDto> {
-    const user = await this.userRepository.findOne(filter);
+    const user = await this.userRepository.findOneByFilter(filter);
     if (!user) {
       throw new NotFoundException('user not found.');
     }
     return user;
   }
 
-  async findOneByGithubId(githubId: string): Promise<UserDto> {
-    const user = await this.userRepository.findOneByGithubId(githubId);
+  async findOneByUsername(username: string): Promise<UserDto> {
+    const user = await this.userRepository.findOneByUsername(username);
     if (!user) {
       throw new NotFoundException('user not found');
     }
     return user;
-  }
-
-  async create(user: UserDto): Promise<UserDto> {
-    return this.userRepository.create(user);
   }
 
   async createOrUpdate(user: UserDto): Promise<UserDto> {
@@ -49,8 +38,8 @@ export class UserService {
     return this.userRepository.createOrUpdate(user);
   }
 
-  async updateRepositories(id: string, githubToken: string): Promise<UserDto> {
-    const user = await this.userRepository.findOneByGithubId(id);
+  async updateRepositories(username: string, githubToken: string): Promise<UserDto> {
+    const user = await this.userRepository.findOneByUsername(username);
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -67,8 +56,21 @@ export class UserService {
     return this.userRepository.createOrUpdate(user);
   }
 
-  async updateScore(githubId: string, githubToken: string): Promise<UserDto> {
-    const user = await this.userRepository.findOneByGithubId(githubId);
+  async findUserWithUpdateViews(ip: string, username: string): Promise<UserDto> {
+    const updateDelayTime = await this.userRepository.findUpdateScoreTimeToLive(username);
+    if (await this.userRepository.isDuplicatedRequestIp(ip, username)) {
+      const user = await this.userRepository.findOneByUsername(username);
+      user.updateDelayTime = updateDelayTime;
+      return user;
+    }
+    this.userRepository.setDuplicatedRequestIp(ip, username);
+    const user = await this.userRepository.findOneByUsernameAndUpdateViews(username);
+    user.updateDelayTime = updateDelayTime;
+    return user;
+  }
+
+  async updateScore(username: string, githubToken: string): Promise<UserDto> {
+    const user = await this.userRepository.findOneByUsername(username);
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -148,27 +150,14 @@ export class UserService {
     return this.userRepository.createOrUpdate(user);
   }
 
-  async getRankings(): Promise<UserDto[]> {
-    const users = await this.userRepository.findAll();
-    users.sort((a, b) => {
-      return b.commitsScore + b.followersScore - (a.commitsScore + a.followersScore);
-    });
-    return users;
+  async isDuplicatedRequestIp(ip: string, username: string): Promise<boolean> {
+    return this.userRepository.isDuplicatedRequestIp(ip, username);
+  }
+  async findUpdateScoreTimeToLive(username: string): Promise<number> {
+    return this.userRepository.findUpdateScoreTimeToLive(username);
   }
 
-  async getMostRisingRankings(): Promise<UserDto[]> {
-    return this.userRepository.getMostRisingRankings();
-  }
-
-  async getMostViewedRankings(): Promise<UserDto[]> {
-    return this.userRepository.getgetMostViewedRankings();
-  }
-
-  async getRankingsByUsername(username: string): Promise<UserDto[]> {
-    const users = await this.userRepository.findAllByUsername(username);
-    users.sort((a, b) => {
-      return b.commitsScore + b.followersScore - (a.commitsScore + a.followersScore);
-    });
-    return users;
+  async setUpdateScoreDelayTime(username: string, seconds: number): Promise<any> {
+    return this.userRepository.setUpdateScoreDelayTime(username, seconds);
   }
 }
