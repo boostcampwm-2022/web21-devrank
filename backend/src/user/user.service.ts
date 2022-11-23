@@ -67,21 +67,6 @@ export class UserService {
     return this.userRepository.createOrUpdate(user);
   }
 
-  /*async updateScore(id: number): Promise<User> {
-    const user = await this.userRepository.findOneByGithubId(id);
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-    const repositories = await this.repositoryService.findAll();
-    const userRepositories = repositories.filter((repository) => {
-      return user.repositories.includes(repository.id);
-    });
-    user.score = userRepositories.reduce((acc, repository) => {
-      return acc + repository.score;
-    }, 0);
-    return this.userRepository.update(id, user);
-  }*/
-
   async updateScore(githubId: string, githubToken: string): Promise<UserDto> {
     const user = await this.userRepository.findOneByGithubId(githubId);
     if (!user) {
@@ -165,6 +150,14 @@ export class UserService {
 
   async getRankings(): Promise<UserDto[]> {
     const users = await this.userRepository.findAll();
+    users.sort((a, b) => {
+      return b.commitsScore + b.followersScore - (a.commitsScore + a.followersScore);
+    });
+    return users;
+  }
+
+  async getRankingsByUsername(username: string): Promise<UserDto[]> {
+    const users = await this.userRepository.findAllByUsername(username);
     users.sort((a, b) => {
       return b.commitsScore + b.followersScore - (a.commitsScore + a.followersScore);
     });

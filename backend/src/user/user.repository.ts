@@ -29,4 +29,8 @@ export class UserRepository {
     const filter = { id: user.id };
     return this.userModel.findOneAndUpdate(filter, user, { upsert: true }).exec();
   }
+
+  async findAllByUsername(username: string): Promise<UserDto[]> {
+    return this.userModel.find({ username: { $regex: username, $options: 'i' } }).exec();
+  }
 }
