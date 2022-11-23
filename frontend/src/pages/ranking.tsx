@@ -3,6 +3,7 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useState } from 'react';
 import styled from 'styled-components';
+import { useRefresh } from '@hooks';
 import { CubeRankType } from '@type/common';
 import Filterbar from '@components/Filterbar';
 import Ranking from '@components/Ranking';
@@ -11,6 +12,7 @@ import { CUBE_RANK } from '@utils/constants';
 import { mockRanking } from '@utils/mockData';
 
 function ranking() {
+  useRefresh();
   const { t } = useTranslation(['ranking', 'common']);
   const [active, setActive] = useState<CubeRankType>(CUBE_RANK.ALL);
 
