@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory, SchemaOptions } from '@nestjs/mongoose';
-import { IsArray, IsEmail, IsInt, IsString } from 'class-validator';
+import { IsArray, IsEmail, IsInt, IsNumber, IsString } from 'class-validator';
 import { Document } from 'mongoose';
 
 const options: SchemaOptions = {
@@ -25,11 +25,11 @@ export class User extends Document {
   followers: number;
 
   @Prop({ required: true })
-  @IsInt()
+  @IsNumber()
   commitsScore: number;
 
   @Prop({ required: true })
-  @IsInt()
+  @IsNumber()
   followersScore: number;
 
   // 선택적 정보

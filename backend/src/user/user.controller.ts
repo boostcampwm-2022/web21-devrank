@@ -1,5 +1,7 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ResponseRankingDto } from './dto/response-ranking.dto';
+import { ResponseRankingsDto } from './dto/response-rankings.dto';
 import { UserDto } from './dto/user.dto';
 import { UserService } from './user.service';
 
@@ -15,7 +17,16 @@ export class UserController {
     return this.userService.findAll();
   }
 
-  @Get(':githubId')
+  @Get('rankings')
+  @ApiOperation({ summary: '전체 랭킹 가져오기' })
+  @ApiResponse({ status: 200, description: '전체 랭킹', type: ResponseRankingsDto })
+  async getRankings(): Promise<ResponseRankingsDto> {
+    const users = await this.userService.getRankings();
+    const rankings = users.map((user) => new ResponseRankingDto().of(user));
+    return new ResponseRankingsDto().of(rankings);
+  }
+
+  @Get('find/:githubId')
   @ApiOperation({ summary: '특정 유저 정보 가져오기' })
   @ApiResponse({ status: 200, description: '유저 정보' })
   async findOneByGithubId(@Param('githubId') githubId: string): Promise<UserDto> {
@@ -24,12 +35,11 @@ export class UserController {
 
   @Get('update-score/:githubId')
   @ApiBearerAuth('accessToken')
-  @ApiOperation({ summary: '특정 유저의 저장소 점수 업데이트' })
+  @ApiOperation({ summary: '특정 유저의 점수 업데이트' })
   @ApiResponse({ status: 200, description: '유저 정보' })
   async updateScore(@Param('githubId') githubId: string): Promise<UserDto> {
     const githubToken = '';
-    this.userService.updateFollowersScore(githubId, githubToken);
-    this.userService.updateCommitsScore(githubId, githubToken);
+    await this.userService.updateScore(githubId, githubToken);
     return this.userService.findOneByGithubId(githubId);
   }
 }

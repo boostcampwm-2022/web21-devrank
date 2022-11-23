@@ -82,22 +82,7 @@ export class UserService {
     return this.userRepository.update(id, user);
   }*/
 
-  async updateFollowersScore(id: string, githubToken: string): Promise<UserDto> {
-    const user = await this.userRepository.findOneByGithubId(id);
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-    const octokit = new Octokit({
-      auth: githubToken,
-    });
-    const res = await octokit.request('GET /users/{username}/followers', {
-      username: user.username,
-    });
-    user.followersScore = res.data.length;
-    return this.userRepository.createOrUpdate(user);
-  }
-
-  async updateCommitsScore(githubId: string, githubToken: string): Promise<UserDto> {
+  async updateScore(githubId: string, githubToken: string): Promise<UserDto> {
     const user = await this.userRepository.findOneByGithubId(githubId);
     if (!user) {
       throw new NotFoundException('User not found');
@@ -112,6 +97,9 @@ export class UserService {
     const res2: any = await octokit.graphql(
       `query repositories($username: String!, $id: ID) {
         user(login: $username) {
+          followers{
+            totalCount
+          }
           repositories(
             first: 100
             isFork: false
@@ -159,6 +147,9 @@ export class UserService {
     console.log(res2);
     const repositories = res2.user.repositories.nodes;
     const score = repositories.reduce((acc, repository) => {
+      // if (!repositories.defaultBranchRef) {
+      //   return 0;
+      // }
       const totalScore =
         ((repository.stargazers.totalCount * 2 + repository.forks.totalCount) *
           repository.defaultBranchRef.target.history.totalCount) /
@@ -167,6 +158,16 @@ export class UserService {
       return acc + totalScore;
     }, 0);
     user.commitsScore = score;
+    console.log(res2.user);
+    user.followersScore = res2.user.followers.totalCount;
     return this.userRepository.createOrUpdate(user);
+  }
+
+  async getRankings(): Promise<UserDto[]> {
+    const users = await this.userRepository.findAll();
+    users.sort((a, b) => {
+      return b.commitsScore + b.followersScore - (a.commitsScore + a.followersScore);
+    });
+    return users;
   }
 }
