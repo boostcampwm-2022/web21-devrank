@@ -33,7 +33,7 @@ export class User extends Document {
 
   @Prop({ default: 0 })
   @IsInt()
-  views: number;
+  dailyViews: number;
 
   @Prop({ default: 0 })
   @IsNumber()
