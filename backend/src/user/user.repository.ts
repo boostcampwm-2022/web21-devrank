@@ -31,19 +31,23 @@ export class UserRepository {
 
   async createOrUpdate(user: UserDto): Promise<UserDto> {
     const filter = { id: user.id };
-    return this.userModel.findOneAndUpdate(filter, user, { upsert: true }).exec();
+    return this.userModel.findOneAndUpdate(filter, user, { upsert: true }).lean().exec();
   }
 
   async findAllByUsername(username: string): Promise<UserDto[]> {
-    return this.userModel.find({ username: { $regex: username, $options: 'i' } }).exec();
+    return this.userModel
+      .find({ username: { $regex: `^${username}` } })
+      .sort({ score: -1 })
+      .lean()
+      .exec();
   }
 
-  async getMostRisingRankings(count = 3): Promise<UserDto[]> {
-    return this.userModel.find().sort({ scoreDifference: -1 }).limit(count).exec();
+  async findMostRisingRankings(count = 3): Promise<UserDto[]> {
+    return this.userModel.find().sort({ scoreDifference: -1 }).limit(count).lean().exec();
   }
 
-  async getMostViewedRankings(count = 3): Promise<UserDto[]> {
-    return this.userModel.find().sort({ views: -1 }).limit(count).exec();
+  async findMostViewedRankings(count = 3): Promise<UserDto[]> {
+    return this.userModel.find().sort({ views: -1 }).limit(count).lean().exec();
   }
 
   async isDuplicatedRequestIp(ip: string, username: string): Promise<boolean> {
@@ -63,5 +67,18 @@ export class UserRepository {
   async findUpdateScoreTimeToLive(username: string): Promise<number> {
     const timeToLive = await this.redis.ttl(username);
     return timeToLive <= 0 ? 0 : timeToLive;
+  }
+
+  async findPaginationRankings(page: number, limit: number, tier: string, username: string): Promise<UserDto[]> {
+    const tierOption = tier === 'all' ? {} : { tier: tier };
+    const usernameOption = username ? { username: { $regex: `^${username}` } } : {};
+
+    return this.userModel
+      .find({ ...tierOption, ...usernameOption })
+      .sort({ score: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean()
+      .exec();
   }
 }
