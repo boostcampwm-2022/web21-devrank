@@ -5,6 +5,8 @@ export class UserDto {
   followers: number;
   commitsScore?: number;
   followersScore?: number;
+  score?: number;
+  tier?: string;
   avatarUrl?: string;
   name?: string;
   company?: string;
