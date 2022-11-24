@@ -1,30 +1,30 @@
 import { RankingResponse } from '@type/response';
 import axiosInstance from '@utils/axiosInstance';
 
-export const requestTopRankingByScore = async (count = 20): Promise<RankingResponse[]> => {
-  const { data } = await axiosInstance.get('/ranking', {
+export const requestTopRankingByScore = async (limit = 20): Promise<RankingResponse[]> => {
+  const { data } = await axiosInstance.get('/rankings', {
     params: {
-      count,
+      limit,
     },
   });
 
   return data;
 };
 
-export const requestTopRankingByRising = async (count = 3): Promise<RankingResponse[]> => {
-  const { data } = await axiosInstance.get('/ranking/rise', {
+export const requestTopRankingByRising = async (limit = 3): Promise<RankingResponse[]> => {
+  const { data } = await axiosInstance.get('/rankings/rise', {
     params: {
-      count,
+      limit,
     },
   });
 
   return data;
 };
 
-export const requestTopRankingByViews = async (count = 3): Promise<RankingResponse[]> => {
-  const { data } = await axiosInstance.get('/ranking/views', {
+export const requestTopRankingByViews = async (limit = 3): Promise<RankingResponse[]> => {
+  const { data } = await axiosInstance.get('/rankings/views', {
     params: {
-      count,
+      limit,
     },
   });
 
