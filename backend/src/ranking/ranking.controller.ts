@@ -78,8 +78,11 @@ export class RankingController {
     type: ResponseRankingDto,
     isArray: true,
   })
-  async getRankingsByUsername(@Param('username') username: string): Promise<ResponseRankingDto[]> {
-    const users = await this.rankingService.getRankingsByUsername(username);
+  async getRankingsByUsername(
+    @Query('limit', new DefaultValuePipe(15), ParseIntPipe) limit: number,
+    @Param('username') username: string,
+  ): Promise<ResponseRankingDto[]> {
+    const users = await this.rankingService.getRankingsByUsername(limit, username);
     const rankings = users.map((user) => new ResponseRankingDto().of(user));
     return rankings;
   }

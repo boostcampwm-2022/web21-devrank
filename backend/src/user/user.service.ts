@@ -9,10 +9,6 @@ import { UserRepository } from './user.repository';
 export class UserService {
   constructor(private readonly userRepository: UserRepository, private readonly repositoryService: RepositoryService) {}
 
-  async findAll(): Promise<UserDto[]> {
-    return this.userRepository.findAll();
-  }
-
   async findOneByFilter(filter: object): Promise<UserDto> {
     const user = await this.userRepository.findOneByFilter(filter);
     if (!user) {

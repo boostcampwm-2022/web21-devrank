@@ -10,13 +10,6 @@ export class RankingService {
     const users = await this.userRepository.findPaginationRankings(page, limit, tier, username);
     return users;
   }
-  async getMostScoredRankings(limit: number): Promise<UserDto[]> {
-    const users = await this.userRepository.findAll(limit);
-    users.sort((a, b) => {
-      return b.commitsScore + b.followersScore - (a.commitsScore + a.followersScore);
-    });
-    return users;
-  }
 
   async getMostRisingRankings(limit: number): Promise<UserDto[]> {
     const users = await this.userRepository.findMostRisingRankings(limit);
@@ -27,11 +20,8 @@ export class RankingService {
     return this.userRepository.findMostViewedRankings(limit);
   }
 
-  async getRankingsByUsername(username: string): Promise<UserDto[]> {
-    const users = await this.userRepository.findAllByUsername(username);
-    users.sort((a, b) => {
-      return b.commitsScore + b.followersScore - (a.commitsScore + a.followersScore);
-    });
+  async getRankingsByUsername(limit: number, username: string): Promise<UserDto[]> {
+    const users = await this.userRepository.findAllByUsername(limit, username);
     return users;
   }
 }
