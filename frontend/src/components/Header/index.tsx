@@ -47,38 +47,44 @@ function Header() {
           </li>
         </NavMenu>
         <ButtonGroup>
-          <Dropdown
-            trigger={
+          <Dropdown>
+            <Dropdown.Trigger>
               <LanguageButton size='md'>
                 <Image src='/icons/globe.svg' alt='언어 선택 버튼' width={25} height={25} />
                 <span>{t('common:current-locale')}</span>
               </LanguageButton>
-            }
-          >
-            <Dropdown.Item>
-              <Link href={router.pathname} locale='ko'>
-                한국어
-              </Link>
-            </Dropdown.Item>
-            <Dropdown.Item>
-              <Link href={router.pathname} locale='en'>
-                English
-              </Link>
-            </Dropdown.Item>
+            </Dropdown.Trigger>
+            <Dropdown.ItemList>
+              <Dropdown.Item>
+                <Link href={router.pathname} locale='ko'>
+                  한국어
+                </Link>
+              </Dropdown.Item>
+              <Dropdown.Item>
+                <Link href={router.pathname} locale='en'>
+                  English
+                </Link>
+              </Dropdown.Item>
+            </Dropdown.ItemList>
           </Dropdown>
           <div className='button-right'>
             {isFetching ? (
               <div>로딩중...</div>
             ) : userData ? (
-              <Dropdown trigger={<Avatar src={userData.avatarUrl} />}>
-                <Dropdown.Item>
-                  <Image src='/icons/profile.svg' alt='프로필 아이콘' width={17} height={17} quality={100} />
-                  {t('common:my-profile')}
-                </Dropdown.Item>
-                <Dropdown.Item onClick={onClickLogoutButton}>
-                  <Image src='/icons/logout.svg' alt='로그아웃 아이콘' width={17} height={17} quality={100} />
-                  {t('common:logout')}
-                </Dropdown.Item>
+              <Dropdown>
+                <Dropdown.Trigger>
+                  <Avatar src={userData.avatarUrl} />
+                </Dropdown.Trigger>
+                <Dropdown.ItemList>
+                  <Dropdown.Item>
+                    <Image src='/icons/profile.svg' alt='프로필 아이콘' width={17} height={17} quality={100} />
+                    {t('common:my-profile')}
+                  </Dropdown.Item>
+                  <Dropdown.Item onClick={onClickLogoutButton}>
+                    <Image src='/icons/logout.svg' alt='로그아웃 아이콘' width={17} height={17} quality={100} />
+                    {t('common:logout')}
+                  </Dropdown.Item>
+                </Dropdown.ItemList>
               </Dropdown>
             ) : (
               <Button size='md' onClick={onClickLoginButton}>
