@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 const instance = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -21,10 +22,10 @@ instance.interceptors.response.use(
     const originConfig = err.config;
 
     // 요청했는데 token 만료면 token refresh 요청
-    if (originConfig.url !== '/api/auth/login' && err.response) {
+    if (originConfig.url !== '/auth/login' && err.response) {
       if (err.response.status === 401 && err.response.retry) {
         try {
-          const { data } = await instance.post('/api/auth/refresh');
+          const { data } = await instance.post('/auth/refresh');
           axios.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`;
 
           return instance(originConfig);

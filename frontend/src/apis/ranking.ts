@@ -2,7 +2,7 @@ import { RankingResponse } from '@type/response';
 import axiosInstance from '@utils/axiosInstance';
 
 export const requestTopRankingByScore = async (count = 20): Promise<RankingResponse[]> => {
-  const { data } = await axiosInstance.get('/api/ranking', {
+  const { data } = await axiosInstance.get('/ranking', {
     params: {
       count,
     },
@@ -12,7 +12,7 @@ export const requestTopRankingByScore = async (count = 20): Promise<RankingRespo
 };
 
 export const requestTopRankingByRising = async (count = 3): Promise<RankingResponse[]> => {
-  const { data } = await axiosInstance.get('/api/ranking/rise', {
+  const { data } = await axiosInstance.get('/ranking/rise', {
     params: {
       count,
     },
@@ -22,7 +22,7 @@ export const requestTopRankingByRising = async (count = 3): Promise<RankingRespo
 };
 
 export const requestTopRankingByViews = async (count = 3): Promise<RankingResponse[]> => {
-  const { data } = await axiosInstance.get('/api/ranking/views', {
+  const { data } = await axiosInstance.get('/ranking/views', {
     params: {
       count,
     },
@@ -32,7 +32,7 @@ export const requestTopRankingByViews = async (count = 3): Promise<RankingRespon
 };
 
 export const requestRankingByUsername = async (username: string) => {
-  const { data } = await axiosInstance.get(`/api/ranking/${username}`);
+  const { data } = await axiosInstance.get(`/ranking/${username}`);
 
   return data;
 };

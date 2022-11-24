@@ -1,7 +1,8 @@
+import { LoginResponse } from '@type/response';
 import axiosInstance from '@utils/axiosInstance';
 
-export const requestGithubLogin = async (code: string) => {
-  const { data } = await axiosInstance.post('/api/auth/login', {
+export const requestGithubLogin = async (code: string): Promise<LoginResponse> => {
+  const { data } = await axiosInstance.post('/auth/login', {
     code,
   });
 
@@ -9,11 +10,11 @@ export const requestGithubLogin = async (code: string) => {
 };
 
 export const requestUserLogout = async () => {
-  await axiosInstance.delete('/api/auth/logout');
+  await axiosInstance.delete('/auth/logout');
 };
 
-export const requestTokenRefresh = async () => {
-  const { data } = await axiosInstance.post('/api/auth/refresh');
+export const requestTokenRefresh = async (): Promise<LoginResponse> => {
+  const { data } = await axiosInstance.post('/auth/refresh');
 
   return data;
 };
