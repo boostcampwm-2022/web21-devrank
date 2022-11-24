@@ -9,7 +9,25 @@ import GlobalStyles from '@styles/globalStyles';
 import theme from '@styles/theme';
 import { lineSeedKR } from '@utils/fonts';
 
-const queryClient = new QueryClient();
+const queryErrorHandler = (error: unknown) => {
+  if (error instanceof Error) {
+    console.error(error.message);
+  }
+};
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchOnMount: false,
+      onError: queryErrorHandler,
+    },
+    mutations: {
+      onError: queryErrorHandler,
+    },
+  },
+});
 
 function App({ Component, pageProps }: AppProps) {
   return (
