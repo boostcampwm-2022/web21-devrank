@@ -1,48 +1,63 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { ClickEvent } from '@type/common';
+import { DropdownContext } from '@contexts/dropdown';
+import useDropdown from '@hooks/useDropdown';
 
-interface ItemProps {
+interface DropdownProps {
   children: React.ReactNode;
   onClick?: (e: ClickEvent) => void;
 }
 
-interface DropdownProps {
-  /** 드롭다운을 동작시킬 컴포넌트를 지정한다. */
-  trigger: React.ReactNode;
-  children: React.ReactNode;
-}
-
-function Item({ children, onClick }: ItemProps) {
-  return <ItemContainer onClick={onClick}>{children}</ItemContainer>;
-}
-
-function Dropdown({ trigger, children }: DropdownProps) {
+function Dropdown({ children }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement | null>(null);
 
-  const onClickBackground = (e: MouseEvent) => {
+  const ref = React.useRef<HTMLDivElement | null>(null);
+
+  const toggleDropdown = () => setIsOpen((prev) => !prev);
+
+  const closeDropdown = (e: MouseEvent) => {
     if (e.target instanceof HTMLElement) {
-      if (!containerRef.current) return;
-      if (!containerRef.current.contains(e.target)) {
+      if (!ref.current) return;
+      if (!ref.current.contains(e.target)) {
         setIsOpen(false);
       }
     }
   };
 
   useEffect(() => {
-    window.addEventListener('click', onClickBackground);
-    return () => window.removeEventListener('click', onClickBackground);
+    window.addEventListener('click', closeDropdown);
+    return () => window.removeEventListener('click', closeDropdown);
   }, []);
 
   return (
-    <Container ref={containerRef} onClick={() => setIsOpen((prev) => !prev)}>
-      {trigger}
-      {isOpen && <Options>{children}</Options>}
-    </Container>
+    <DropdownContext.Provider value={{ ref, isOpen, toggleDropdown, closeDropdown }}>
+      <Container>{children}</Container>
+    </DropdownContext.Provider>
   );
 }
 
+function Trigger({ children }: DropdownProps) {
+  const { toggleDropdown, ref } = useDropdown();
+  return (
+    <div ref={ref} onClick={toggleDropdown}>
+      {children}
+    </div>
+  );
+}
+
+function ItemList({ children }: DropdownProps) {
+  const { isOpen } = useDropdown();
+
+  return isOpen ? <DropdownList>{children}</DropdownList> : null;
+}
+
+function Item({ children, onClick }: DropdownProps) {
+  return <DropdownItem onClick={onClick}>{children}</DropdownItem>;
+}
+
+Dropdown.ItemList = ItemList;
+Dropdown.Trigger = Trigger;
 Dropdown.Item = Item;
 
 export default Dropdown;
@@ -51,7 +66,7 @@ const Container = styled.div`
   position: relative;
   width: max-content;
 `;
-const Options = styled.ul`
+const DropdownList = styled.ul`
   position: absolute;
   bottom: -25px;
   left: 50%;
@@ -72,7 +87,7 @@ const Options = styled.ul`
   }
 `;
 
-const ItemContainer = styled.li`
+const DropdownItem = styled.li`
   ${({ theme }) => theme.common.flexCenter};
   gap: 5px;
   width: max-content;
