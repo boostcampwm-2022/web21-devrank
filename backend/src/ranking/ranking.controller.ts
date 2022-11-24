@@ -1,68 +1,80 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ResponseRankingDto } from './dto/response-ranking.dto';
 import { RankingService } from './ranking.service';
 
 @ApiTags('Ranking')
-@Controller('ranking')
+@Controller('rankings')
 export class RankingController {
   constructor(private readonly rankingService: RankingService) {}
 
   @Get()
-  @ApiOperation({ summary: '전체 랭킹 가져오기' })
-  @ApiQuery({ name: 'count', required: false, description: '설정 안 할 경우 기본값 20' })
+  @ApiOperation({ summary: 'score기반의 전체 랭킹 리스트' })
+  @ApiQuery({ name: 'page', required: false, description: '설정 안 할 경우 기본값 1' })
+  @ApiQuery({ name: 'limit', required: false, description: '설정 안 할 경우 기본값 15' })
+  @ApiQuery({ name: 'tier', required: false, description: '설정 안 할 경우 기본값 all' })
+  @ApiQuery({ name: 'username', required: false, description: `설정 안 할 경우 기본값 ''` })
   @ApiResponse({
     status: 200,
-    description: 'count 길이만큼의 score기준으로 정렬된 유저 리스트',
+    description: '15개 단위로 페이지네이션된 유저 랭킹 리스트',
     type: ResponseRankingDto,
     isArray: true,
   })
-  async getRankings(@Query('count') count): Promise<ResponseRankingDto[]> {
-    const users = await this.rankingService.getRankings(count);
+  async getRankings(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(15), ParseIntPipe) limit: number,
+    @Query('tier', new DefaultValuePipe('all')) tier: string,
+    @Query('username', new DefaultValuePipe('')) username: string,
+  ): Promise<ResponseRankingDto[]> {
+    const users = await this.rankingService.getFilteredRankings(page, limit, tier, username);
     const rankings = users.map((user) => new ResponseRankingDto().of(user));
     return rankings;
   }
 
   @Get('rise')
-  @ApiOperation({ summary: 'score 급상승 유저 리스트' })
-  @ApiQuery({ name: 'count', required: false, description: '설정 안 할 경우 기본값 3' })
+  @ApiOperation({ summary: 'score가 급상승한 랭킹 리스트' })
+  @ApiQuery({ name: 'limit', required: false, description: '설정 안 할 경우 기본값 3' })
   @ApiResponse({
     status: 200,
-    description: 'count 길이만큼의 급상승 유저 리스트',
+    description: 'limit 길이만큼의 급상승 유저 리스트',
     type: ResponseRankingDto,
     isArray: true,
   })
-  async getMostRisingRankings(@Query('count') count): Promise<ResponseRankingDto[]> {
-    const users = await this.rankingService.getMostRisingRankings(count);
+  async getMostRisingRankings(
+    @Query('limit', new DefaultValuePipe(3), ParseIntPipe) limit: number,
+  ): Promise<ResponseRankingDto[]> {
+    const users = await this.rankingService.getMostRisingRankings(limit);
     const rankings = users.map((user) => new ResponseRankingDto().of(user));
     return rankings;
   }
 
   @Get('views')
   @ApiOperation({ summary: '조회수 높은 유저 리스트' })
-  @ApiQuery({ name: 'count', required: false, description: '설정 안 할 경우 기본값 3' })
+  @ApiQuery({ name: 'limit', required: false, description: '설정 안 할 경우 기본값 3' })
   @ApiResponse({
     status: 200,
-    description: 'count 길이만큼의 조회수 높은 유저 리스트',
+    description: 'limit 길이만큼의 조회수 높은 유저 리스트',
     type: ResponseRankingDto,
     isArray: true,
   })
-  async getMostViewedRankings(@Query('count') count): Promise<ResponseRankingDto[]> {
-    const users = await this.rankingService.getMostViewedRankings(count);
+  async getMostViewedRankings(
+    @Query('limit', new DefaultValuePipe(3), ParseIntPipe) limit: number,
+  ): Promise<ResponseRankingDto[]> {
+    const users = await this.rankingService.getMostViewedRankings(limit);
     const rankings = users.map((user) => new ResponseRankingDto().of(user));
     return rankings;
   }
 
   @Get(':username')
-  @ApiOperation({ summary: '특정 유저들의 랭킹 가져오기' })
+  @ApiOperation({ summary: 'username이 앞부분부터 일치하는 랭킹 리스트' })
   @ApiParam({
     name: 'username',
     required: true,
-    description: '대소문자 관계없이 문자열이 유저 아이디와 (부분)일치하면 결과에 포함',
+    description: '사용자의 아이디 앞부분 (대소문자 구분 O)',
   })
   @ApiResponse({
     status: 200,
-    description: 'param으로 넘어온 문자열과 일치하는 유저들 라스트',
+    description: 'param으로 넘어온 username 문자열이 유저 아이디의 접두어인 유저 리스트',
     type: ResponseRankingDto,
     isArray: true,
   })

@@ -20,11 +20,15 @@ export class ResponseRankingDto {
   @ApiProperty()
   scoreDifference: number;
 
+  @ApiProperty()
+  tier: string;
+
   of(user: UserDto): ResponseRankingDto {
     this.id = user.id;
     this.username = user.username;
     this.avatarUrl = user.avatarUrl;
     this.score = user.commitsScore + user.followersScore;
+    this.tier = user.tier;
     this.dailyViews = user.dailyViews;
     this.scoreDifference = user.scoreDifference;
     return this;

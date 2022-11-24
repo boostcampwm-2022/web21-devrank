@@ -31,6 +31,10 @@ export class User extends Document {
   @IsNumber()
   followersScore: number;
 
+  @Prop({ required: true })
+  @IsNumber()
+  score: number;
+
   @Prop({ default: 0 })
   @IsInt()
   dailyViews: number;
@@ -42,6 +46,10 @@ export class User extends Document {
   @Prop({ default: 'default-image-path' })
   @IsString()
   avatarUrl: string;
+
+  @Prop()
+  @IsString()
+  tier: string;
 
   @Prop()
   @IsString()
@@ -69,14 +77,12 @@ export class User extends Document {
 
   @IsArray()
   repositories: number[];
-  // Github API를 통해 계산된 정보 (for Ranking)
 }
 
-// 점수계산 : followers, 최근 commit 이력들 * repo크기 가중치
-/**
- * repo 크기를 결정해줄 요소들
- */
-export class UserRank extends Document {}
-
-// class to scheme
 export const UserScheme = SchemaFactory.createForClass(User);
+
+UserScheme.index({ score: -1 });
+UserScheme.index({ scoreDifference: -1 });
+UserScheme.index({ dailyViews: -1 });
+UserScheme.index({ username: 1, score: 1 });
+UserScheme.index({ tier: 1, username: 1, score: 1 });
