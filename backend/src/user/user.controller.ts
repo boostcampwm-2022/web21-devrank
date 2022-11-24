@@ -12,13 +12,6 @@ import { UserService } from './user.service';
 export class UserController {
   constructor(private readonly userService: UserService, private readonly configService: ConfigService) {}
 
-  @Get()
-  @ApiOperation({ summary: '모든 유저 정보 가져오기' })
-  @ApiResponse({ status: 200, description: '모든 유저 정보' })
-  async findAll(): Promise<UserDto[]> {
-    return this.userService.findAll();
-  }
-
   @Get(':username')
   @ApiOperation({ summary: '특정 유저 정보 가져오기' })
   @ApiResponse({

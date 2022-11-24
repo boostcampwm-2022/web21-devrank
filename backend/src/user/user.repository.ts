@@ -13,10 +13,6 @@ export class UserRepository {
     @InjectRedis() private readonly redis: Redis,
   ) {}
 
-  async findAll(limit = 20): Promise<UserDto[]> {
-    return this.userModel.find().lean().limit(limit).exec();
-  }
-
   async findOneByFilter(filter: object): Promise<UserDto> {
     return this.userModel.findOne(filter).exec();
   }
@@ -34,10 +30,11 @@ export class UserRepository {
     return this.userModel.findOneAndUpdate(filter, user, { upsert: true }).lean().exec();
   }
 
-  async findAllByUsername(username: string): Promise<UserDto[]> {
+  async findAllByUsername(limit = 15, username: string): Promise<UserDto[]> {
     return this.userModel
       .find({ username: { $regex: `^${username}` } })
       .sort({ score: -1 })
+      .limit(limit)
       .lean()
       .exec();
   }
