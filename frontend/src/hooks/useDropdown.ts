@@ -1,13 +1,12 @@
-import { useState } from 'react';
+import React from 'react';
+import { DropdownContext } from '@contexts/dropdown';
 
 function useDropdown() {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const closeDropdown = () => setIsOpen(false);
-
-  const toggleDropdown = () => setIsOpen(!isOpen);
-
-  return { isOpen, toggleDropdown, closeDropdown };
+  const context = React.useContext(DropdownContext);
+  if (context === undefined) {
+    throw new Error('useToggle must be used within a <Toggle />');
+  }
+  return context;
 }
 
 export default useDropdown;
