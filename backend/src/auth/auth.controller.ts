@@ -67,6 +67,7 @@ export class AuthController {
       email: userInfo.email,
     };
     await this.userService.createOrUpdate(user);
+    this.userService.updateScore(user.username, githubToken);
 
     const accessToken = this.authService.issueAccessToken(user.id, githubToken);
     const refreshToken = this.authService.issueRefreshToken(user.id, githubToken);
