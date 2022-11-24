@@ -5,9 +5,13 @@ import { ClickEvent } from '@type/common';
 type AvatarSize = 'sm' | 'md' | 'lg';
 
 interface AvatarProps {
+  /** 유저 프로필 사진 경로 */
   src: string;
+  /** 아바타 가로 세로 크기 */
   size?: AvatarSize;
+  /** 사용자명 */
   name?: string;
+  /** 아바타 클릭시 실행되는 함수 */
   onClick?: (e: ClickEvent) => void;
 }
 

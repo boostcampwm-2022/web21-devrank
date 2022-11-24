@@ -4,21 +4,13 @@ import { ButtonClickEvent } from '@type/common';
 type ButtonSize = 'sm' | 'md';
 
 interface ButtonProps {
-  /**
-   * Button 내부 label 텍스트
-   */
+  /** Button 내부 label 텍스트 */
   children: React.ReactNode;
-  /**
-   * Button 크기 (sm => small, md => medium)
-   */
+  /** Button 크기 (sm => small, md => medium) */
   size?: ButtonSize;
-  /**
-   * Button 동작 여부
-   */
+  /** Button 동작 여부 */
   disabled?: boolean;
-  /**
-   * Button click시 실행되는 함수
-   */
+  /** Button click시 실행되는 함수 */
   onClick?: (e: ButtonClickEvent) => void;
 }
 

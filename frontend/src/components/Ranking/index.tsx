@@ -16,9 +16,13 @@ interface ElementProps {
 }
 
 interface RankingProps {
+  /** 테이블의 가로 크기 */
   width: string;
+  /** 각 컬럼의 width 비율(%) 배열 */
   columnWidthList: string[];
+  /** 각 컬럼의 수직 정렬 상태(left | center | right) 배열  */
   columnAlignList: TextAlignType[];
+  /** 랭킹 테이블 헤드, 바디 */
   children?: React.ReactNode;
 }
 
