@@ -81,8 +81,8 @@ export class User extends Document {
 
 export const UserScheme = SchemaFactory.createForClass(User);
 
-UserScheme.index({ score: -1 }); // clustered collection이 최적인데...
+UserScheme.index({ score: -1 });
 UserScheme.index({ scoreDifference: -1 });
 UserScheme.index({ dailyViews: -1 });
-UserScheme.index({ username: 1, tier: 1, score: 1 });
+UserScheme.index({ username: 1, score: 1 });
 UserScheme.index({ tier: 1, username: 1, score: 1 });
