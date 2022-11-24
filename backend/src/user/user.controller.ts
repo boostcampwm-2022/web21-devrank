@@ -1,16 +1,15 @@
-import { Payload } from '@apps/auth/types';
-import { BadRequestException, Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
+import { BadRequestException, Controller, Get, Param, Patch } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { RealIP } from 'nestjs-real-ip';
-import { CurrentUser } from '../../libs/common/decorators/current-user.decodator';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { UserGithubToken } from '../../libs/common/decorators/user-github-token.decorator';
 import { UserDto } from './dto/user.dto';
 import { UserService } from './user.service';
 
 @ApiTags('User')
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService, private readonly configService: ConfigService) {}
 
   @Get()
   @ApiOperation({ summary: '모든 유저 정보 가져오기' })
@@ -31,15 +30,13 @@ export class UserController {
 
   @Patch(':username')
   @ApiBearerAuth('accessToken')
-  @ApiOperation({ summary: '특정 유저의 점수 업데이트' })
-  @ApiResponse({ status: 200, description: '유저 정보' })
-  @UseGuards(JwtAuthGuard) // 유저 정보 업데이트 가드 없어도 될 거 같은데?
-  async updateScore(@CurrentUser() currentUser: Payload, @Param('username') username: string): Promise<UserDto> {
+  @ApiOperation({ summary: '특정 유저의 점수 업데이트 (유저마다 딜레이 시간 120초)' })
+  @ApiResponse({ status: 200, description: '업데이트된 유저 정보' })
+  async updateScore(@UserGithubToken() githubToken: string, @Param('username') username: string): Promise<UserDto> {
     if ((await this.userService.findUpdateScoreTimeToLive(username)) > 0) {
       throw new BadRequestException('user score has been updated recently.');
     }
-    const { githubToken } = currentUser;
-    await this.userService.updateScore(username, githubToken);
+    await this.userService.updateScore(username, githubToken || this.configService.get('GITHUB_PERSONAL_ACCESS_TOKEN'));
     const UPDATE_DELAY_TIME = 120;
     this.userService.setUpdateScoreDelayTime(username, UPDATE_DELAY_TIME);
     return this.userService.findOneByUsername(username);
