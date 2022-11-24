@@ -6,7 +6,11 @@ import { Injectable } from '@nestjs/common';
 export class RankingService {
   constructor(private readonly userRepository: UserRepository) {}
 
-  async getRankings(count: number): Promise<UserDto[]> {
+  async getFilteredRankings(page: number, count: number, tier: string, username: string): Promise<UserDto[]> {
+    const users = await this.userRepository.findPaginationRankings(page, count, tier, username);
+    return users;
+  }
+  async getMostScoredRankings(count: number): Promise<UserDto[]> {
     const users = await this.userRepository.findAll(count);
     users.sort((a, b) => {
       return b.commitsScore + b.followersScore - (a.commitsScore + a.followersScore);
@@ -15,11 +19,12 @@ export class RankingService {
   }
 
   async getMostRisingRankings(count: number): Promise<UserDto[]> {
-    return this.userRepository.getMostRisingRankings(count);
+    const users = await this.userRepository.findMostRisingRankings(count);
+    return users;
   }
 
   async getMostViewedRankings(count: number): Promise<UserDto[]> {
-    return this.userRepository.getMostViewedRankings(count);
+    return this.userRepository.findMostViewedRankings(count);
   }
 
   async getRankingsByUsername(username: string): Promise<UserDto[]> {
