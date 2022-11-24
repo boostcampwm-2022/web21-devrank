@@ -137,10 +137,10 @@ export class UserService {
     );
     console.log(res2);
     const repositories = res2.user.repositories.nodes;
-    const score = repositories.reduce((acc, repository) => {
-      // if (!repositories.defaultBranchRef) {
-      //   return 0;
-      // }
+    const score = repositories.reduce((acc: number, repository) => {
+      if (!repository.defaultBranchRef) {
+        return acc + 0;
+      }
       const totalScore =
         ((repository.stargazers.totalCount * 2 + repository.forks.totalCount) *
           repository.defaultBranchRef.target.history.totalCount) /
