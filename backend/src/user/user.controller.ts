@@ -1,3 +1,4 @@
+import { UPDATE_DELAY_TIME } from '@libs/const';
 import { BadRequestException, Controller, Get, Param, Patch } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -37,7 +38,6 @@ export class UserController {
       throw new BadRequestException('user score has been updated recently.');
     }
     await this.userService.updateScore(username, githubToken || this.configService.get('GITHUB_PERSONAL_ACCESS_TOKEN'));
-    const UPDATE_DELAY_TIME = 120;
     this.userService.setUpdateScoreDelayTime(username, UPDATE_DELAY_TIME);
     return this.userService.findOneByUsername(username);
   }
