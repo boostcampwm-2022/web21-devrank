@@ -1,3 +1,5 @@
+import { CubeRankType } from '@type/common';
+
 export interface LoginResponse {
   id: string;
   username: string;
@@ -7,6 +9,7 @@ export interface LoginResponse {
 
 export interface RankingResponse {
   id: string;
+  tier: CubeRankType;
   username: string;
   avatarUrl: string;
   dailyViews: number;

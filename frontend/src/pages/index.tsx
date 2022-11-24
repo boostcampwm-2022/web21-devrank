@@ -11,7 +11,6 @@ import { Avatar, LanguageIcon } from '@components/common';
 import CubeIcon from '@components/common/CubeIcon';
 import Searchbar from '@components/common/Searchbar';
 import { requestTopRankingByRising, requestTopRankingByScore, requestTopRankingByViews } from '@apis/ranking';
-import { CUBE_RANK } from '@utils/constants';
 import { mockLanguage } from '@utils/mockData';
 
 function Home(props: any) {
@@ -71,10 +70,10 @@ function Home(props: any) {
               <Ranking.Element>{t('common:table-user')}</Ranking.Element>
               <Ranking.Element>{t('common:table-score')}</Ranking.Element>
             </Ranking.Head>
-            {rankingByScore?.map(({ id, avatarUrl, username, score }, index) => (
+            {rankingByScore?.map(({ id, tier, avatarUrl, username, score }, index) => (
               <Ranking.Row key={id}>
                 <Ranking.Element>
-                  <CubeIcon tier={CUBE_RANK.ALL} />
+                  <CubeIcon tier={tier} />
                 </Ranking.Element>
                 <Ranking.Element>
                   <GrayText>{index + 1}</GrayText>
@@ -102,10 +101,10 @@ function Home(props: any) {
               <Ranking.Element>{t('common:table-user')}</Ranking.Element>
               <Ranking.Element>{t('common:table-score')}</Ranking.Element>
             </Ranking.Head>
-            {rankingByRising?.map(({ id, username, avatarUrl, score }, index) => (
+            {rankingByRising?.map(({ id, tier, username, avatarUrl, score }, index) => (
               <Ranking.Row key={id}>
                 <Ranking.Element>
-                  <CubeIcon tier={CUBE_RANK.ALL} />
+                  <CubeIcon tier={tier} />
                 </Ranking.Element>
                 <Ranking.Element>
                   <GrayText>{index + 1}</GrayText>
@@ -133,10 +132,10 @@ function Home(props: any) {
               <Ranking.Element>{t('common:table-user')}</Ranking.Element>
               <Ranking.Element>{t('common:table-views')}</Ranking.Element>
             </Ranking.Head>
-            {rankingByViews?.map(({ id, username, avatarUrl, dailyViews }, index) => (
+            {rankingByViews?.map(({ id, tier, username, avatarUrl, dailyViews }, index) => (
               <Ranking.Row key={id}>
                 <Ranking.Element>
-                  <CubeIcon tier={CUBE_RANK.ALL} />
+                  <CubeIcon tier={tier} />
                 </Ranking.Element>
                 <Ranking.Element>
                   <GrayText>{index + 1}</GrayText>
