@@ -1,18 +1,43 @@
-import { GetStaticProps } from 'next';
+import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Image from 'next/image';
 import styled from 'styled-components';
 import { useRefresh } from '@hooks';
+import { useQuery } from '@tanstack/react-query';
+import { RankingResponse } from '@type/response';
 import Ranking from '@components/Ranking';
 import { Avatar, LanguageIcon } from '@components/common';
 import CubeIcon from '@components/common/CubeIcon';
 import Searchbar from '@components/common/Searchbar';
-import { mockDaily, mockLanguage, mockOverall, mockRising } from '@utils/mockData';
+import { requestTopRankingByRising, requestTopRankingByScore, requestTopRankingByViews } from '@apis/ranking';
+import { CUBE_RANK } from '@utils/constants';
+import { mockLanguage } from '@utils/mockData';
 
-function Home() {
+function Home(props: any) {
   useRefresh();
   const { t } = useTranslation(['index', 'common']);
+  const { data: rankingByScore } = useQuery<RankingResponse[]>(
+    ['top-ranking-by-score'],
+    () => requestTopRankingByScore(12),
+    {
+      initialData: props.topRankingByScore,
+    },
+  );
+  const { data: rankingByRising } = useQuery<RankingResponse[]>(
+    ['top-ranking-by-rising'],
+    () => requestTopRankingByRising(),
+    {
+      initialData: props.topRankingByRising,
+    },
+  );
+  const { data: rankingByViews } = useQuery<RankingResponse[]>(
+    ['top-ranking-by-views'],
+    () => requestTopRankingByViews(),
+    {
+      initialData: props.topRankingByViews,
+    },
+  );
 
   return (
     <Container>
@@ -46,16 +71,16 @@ function Home() {
               <Ranking.Element>{t('common:table-user')}</Ranking.Element>
               <Ranking.Element>{t('common:table-score')}</Ranking.Element>
             </Ranking.Head>
-            {mockOverall.map(({ tier, user, score }, index) => (
-              <Ranking.Row key={user.id}>
+            {rankingByScore?.map(({ id, avatarUrl, username, score }, index) => (
+              <Ranking.Row key={id}>
                 <Ranking.Element>
-                  <CubeIcon tier={tier} />
+                  <CubeIcon tier={CUBE_RANK.ALL} />
                 </Ranking.Element>
                 <Ranking.Element>
                   <GrayText>{index + 1}</GrayText>
                 </Ranking.Element>
                 <Ranking.Element>
-                  <Avatar src='/profile-dummy.png' name={user.username} />
+                  <Avatar src={avatarUrl} name={username} />
                 </Ranking.Element>
                 <Ranking.Element>
                   <GrayText>{score.toLocaleString()}</GrayText>
@@ -77,16 +102,16 @@ function Home() {
               <Ranking.Element>{t('common:table-user')}</Ranking.Element>
               <Ranking.Element>{t('common:table-score')}</Ranking.Element>
             </Ranking.Head>
-            {mockRising.map(({ tier, user, score }, index) => (
-              <Ranking.Row key={user.id}>
+            {rankingByRising?.map(({ id, username, avatarUrl, score }, index) => (
+              <Ranking.Row key={id}>
                 <Ranking.Element>
-                  <CubeIcon tier={tier} />
+                  <CubeIcon tier={CUBE_RANK.ALL} />
                 </Ranking.Element>
                 <Ranking.Element>
                   <GrayText>{index + 1}</GrayText>
                 </Ranking.Element>
                 <Ranking.Element>
-                  <Avatar src='/profile-dummy.png' name={user.username} />
+                  <Avatar src={avatarUrl} name={username} />
                 </Ranking.Element>
                 <Ranking.Element>
                   <GrayText>{score.toLocaleString()}</GrayText>
@@ -108,19 +133,19 @@ function Home() {
               <Ranking.Element>{t('common:table-user')}</Ranking.Element>
               <Ranking.Element>{t('common:table-views')}</Ranking.Element>
             </Ranking.Head>
-            {mockDaily.map(({ tier, user, view }, index) => (
-              <Ranking.Row key={user.id}>
+            {rankingByViews?.map(({ id, username, avatarUrl, dailyViews }, index) => (
+              <Ranking.Row key={id}>
                 <Ranking.Element>
-                  <CubeIcon tier={tier} />
+                  <CubeIcon tier={CUBE_RANK.ALL} />
                 </Ranking.Element>
                 <Ranking.Element>
                   <GrayText>{index + 1}</GrayText>
                 </Ranking.Element>
                 <Ranking.Element>
-                  <Avatar src='/profile-dummy.png' name={user.username} />
+                  <Avatar src={avatarUrl} name={username} />
                 </Ranking.Element>
                 <Ranking.Element>
-                  <GrayText>{view.toLocaleString()}</GrayText>
+                  <GrayText>{dailyViews.toLocaleString()}</GrayText>
                 </Ranking.Element>
               </Ranking.Row>
             ))}
@@ -154,9 +179,18 @@ function Home() {
 
 export default Home;
 
-export const getStaticProps: GetStaticProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const [topRankingByScore, topRankingByRising, topRankingByViews] = await Promise.all([
+    requestTopRankingByScore(12),
+    requestTopRankingByRising(),
+    requestTopRankingByViews(),
+  ]);
+
   return {
     props: {
+      topRankingByScore,
+      topRankingByRising,
+      topRankingByViews,
       ...(await serverSideTranslations(context.locale as string, ['index', 'common', 'header', 'footer'])),
     },
   };
