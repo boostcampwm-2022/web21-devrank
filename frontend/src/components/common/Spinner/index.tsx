@@ -1,9 +1,7 @@
 import styled, { css, keyframes } from 'styled-components';
 
 interface SpinnerProps {
-  /**
-   * Spinner의 사이즈를 설정합니다.
-   */
+  /** Spinner의 사이즈를 설정합니다. */
   size: number;
 }
 

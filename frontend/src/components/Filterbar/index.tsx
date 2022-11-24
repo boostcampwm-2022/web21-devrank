@@ -6,7 +6,9 @@ import { CubeIcon } from '@components/common';
 import { CUBE_RANK } from '@utils/constants';
 
 interface FilterbarProps {
+  /** 현재 필터링바에서  활성화 된 큐브 등급 탭  */
   active: CubeRankType;
+  /** 필터링 바 활성화 탭 setter 함수 */
   setActive: Dispatch<SetStateAction<CubeRankType>>;
 }
 

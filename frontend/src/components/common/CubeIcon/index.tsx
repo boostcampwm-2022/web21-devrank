@@ -2,6 +2,7 @@ import Image from 'next/image';
 import { CubeRankType } from '@type/common';
 
 interface CubeIconProps {
+  /** 큐브 티어를 설정 */
   tier: CubeRankType;
 }
 
