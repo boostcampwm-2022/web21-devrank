@@ -13,6 +13,6 @@ export function getTier(score: number): string {
     case score < 600:
       return 'orange';
     default:
-      return 'rad';
+      return 'red';
   }
 }
