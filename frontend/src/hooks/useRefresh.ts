@@ -2,9 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { requestTokenRefresh } from '@apis/auth';
 
 function useRefresh() {
-  useQuery(['user'], requestTokenRefresh, {
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
+  return useQuery(['user'], requestTokenRefresh, {
     retry: false,
     cacheTime: Infinity,
   });

@@ -12,10 +12,7 @@ function Callback() {
 
   useQuery(['user'], () => requestGithubLogin(router.query.code as string), {
     cacheTime: Infinity,
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
     enabled: !!router.query.code,
-    select: (data) => data.user,
     onSuccess: () => {
       const loginPathname = localStorage.getItem('login-pathname');
       if (loginPathname) router.push(loginPathname);
