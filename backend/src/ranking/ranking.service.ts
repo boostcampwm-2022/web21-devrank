@@ -6,25 +6,25 @@ import { Injectable } from '@nestjs/common';
 export class RankingService {
   constructor(private readonly userRepository: UserRepository) {}
 
-  async getFilteredRankings(page: number, count: number, tier: string, username: string): Promise<UserDto[]> {
-    const users = await this.userRepository.findPaginationRankings(page, count, tier, username);
+  async getFilteredRankings(page: number, limit: number, tier: string, username: string): Promise<UserDto[]> {
+    const users = await this.userRepository.findPaginationRankings(page, limit, tier, username);
     return users;
   }
-  async getMostScoredRankings(count: number): Promise<UserDto[]> {
-    const users = await this.userRepository.findAll(count);
+  async getMostScoredRankings(limit: number): Promise<UserDto[]> {
+    const users = await this.userRepository.findAll(limit);
     users.sort((a, b) => {
       return b.commitsScore + b.followersScore - (a.commitsScore + a.followersScore);
     });
     return users;
   }
 
-  async getMostRisingRankings(count: number): Promise<UserDto[]> {
-    const users = await this.userRepository.findMostRisingRankings(count);
+  async getMostRisingRankings(limit: number): Promise<UserDto[]> {
+    const users = await this.userRepository.findMostRisingRankings(limit);
     return users;
   }
 
-  async getMostViewedRankings(count: number): Promise<UserDto[]> {
-    return this.userRepository.findMostViewedRankings(count);
+  async getMostViewedRankings(limit: number): Promise<UserDto[]> {
+    return this.userRepository.findMostViewedRankings(limit);
   }
 
   async getRankingsByUsername(username: string): Promise<UserDto[]> {

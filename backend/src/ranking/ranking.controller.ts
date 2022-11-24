@@ -33,34 +33,34 @@ export class RankingController {
 
   @Get('rise')
   @ApiOperation({ summary: 'score가 급상승한 랭킹 리스트' })
-  @ApiQuery({ name: 'count', required: false, description: '설정 안 할 경우 기본값 3' })
+  @ApiQuery({ name: 'limit', required: false, description: '설정 안 할 경우 기본값 3' })
   @ApiResponse({
     status: 200,
-    description: 'count 길이만큼의 급상승 유저 리스트',
+    description: 'limit 길이만큼의 급상승 유저 리스트',
     type: ResponseRankingDto,
     isArray: true,
   })
   async getMostRisingRankings(
-    @Query('count', new DefaultValuePipe(3), ParseIntPipe) count: number,
+    @Query('limit', new DefaultValuePipe(3), ParseIntPipe) limit: number,
   ): Promise<ResponseRankingDto[]> {
-    const users = await this.rankingService.getMostRisingRankings(count);
+    const users = await this.rankingService.getMostRisingRankings(limit);
     const rankings = users.map((user) => new ResponseRankingDto().of(user));
     return rankings;
   }
 
   @Get('views')
   @ApiOperation({ summary: '조회수 높은 유저 리스트' })
-  @ApiQuery({ name: 'count', required: false, description: '설정 안 할 경우 기본값 3' })
+  @ApiQuery({ name: 'limit', required: false, description: '설정 안 할 경우 기본값 3' })
   @ApiResponse({
     status: 200,
-    description: 'count 길이만큼의 조회수 높은 유저 리스트',
+    description: 'limit 길이만큼의 조회수 높은 유저 리스트',
     type: ResponseRankingDto,
     isArray: true,
   })
   async getMostViewedRankings(
-    @Query('count', new DefaultValuePipe(3), ParseIntPipe) count: number,
+    @Query('limit', new DefaultValuePipe(3), ParseIntPipe) limit: number,
   ): Promise<ResponseRankingDto[]> {
-    const users = await this.rankingService.getMostViewedRankings(count);
+    const users = await this.rankingService.getMostViewedRankings(limit);
     const rankings = users.map((user) => new ResponseRankingDto().of(user));
     return rankings;
   }

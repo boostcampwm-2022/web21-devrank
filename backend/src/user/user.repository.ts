@@ -13,8 +13,8 @@ export class UserRepository {
     @InjectRedis() private readonly redis: Redis,
   ) {}
 
-  async findAll(count = 20): Promise<UserDto[]> {
-    return this.userModel.find().lean().limit(count).exec();
+  async findAll(limit = 20): Promise<UserDto[]> {
+    return this.userModel.find().lean().limit(limit).exec();
   }
 
   async findOneByFilter(filter: object): Promise<UserDto> {
@@ -42,12 +42,12 @@ export class UserRepository {
       .exec();
   }
 
-  async findMostRisingRankings(count = 3): Promise<UserDto[]> {
-    return this.userModel.find().sort({ scoreDifference: -1 }).limit(count).lean().exec();
+  async findMostRisingRankings(limit = 3): Promise<UserDto[]> {
+    return this.userModel.find().sort({ scoreDifference: -1 }).limit(limit).lean().exec();
   }
 
-  async findMostViewedRankings(count = 3): Promise<UserDto[]> {
-    return this.userModel.find().sort({ views: -1 }).limit(count).lean().exec();
+  async findMostViewedRankings(limit = 3): Promise<UserDto[]> {
+    return this.userModel.find().sort({ views: -1 }).limit(limit).lean().exec();
   }
 
   async isDuplicatedRequestIp(ip: string, username: string): Promise<boolean> {
