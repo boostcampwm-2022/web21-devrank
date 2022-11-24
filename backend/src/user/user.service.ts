@@ -1,3 +1,4 @@
+import { getTier } from '@libs/utils';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Octokit } from '@octokit/core';
 import { UserDto } from './dto/user.dto';
@@ -58,13 +59,16 @@ export class UserService {
 
   async findOneWithUpdateViews(ip: string, username: string): Promise<UserDto> {
     const updateDelayTime = await this.userRepository.findUpdateScoreTimeToLive(username);
+    let user = null;
     if (await this.userRepository.isDuplicatedRequestIp(ip, username)) {
-      const user = await this.userRepository.findOneByUsername(username);
-      user.updateDelayTime = updateDelayTime;
-      return user;
+      user = await this.userRepository.findOneByUsername(username);
+    } else {
+      user = await this.userRepository.findOneByUsernameAndUpdateViews(username);
+    }
+    if (!user) {
+      throw new NotFoundException('User not found');
     }
     this.userRepository.setDuplicatedRequestIp(ip, username);
-    const user = await this.userRepository.findOneByUsernameAndUpdateViews(username);
     user.updateDelayTime = updateDelayTime;
     return user;
   }
@@ -147,6 +151,8 @@ export class UserService {
     user.commitsScore = score;
     console.log(res2.user);
     user.followersScore = res2.user.followers.totalCount;
+    user.score = user.commitsScore + user.followersScore;
+    user.tier = getTier(user.score);
     return this.userRepository.createOrUpdate(user);
   }
 
