@@ -20,7 +20,17 @@ export class UserService {
   async findOneByUsername(username: string): Promise<UserDto> {
     const user = await this.userRepository.findOneByUsername(username);
     if (!user) {
-      throw new NotFoundException('user not found');
+      const octokit = new Octokit();
+      const res = await octokit.request('GET /users/{username}', {
+        username: username,
+      });
+      const userDto = new UserDto();
+      userDto.username = res.data.login;
+      userDto.avatarUrl = res.data.avatar_url;
+      userDto.commitsScore = 0;
+      userDto.followersScore = 0;
+      userDto.score = 0;
+      return this.userRepository.createOrUpdate(userDto);
     }
     return user;
   }
@@ -62,7 +72,17 @@ export class UserService {
       user = await this.userRepository.findOneByUsernameAndUpdateViews(username);
     }
     if (!user) {
-      throw new NotFoundException('User not found');
+      const octokit = new Octokit();
+      const res = await octokit.request('GET /users/{username}', {
+        username: username,
+      });
+      const userDto = new UserDto();
+      userDto.username = res.data.login;
+      userDto.avatarUrl = res.data.avatar_url;
+      userDto.commitsScore = 0;
+      userDto.followersScore = 0;
+      userDto.score = 0;
+      user = this.userRepository.createOrUpdate(userDto);
     }
     this.userRepository.setDuplicatedRequestIp(ip, username);
     user.updateDelayTime = updateDelayTime;
@@ -88,7 +108,7 @@ export class UserService {
             totalCount
           }
           repositories(
-            first: 100
+            first: 50
             isFork: false
             privacy: PUBLIC
             orderBy: {field: STARGAZERS, direction: DESC}
