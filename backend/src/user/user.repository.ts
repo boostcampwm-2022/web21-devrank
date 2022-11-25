@@ -27,7 +27,7 @@ export class UserRepository {
 
   async createOrUpdate(user: UserDto): Promise<UserDto> {
     const filter = { id: user.id };
-    return this.userModel.findOneAndUpdate(filter, user, { upsert: true }).lean().exec();
+    return this.userModel.findOneAndUpdate(filter, user, { upsert: true, new: true }).lean().exec();
   }
 
   async findAllByUsername(limit = 15, username: string): Promise<UserDto[]> {
