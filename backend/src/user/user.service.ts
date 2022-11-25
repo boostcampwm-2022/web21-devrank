@@ -77,12 +77,13 @@ export class UserService {
         username: username,
       });
       const userDto = new UserDto();
+      userDto.id = res.data.node_id;
       userDto.username = res.data.login;
       userDto.avatarUrl = res.data.avatar_url;
       userDto.commitsScore = 0;
       userDto.followersScore = 0;
       userDto.score = 0;
-      user = this.userRepository.createOrUpdate(userDto);
+      user = await this.userRepository.createOrUpdate(userDto);
     }
     this.userRepository.setDuplicatedRequestIp(ip, username);
     user.updateDelayTime = updateDelayTime;
@@ -108,7 +109,7 @@ export class UserService {
             totalCount
           }
           repositories(
-            first: 50
+            first: 10
             isFork: false
             privacy: PUBLIC
             orderBy: {field: STARGAZERS, direction: DESC}
@@ -158,7 +159,7 @@ export class UserService {
         return acc + 0;
       }
       const totalScore =
-        ((repository.stargazers.totalCount * 2 + repository.forks.totalCount) *
+        ((repository.stargazers.totalCount + repository.forks.totalCount) *
           repository.defaultBranchRef.target.history.totalCount) /
         1000;
       console.log(repository.name, totalScore);
@@ -166,6 +167,7 @@ export class UserService {
     }, 0);
     user.commitsScore = score;
     console.log(res2.user);
+    user.followers = res2.user.followers.totalCount;
     user.followersScore = res2.user.followers.totalCount;
     user.score = user.commitsScore + user.followersScore;
     user.tier = getTier(user.score);
