@@ -197,6 +197,7 @@ export class UserService {
       const repositoryWeight = repository.stargazerCount + repository.forkCount;
       repository.defaultBranchRef.target.history.nodes.forEach((commit) => {
         const time = +new Date() - +new Date(commit.committedDate);
+        //TODO: 매직넘버 제거
         const timeWeight = (1 / 1.0019) ** (time / 1000 / 60 / 60 / 24);
         repositoryScore += repositoryWeight * timeWeight;
       });
