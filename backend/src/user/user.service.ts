@@ -117,6 +117,7 @@ export class UserService {
           ) {
             nodes {
               parent {
+                diskUsage
                 name
                 stargazerCount
                 forkCount
@@ -134,7 +135,9 @@ export class UserService {
                     }
                   }
                 }
-
+                languages(first: 50, orderBy: {field: SIZE, direction: DESC}) {
+                  totalSize
+                }
               }
             }
           }
@@ -155,6 +158,7 @@ export class UserService {
             orderBy: {field: STARGAZERS, direction: DESC}
           ) {
             nodes {
+              diskUsage
               name
               stargazerCount
               forkCount
@@ -171,6 +175,9 @@ export class UserService {
                     }
                   }
                 }
+              }
+              languages(first: 50, orderBy: {field: SIZE, direction: DESC}) {
+                totalSize
               }
             }
           }
@@ -195,6 +202,9 @@ export class UserService {
     );
     function getScore(acc: number, repository) {
       if (!repository.defaultBranchRef) {
+        return acc + 0;
+      }
+      if (repository.diskUsage > repository.languages.totalSize) {
         return acc + 0;
       }
       let repositoryScore = 0;
