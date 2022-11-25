@@ -189,6 +189,18 @@ export class UserService {
         id: userId,
       },
     );
+    const followersResponse: any = await octokit.graphql(
+      `query repositories($username: String!) {
+        user(login: $username) {
+          followers {
+            totalCount
+          }
+        }
+      }`,
+      {
+        username: user.username,
+      },
+    );
     function getScore(acc: number, repository) {
       if (!repository.defaultBranchRef) {
         return acc + 0;
@@ -210,6 +222,7 @@ export class UserService {
       return repository.parent;
     });
     const forkScore = forkRepositories.reduce(getScore, 0);
+    const followersScore = followersResponse.user.followers.totalCount;
 
     const personalRepositories = personalResponse.user.repositories.nodes;
     const personalScore = personalRepositories.reduce(getScore, 0);
