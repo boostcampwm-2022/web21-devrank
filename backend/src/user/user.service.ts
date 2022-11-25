@@ -105,7 +105,47 @@ export class UserService {
       username: user.username,
     });
     const userId = res.node_id;
+    //TODO: parent orderBy 적용되어야함
     const res2: any = await octokit.graphql(
+      `query repositories($username: String!, $id: ID) {
+        user(login: $username) {
+          followers{
+            totalCount
+          }
+          repositories(
+            first: 100
+            isFork: true
+            privacy: PUBLIC
+            orderBy: {field: STARGAZERS, direction: DESC}
+          ) {
+            nodes {
+              parent {
+                name
+                stargazerCount
+                forkCount
+                defaultBranchRef {
+                  target {
+                    ... on Commit {
+                      history(
+                        author: {id: $id}
+                      ) {
+                        totalCount
+                      }
+                    }
+                  }
+                }
+
+              }
+            }
+          }
+        }
+      }`,
+      {
+        username: user.username,
+        id: userId,
+      },
+    );
+    const res3: any = await octokit.graphql(
       `query repositories($username: String!, $id: ID) {
         user(login: $username) {
           followers{
@@ -119,30 +159,16 @@ export class UserService {
           ) {
             nodes {
               name
+              stargazerCount
+              forkCount
               defaultBranchRef {
                 target {
                   ... on Commit {
                     history(
                       author: {id: $id}
-                      first: 100
                     ) {
                       totalCount
                     }
-                  }
-                }
-              }
-              stargazers {
-                totalCount
-              }
-              forks {
-                totalCount
-              }
-              languages(first: 100, orderBy: {field: SIZE, direction: DESC}) {
-                totalSize
-                edges {
-                  size
-                  node {
-                    name
                   }
                 }
               }
@@ -156,13 +182,14 @@ export class UserService {
       },
     );
     console.log(res2);
-    const repositories = res2.user.repositories.nodes;
-    const score = repositories.reduce((acc: number, repository) => {
+    const forkRepositories = res2.user.repositories.nodes;
+    const forkScore = forkRepositories.reduce((acc: number, repository) => {
+      repository = repository.parent;
       if (!repository.defaultBranchRef) {
         return acc + 0;
       }
       const totalScore =
-        ((repository.stargazers.totalCount + repository.forks.totalCount) *
+        ((repository.stargazerCount + repository.forkCount) *
           (repository.defaultBranchRef.target.history.totalCount > 100
             ? 100
             : repository.defaultBranchRef.target.history.totalCount)) /
@@ -170,7 +197,21 @@ export class UserService {
       console.log(repository.name, totalScore);
       return acc + totalScore;
     }, 0);
-    user.commitsScore = score;
+    const personalRepositories = res3.user.repositories.nodes;
+    const personalScore = personalRepositories.reduce((acc: number, repository) => {
+      if (!repository.defaultBranchRef) {
+        return acc + 0;
+      }
+      const totalScore =
+        ((repository.stargazerCount + repository.forkCount) *
+          (repository.defaultBranchRef.target.history.totalCount > 100
+            ? 100
+            : repository.defaultBranchRef.target.history.totalCount)) /
+        1000;
+      console.log(repository.name, totalScore);
+      return acc + totalScore;
+    }, 0);
+    user.commitsScore = forkScore + personalScore;
     console.log(res2.user);
     user.followers = res2.user.followers.totalCount;
     user.followersScore = res2.user.followers.totalCount;
