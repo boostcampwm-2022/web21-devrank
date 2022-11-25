@@ -106,20 +106,18 @@ export class UserService {
     });
     const userId = res.node_id;
     //TODO: parent orderBy 적용되어야함
-    const res2: any = await octokit.graphql(
+    const forkResponse: any = await octokit.graphql(
       `query repositories($username: String!, $id: ID) {
         user(login: $username) {
-          followers{
-            totalCount
-          }
           repositories(
-            first: 100
+            first: 50
             isFork: true
             privacy: PUBLIC
             orderBy: {field: STARGAZERS, direction: DESC}
           ) {
             nodes {
               parent {
+                diskUsage
                 name
                 stargazerCount
                 forkCount
@@ -128,13 +126,18 @@ export class UserService {
                     ... on Commit {
                       history(
                         author: {id: $id}
+                        first: 100
                       ) {
-                        totalCount
+                        nodes {
+                          committedDate
+                        }
                       }
                     }
                   }
                 }
-
+                languages(first: 50, orderBy: {field: SIZE, direction: DESC}) {
+                  totalSize
+                }
               }
             }
           }
@@ -145,19 +148,17 @@ export class UserService {
         id: userId,
       },
     );
-    const res3: any = await octokit.graphql(
+    const personalResponse: any = await octokit.graphql(
       `query repositories($username: String!, $id: ID) {
         user(login: $username) {
-          followers{
-            totalCount
-          }
           repositories(
-            first: 100
+            first: 50
             isFork: false
             privacy: PUBLIC
             orderBy: {field: STARGAZERS, direction: DESC}
           ) {
             nodes {
+              diskUsage
               name
               stargazerCount
               forkCount
@@ -166,11 +167,17 @@ export class UserService {
                   ... on Commit {
                     history(
                       author: {id: $id}
+                      first: 100
                     ) {
-                      totalCount
+                      nodes {
+                        committedDate
+                      }
                     }
                   }
                 }
+              }
+              languages(first: 50, orderBy: {field: SIZE, direction: DESC}) {
+                totalSize
               }
             }
           }
@@ -181,43 +188,60 @@ export class UserService {
         id: userId,
       },
     );
-    console.log(res2);
-    const forkRepositories = res2.user.repositories.nodes;
-    const forkScore = forkRepositories.reduce((acc: number, repository) => {
-      repository = repository.parent;
+    const followersResponse: any = await octokit.graphql(
+      `query repositories($username: String!) {
+        user(login: $username) {
+          followers {
+            totalCount
+          }
+        }
+      }`,
+      {
+        username: user.username,
+      },
+    );
+    function getScore(acc: number, repository) {
       if (!repository.defaultBranchRef) {
         return acc + 0;
       }
-      const totalScore =
-        ((repository.stargazerCount + repository.forkCount) *
-          (repository.defaultBranchRef.target.history.totalCount > 100
-            ? 100
-            : repository.defaultBranchRef.target.history.totalCount)) /
-        1000;
-      console.log(repository.name, totalScore);
-      return acc + totalScore;
-    }, 0);
-    const personalRepositories = res3.user.repositories.nodes;
-    const personalScore = personalRepositories.reduce((acc: number, repository) => {
-      if (!repository.defaultBranchRef) {
+      if (repository.diskUsage > repository.languages.totalSize) {
         return acc + 0;
       }
-      const totalScore =
-        ((repository.stargazerCount + repository.forkCount) *
-          (repository.defaultBranchRef.target.history.totalCount > 100
-            ? 100
-            : repository.defaultBranchRef.target.history.totalCount)) /
-        1000;
-      console.log(repository.name, totalScore);
-      return acc + totalScore;
-    }, 0);
-    user.commitsScore = forkScore + personalScore;
-    console.log(res2.user);
-    user.followers = res2.user.followers.totalCount;
-    user.followersScore = res2.user.followers.totalCount;
+      let repositoryScore = 0;
+      const repositoryWeight = repository.stargazerCount + repository.forkCount;
+      repository.defaultBranchRef.target.history.nodes.forEach((commit) => {
+        const time = +new Date() - +new Date(commit.committedDate);
+        //TODO: 매직넘버 제거
+        const timeWeight = (1 / 1.0019) ** (time / 1000 / 60 / 60 / 24);
+        repositoryScore += repositoryWeight * timeWeight;
+      });
+      repositoryScore /= 1000;
+      console.log(repository.name, repositoryScore);
+      return acc + repositoryScore;
+    }
+
+    const forkRepositories = forkResponse.user.repositories.nodes.map((repository) => {
+      return repository.parent;
+    });
+    const forkScore = forkRepositories.reduce(getScore, 0);
+    const followersScore = followersResponse.user.followers.totalCount;
+
+    const personalRepositories = personalResponse.user.repositories.nodes;
+    const personalScore = personalRepositories.reduce(getScore, 0);
+    user.commitsScore = parseInt(forkScore + personalScore);
+    user.followers = followersScore;
+    user.followersScore = followersScore;
     user.score = user.commitsScore + user.followersScore;
     user.tier = getTier(user.score);
     return this.userRepository.createOrUpdate(user);
+  }
+
+  async updateAllScore(githubToken: string): Promise<UserDto[]> {
+    const users = await this.userRepository.findAll();
+    const promises = users.map((user) => {
+      return this.updateScore(user.username, githubToken);
+    });
+    return Promise.all(promises);
   }
 
   async isDuplicatedRequestIp(ip: string, username: string): Promise<boolean> {
