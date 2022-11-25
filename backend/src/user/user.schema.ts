@@ -24,15 +24,15 @@ export class User extends Document {
   followers: number;
 
   @Prop({ required: true })
-  @IsNumber()
+  @IsInt()
   commitsScore: number;
 
   @Prop({ required: true })
-  @IsNumber()
+  @IsInt()
   followersScore: number;
 
   @Prop({ required: true })
-  @IsNumber()
+  @IsInt()
   score: number;
 
   @Prop({ default: 0 })
