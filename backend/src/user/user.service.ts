@@ -226,10 +226,9 @@ export class UserService {
 
     const personalRepositories = personalResponse.user.repositories.nodes;
     const personalScore = personalRepositories.reduce(getScore, 0);
-    user.commitsScore = forkScore + personalScore;
-    console.log(forkResponse.user);
-    user.followers = forkResponse.user.followers.totalCount;
-    user.followersScore = forkResponse.user.followers.totalCount;
+    user.commitsScore = parseInt(forkScore + personalScore);
+    user.followers = followersScore;
+    user.followersScore = followersScore;
     user.score = user.commitsScore + user.followersScore;
     user.tier = getTier(user.score);
     return this.userRepository.createOrUpdate(user);
