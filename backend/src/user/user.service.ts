@@ -84,8 +84,11 @@ export class UserService {
       userDto.followersScore = 0;
       userDto.score = 0;
       user = await this.userRepository.createOrUpdate(userDto);
+      console.log(user);
     }
+    console.log(user);
     this.userRepository.setDuplicatedRequestIp(ip, username);
+    console.log(updateDelayTime);
     user.updateDelayTime = updateDelayTime;
     return user;
   }
@@ -160,7 +163,9 @@ export class UserService {
       }
       const totalScore =
         ((repository.stargazers.totalCount + repository.forks.totalCount) *
-          repository.defaultBranchRef.target.history.totalCount) /
+          (repository.defaultBranchRef.target.history.totalCount > 100
+            ? 100
+            : repository.defaultBranchRef.target.history.totalCount)) /
         1000;
       console.log(repository.name, totalScore);
       return acc + totalScore;
