@@ -18,7 +18,10 @@ function Home(props: any) {
   const { t } = useTranslation(['index', 'common']);
   const { data: rankingByScore } = useQuery<RankingResponse[]>(
     ['top-ranking-by-score'],
-    () => requestTopRankingByScore(12),
+    () =>
+      requestTopRankingByScore({
+        limit: 12,
+      }),
     {
       initialData: props.topRankingByScore,
     },
@@ -180,7 +183,9 @@ export default Home;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const [topRankingByScore, topRankingByRising, topRankingByViews] = await Promise.all([
-    requestTopRankingByScore(12),
+    requestTopRankingByScore({
+      limit: 12,
+    }),
     requestTopRankingByRising(),
     requestTopRankingByViews(),
   ]);
