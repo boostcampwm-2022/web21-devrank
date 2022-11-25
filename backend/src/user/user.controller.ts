@@ -34,4 +34,12 @@ export class UserController {
     this.userService.setUpdateScoreDelayTime(username, UPDATE_DELAY_TIME);
     return this.userService.findOneByUsername(username);
   }
+
+  @Patch('')
+  @ApiBearerAuth('accessToken')
+  @ApiOperation({ summary: '모든 유저의 점수 업데이트' })
+  @ApiResponse({ status: 200, description: '업데이트된 유저들 정보' })
+  async updateAllScore(@UserGithubToken() githubToken: string): Promise<UserDto[]> {
+    return this.userService.updateAllScore(githubToken || this.configService.get('GITHUB_PERSONAL_ACCESS_TOKEN'));
+  }
 }

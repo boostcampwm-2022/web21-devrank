@@ -222,6 +222,14 @@ export class UserService {
     return this.userRepository.createOrUpdate(user);
   }
 
+  async updateAllScore(githubToken: string): Promise<UserDto[]> {
+    const users = await this.userRepository.findAll();
+    const promises = users.map((user) => {
+      return this.updateScore(user.username, githubToken);
+    });
+    return Promise.all(promises);
+  }
+
   async isDuplicatedRequestIp(ip: string, username: string): Promise<boolean> {
     return this.userRepository.isDuplicatedRequestIp(ip, username);
   }

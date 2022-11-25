@@ -13,6 +13,10 @@ export class UserRepository {
     @InjectRedis() private readonly redis: Redis,
   ) {}
 
+  async findAll(): Promise<UserDto[]> {
+    return this.userModel.find().lean().exec();
+  }
+
   async findOneByFilter(filter: object): Promise<UserDto> {
     return this.userModel.findOne(filter).exec();
   }
