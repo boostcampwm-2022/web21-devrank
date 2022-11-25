@@ -109,7 +109,7 @@ export class UserService {
             totalCount
           }
           repositories(
-            first: 10
+            first: 100
             isFork: false
             privacy: PUBLIC
             orderBy: {field: STARGAZERS, direction: DESC}
@@ -119,11 +119,11 @@ export class UserService {
               defaultBranchRef {
                 target {
                   ... on Commit {
-                    history(author: {id: $id}) {
+                    history(
+                      author: {id: $id}
+                      first: 100
+                    ) {
                       totalCount
-                      nodes {
-                        committedDate
-                      }
                     }
                   }
                 }
