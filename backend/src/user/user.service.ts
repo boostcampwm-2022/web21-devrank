@@ -109,11 +109,8 @@ export class UserService {
     const forkResponse: any = await octokit.graphql(
       `query repositories($username: String!, $id: ID) {
         user(login: $username) {
-          followers{
-            totalCount
-          }
           repositories(
-            first: 100
+            first: 50
             isFork: true
             privacy: PUBLIC
             orderBy: {field: STARGAZERS, direction: DESC}
@@ -130,7 +127,6 @@ export class UserService {
                         author: {id: $id}
                         first: 100
                       ) {
-                        totalCount
                         nodes {
                           committedDate
                         }
@@ -152,11 +148,8 @@ export class UserService {
     const personalResponse: any = await octokit.graphql(
       `query repositories($username: String!, $id: ID) {
         user(login: $username) {
-          followers{
-            totalCount
-          }
           repositories(
-            first: 100
+            first: 50
             isFork: false
             privacy: PUBLIC
             orderBy: {field: STARGAZERS, direction: DESC}
@@ -172,7 +165,6 @@ export class UserService {
                       author: {id: $id}
                       first: 100
                     ) {
-                      totalCount
                       nodes {
                         committedDate
                       }
