@@ -106,7 +106,7 @@ export class UserService {
     });
     const userId = res.node_id;
     //TODO: parent orderBy 적용되어야함
-    const res2: any = await octokit.graphql(
+    const forkResponse: any = await octokit.graphql(
       `query repositories($username: String!, $id: ID) {
         user(login: $username) {
           followers{
@@ -128,8 +128,12 @@ export class UserService {
                     ... on Commit {
                       history(
                         author: {id: $id}
+                        first: 100
                       ) {
                         totalCount
+                        nodes {
+                          committedDate
+                        }
                       }
                     }
                   }
@@ -145,7 +149,7 @@ export class UserService {
         id: userId,
       },
     );
-    const res3: any = await octokit.graphql(
+    const personalResponse: any = await octokit.graphql(
       `query repositories($username: String!, $id: ID) {
         user(login: $username) {
           followers{
@@ -166,8 +170,12 @@ export class UserService {
                   ... on Commit {
                     history(
                       author: {id: $id}
+                      first: 100
                     ) {
                       totalCount
+                      nodes {
+                        committedDate
+                      }
                     }
                   }
                 }
@@ -181,40 +189,33 @@ export class UserService {
         id: userId,
       },
     );
-    console.log(res2);
-    const forkRepositories = res2.user.repositories.nodes;
-    const forkScore = forkRepositories.reduce((acc: number, repository) => {
-      repository = repository.parent;
+    function getScore(acc: number, repository) {
       if (!repository.defaultBranchRef) {
         return acc + 0;
       }
-      const totalScore =
-        ((repository.stargazerCount + repository.forkCount) *
-          (repository.defaultBranchRef.target.history.totalCount > 100
-            ? 100
-            : repository.defaultBranchRef.target.history.totalCount)) /
-        1000;
-      console.log(repository.name, totalScore);
-      return acc + totalScore;
-    }, 0);
-    const personalRepositories = res3.user.repositories.nodes;
-    const personalScore = personalRepositories.reduce((acc: number, repository) => {
-      if (!repository.defaultBranchRef) {
-        return acc + 0;
-      }
-      const totalScore =
-        ((repository.stargazerCount + repository.forkCount) *
-          (repository.defaultBranchRef.target.history.totalCount > 100
-            ? 100
-            : repository.defaultBranchRef.target.history.totalCount)) /
-        1000;
-      console.log(repository.name, totalScore);
-      return acc + totalScore;
-    }, 0);
+      let repositoryScore = 0;
+      const repositoryWeight = repository.stargazerCount + repository.forkCount;
+      repository.defaultBranchRef.target.history.nodes.forEach((commit) => {
+        const time = +new Date() - +new Date(commit.committedDate);
+        const timeWeight = (1 / 1.0019) ** (time / 1000 / 60 / 60 / 24);
+        repositoryScore += repositoryWeight * timeWeight;
+      });
+      repositoryScore /= 1000;
+      console.log(repository.name, repositoryScore);
+      return acc + repositoryScore;
+    }
+
+    const forkRepositories = forkResponse.user.repositories.nodes.map((repository) => {
+      return repository.parent;
+    });
+    const forkScore = forkRepositories.reduce(getScore, 0);
+
+    const personalRepositories = personalResponse.user.repositories.nodes;
+    const personalScore = personalRepositories.reduce(getScore, 0);
     user.commitsScore = forkScore + personalScore;
-    console.log(res2.user);
-    user.followers = res2.user.followers.totalCount;
-    user.followersScore = res2.user.followers.totalCount;
+    console.log(forkResponse.user);
+    user.followers = forkResponse.user.followers.totalCount;
+    user.followersScore = forkResponse.user.followers.totalCount;
     user.score = user.commitsScore + user.followersScore;
     user.tier = getTier(user.score);
     return this.userRepository.createOrUpdate(user);
