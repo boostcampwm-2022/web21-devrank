@@ -104,7 +104,7 @@ export class UserService {
     const res: any = await octokit.request('GET /users/{username}', {
       username: user.username,
     });
-    const userId = res.node_id;
+    const userId = res.data.node_id;
     //TODO: parent orderBy 적용되어야함
     const forkResponse: any = await octokit.graphql(
       `query repositories($username: String!, $id: ID) {
@@ -219,7 +219,6 @@ export class UserService {
       console.log(repository.name, repositoryScore);
       return acc + repositoryScore;
     }
-
     const forkRepositories = forkResponse.user.repositories.nodes.map((repository) => {
       return repository.parent;
     });
