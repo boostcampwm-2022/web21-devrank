@@ -3,16 +3,16 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useState } from 'react';
 import styled from 'styled-components';
-import { useRefresh } from '@hooks';
+import { QueryClient, dehydrate } from '@tanstack/react-query';
 import { CubeRankType } from '@type/common';
 import Filterbar from '@components/Filterbar';
 import Ranking from '@components/Ranking';
 import { Avatar, CubeIcon, LanguageIcon, Searchbar } from '@components/common';
+import { requestTokenRefresh } from '@apis/auth';
 import { CUBE_RANK } from '@utils/constants';
 import { mockRanking } from '@utils/mockData';
 
 function ranking() {
-  useRefresh();
   const { t } = useTranslation(['ranking', 'common']);
   const [active, setActive] = useState<CubeRankType>(CUBE_RANK.ALL);
 
@@ -71,8 +71,19 @@ function ranking() {
 export default ranking;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+        refetchOnMount: false,
+      },
+    },
+  });
+  await queryClient.prefetchQuery(['user'], () => requestTokenRefresh(context));
   return {
     props: {
+      dehydratedState: dehydrate(queryClient),
       ...(await serverSideTranslations(context.locale as string, ['common', 'header', 'footer', 'tier', 'ranking'])),
     },
   };

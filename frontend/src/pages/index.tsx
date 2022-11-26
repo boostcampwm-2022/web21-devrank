@@ -3,41 +3,28 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Image from 'next/image';
 import styled from 'styled-components';
-import { useRefresh } from '@hooks';
-import { useQuery } from '@tanstack/react-query';
+import { QueryClient, dehydrate, useQuery } from '@tanstack/react-query';
 import { RankingResponse } from '@type/response';
 import Ranking from '@components/Ranking';
 import { Avatar, LanguageIcon } from '@components/common';
 import CubeIcon from '@components/common/CubeIcon';
 import Searchbar from '@components/common/Searchbar';
+import { requestTokenRefresh } from '@apis/auth';
 import { requestTopRankingByRising, requestTopRankingByScore, requestTopRankingByViews } from '@apis/ranking';
 import { mockLanguage } from '@utils/mockData';
 
-function Home(props: any) {
-  useRefresh();
+function Home() {
   const { t } = useTranslation(['index', 'common']);
-  const { data: rankingByScore } = useQuery<RankingResponse[]>(
-    ['top-ranking-by-score'],
-    () => requestTopRankingByScore(12),
-    {
-      initialData: props.topRankingByScore,
-    },
-  );
-  const { data: rankingByRising } = useQuery<RankingResponse[]>(
-    ['top-ranking-by-rising'],
-    () => requestTopRankingByRising(),
-    {
-      initialData: props.topRankingByRising,
-    },
-  );
-  const { data: rankingByViews } = useQuery<RankingResponse[]>(
-    ['top-ranking-by-views'],
-    () => requestTopRankingByViews(),
-    {
-      initialData: props.topRankingByViews,
-    },
-  );
 
+  const { data: rankingByScore } = useQuery<RankingResponse[]>(['top-ranking-by-score'], () =>
+    requestTopRankingByScore(12),
+  );
+  const { data: rankingByRising } = useQuery<RankingResponse[]>(['top-ranking-by-rising'], () =>
+    requestTopRankingByRising(),
+  );
+  const { data: rankingByViews } = useQuery<RankingResponse[]>(['top-ranking-by-views'], () =>
+    requestTopRankingByViews(),
+  );
   return (
     <Container>
       <h2>
@@ -179,17 +166,24 @@ function Home(props: any) {
 export default Home;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const [topRankingByScore, topRankingByRising, topRankingByViews] = await Promise.all([
-    requestTopRankingByScore(12),
-    requestTopRankingByRising(),
-    requestTopRankingByViews(),
-  ]);
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+        refetchOnMount: false,
+      },
+    },
+  });
+
+  await queryClient.prefetchQuery(['top-ranking-by-score'], () => requestTopRankingByScore(12));
+  await queryClient.prefetchQuery(['top-ranking-by-rising'], () => requestTopRankingByRising());
+  await queryClient.prefetchQuery(['top-ranking-by-views'], () => requestTopRankingByViews());
+  await queryClient.prefetchQuery(['user'], () => requestTokenRefresh(context));
 
   return {
     props: {
-      topRankingByScore,
-      topRankingByRising,
-      topRankingByViews,
+      dehydratedState: dehydrate(queryClient),
       ...(await serverSideTranslations(context.locale as string, ['index', 'common', 'header', 'footer'])),
     },
   };
