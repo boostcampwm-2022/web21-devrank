@@ -4,12 +4,10 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Image from 'next/image';
 import React from 'react';
 import styled from 'styled-components';
-import { useRefresh } from '@hooks';
 import { CubeIcon } from '@components/common';
 import { CUBE_RANK, DEVELOPER_INFORMATION } from '@utils/constants';
 
 function About() {
-  useRefresh();
   const { t } = useTranslation(['tier', 'about']);
 
   return (

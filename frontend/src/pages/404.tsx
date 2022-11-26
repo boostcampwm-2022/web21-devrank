@@ -4,13 +4,11 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
-import { useRefresh } from '@hooks';
 import { Button } from '@components/common';
 import { aldrich, lineSeedKR } from '@utils/fonts';
 
 function NotFound() {
   const router = useRouter();
-  useRefresh();
 
   const { t } = useTranslation(['404']);
 
