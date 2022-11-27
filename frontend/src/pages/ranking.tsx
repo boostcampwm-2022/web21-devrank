@@ -1,10 +1,9 @@
-import { GetServerSideProps, NextPage } from 'next';
+import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
-import { QueryClient, dehydrate } from '@tanstack/react-query';
-import { useQuery } from '@tanstack/react-query';
+import { QueryClient, dehydrate, useQuery } from '@tanstack/react-query';
 import { CubeRankType } from '@type/common';
 import { RankingResponse } from '@type/response';
 import Filterbar from '@components/Filterbar';
@@ -14,25 +13,16 @@ import { requestTokenRefresh } from '@apis/auth';
 import { requestTopRankingByScore } from '@apis/ranking';
 import { CUBE_RANK } from '@utils/constants';
 
-interface RankingPageProps {
-  ranking: RankingResponse[];
-}
-
-const Ranking: NextPage<RankingPageProps> = ({ ranking }) => {
+function Ranking() {
   const { t } = useTranslation(['ranking', 'common']);
   const [active, setActive] = useState<CubeRankType>(CUBE_RANK.ALL);
-  const { data, refetch } = useQuery<RankingResponse[]>(
-    ['ranking'],
+  const { data } = useQuery<RankingResponse[]>(
+    ['ranking', active],
     () => requestTopRankingByScore({ limit: 10, tier: active }),
     {
-      initialData: ranking,
       keepPreviousData: true,
     },
   );
-
-  useEffect(() => {
-    refetch();
-  }, [active]);
 
   return (
     <Container>
@@ -85,7 +75,7 @@ const Ranking: NextPage<RankingPageProps> = ({ ranking }) => {
       </RankingTable>
     </Container>
   );
-};
+}
 
 export default Ranking;
 
@@ -100,13 +90,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     },
   });
   await queryClient.prefetchQuery(['user'], () => requestTokenRefresh(context));
-  const ranking = await requestTopRankingByScore({
-    limit: 10,
-  });
-  
+  await queryClient.prefetchQuery(['ranking', CUBE_RANK.ALL], () => requestTopRankingByScore({ limit: 10 }));
+
   return {
     props: {
-      ranking,
       dehydratedState: dehydrate(queryClient),
       ...(await serverSideTranslations(context.locale as string, ['common', 'header', 'footer', 'tier', 'ranking'])),
     },
