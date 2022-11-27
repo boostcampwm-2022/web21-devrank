@@ -15,7 +15,6 @@ import { mockLanguage } from '@utils/mockData';
 
 function Home() {
   const { t } = useTranslation(['index', 'common']);
-
   const { data: rankingByScore } = useQuery<RankingResponse[]>(['top-ranking-by-score'], () =>
     requestTopRankingByScore(12),
   );

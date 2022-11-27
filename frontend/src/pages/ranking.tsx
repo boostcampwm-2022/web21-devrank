@@ -1,20 +1,38 @@
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, NextPage } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { QueryClient, dehydrate } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { CubeRankType } from '@type/common';
+import { RankingResponse } from '@type/response';
 import Filterbar from '@components/Filterbar';
-import Ranking from '@components/Ranking';
+import RankingTable from '@components/Ranking';
 import { Avatar, CubeIcon, LanguageIcon, Searchbar } from '@components/common';
 import { requestTokenRefresh } from '@apis/auth';
+import { requestTopRankingByScore } from '@apis/ranking';
 import { CUBE_RANK } from '@utils/constants';
-import { mockRanking } from '@utils/mockData';
 
-function ranking() {
+interface RankingPageProps {
+  ranking: RankingResponse[];
+}
+
+const Ranking: NextPage<RankingPageProps> = ({ ranking }) => {
   const { t } = useTranslation(['ranking', 'common']);
   const [active, setActive] = useState<CubeRankType>(CUBE_RANK.ALL);
+  const { data, refetch } = useQuery<RankingResponse[]>(
+    ['ranking'],
+    () => requestTopRankingByScore({ limit: 10, tier: active }),
+    {
+      initialData: ranking,
+      keepPreviousData: true,
+    },
+  );
+
+  useEffect(() => {
+    refetch();
+  }, [active]);
 
   return (
     <Container>
@@ -30,45 +48,46 @@ function ranking() {
           onSubmit={(e) => {}}
         />
       </SearchbarContainer>
-      <Ranking
+      <RankingTable
         width={'100%'}
         columnWidthList={['8%', '52%', '10%', '10%', '20%']}
         columnAlignList={['center', 'left', 'left', 'left', 'center']}
       >
-        <Ranking.Head>
-          <Ranking.Element>#</Ranking.Element>
-          <Ranking.Element>{t('common:table-user')}</Ranking.Element>
-          <Ranking.Element>{t('common:table-tier')}</Ranking.Element>
-          <Ranking.Element>{t('common:table-score')}</Ranking.Element>
-          <Ranking.Element>{t('common:table-tech-stack')}</Ranking.Element>
-        </Ranking.Head>
-        {mockRanking.map((data) => (
-          <Ranking.Row key={data.id}>
-            <Ranking.Element>{data.id}</Ranking.Element>
-            <Ranking.Element>
-              <Avatar src={data.avatarUrl} name={data.username} />
-            </Ranking.Element>
-            <Ranking.Element>
-              <CubeIcon tier={data.tier as CubeRankType} />
-            </Ranking.Element>
-            <Ranking.Element>{data.score}</Ranking.Element>
-            <Ranking.Element>
+        <RankingTable.Head>
+          <RankingTable.Element>#</RankingTable.Element>
+          <RankingTable.Element>{t('common:table-user')}</RankingTable.Element>
+          <RankingTable.Element>{t('common:table-tier')}</RankingTable.Element>
+          <RankingTable.Element>{t('common:table-score')}</RankingTable.Element>
+          <RankingTable.Element>{t('common:table-tech-stack')}</RankingTable.Element>
+        </RankingTable.Head>
+        {data?.map(({ id, username, avatarUrl, tier, score }, index) => (
+          <RankingTable.Row key={id}>
+            <RankingTable.Element>{index + 1}</RankingTable.Element>
+            <RankingTable.Element>
+              <Avatar src={avatarUrl} name={username} />
+            </RankingTable.Element>
+            <RankingTable.Element>
+              <CubeIcon tier={tier} />
+            </RankingTable.Element>
+            <RankingTable.Element>{score}</RankingTable.Element>
+            <RankingTable.Element>
+              {/* TODO: 기술스택 아이콘으로 변경
               <TechStackList>
                 {data.langs.map((lang) => (
                   <li key={lang}>
                     <LanguageIcon language={lang} width={35} height={35} />
                   </li>
                 ))}
-              </TechStackList>
-            </Ranking.Element>
-          </Ranking.Row>
+              </TechStackList> */}
+            </RankingTable.Element>
+          </RankingTable.Row>
         ))}
-      </Ranking>
+      </RankingTable>
     </Container>
   );
-}
+};
 
-export default ranking;
+export default Ranking;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const queryClient = new QueryClient({
@@ -81,8 +100,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     },
   });
   await queryClient.prefetchQuery(['user'], () => requestTokenRefresh(context));
+  const ranking = await requestTopRankingByScore({
+    limit: 10,
+  });
+  
   return {
     props: {
+      ranking,
       dehydratedState: dehydrate(queryClient),
       ...(await serverSideTranslations(context.locale as string, ['common', 'header', 'footer', 'tier', 'ranking'])),
     },
