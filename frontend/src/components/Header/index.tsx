@@ -4,21 +4,21 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { useQueryData } from '@hooks';
-import { useIsFetching, useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { Avatar, Button } from '@components/common';
 import Dropdown from '@components/common/Dropdown';
-import { requestUserLogout } from '@apis/auth';
+import { requestTokenRefresh, requestUserLogout } from '@apis/auth';
 import { GITHUB_AUTH_REQUEST_URL } from '@utils/constants';
 
 function Header() {
   const { mutate: logout } = useMutation({
     mutationFn: requestUserLogout,
   });
-  const { queryData: userData, removeQueryData: removeUser } = useQueryData(['user']);
+  const { removeQueryData: removeUser } = useQueryData(['user']);
+  const { data: userData } = useQuery(['user'], () => requestTokenRefresh());
+
   const { t } = useTranslation(['header', 'common']);
   const router = useRouter();
-
-  const isFetching = useIsFetching(['user']);
 
   const onClickLoginButton = () => {
     localStorage.setItem('login-pathname', window.location.pathname);
@@ -68,9 +68,7 @@ function Header() {
             </Dropdown.ItemList>
           </Dropdown>
           <div className='button-right'>
-            {isFetching ? (
-              <div>로딩중...</div>
-            ) : userData ? (
+            {userData ? (
               <Dropdown>
                 <Dropdown.Trigger>
                   <Avatar src={userData.avatarUrl} />

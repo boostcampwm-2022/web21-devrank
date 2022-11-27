@@ -3,13 +3,14 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { useRefresh } from '@hooks';
+import { QueryClient, dehydrate } from '@tanstack/react-query';
 import { useQuery } from '@tanstack/react-query';
 import { CubeRankType } from '@type/common';
 import { RankingResponse } from '@type/response';
 import Filterbar from '@components/Filterbar';
 import RankingTable from '@components/Ranking';
 import { Avatar, CubeIcon, LanguageIcon, Searchbar } from '@components/common';
+import { requestTokenRefresh } from '@apis/auth';
 import { requestTopRankingByScore } from '@apis/ranking';
 import { CUBE_RANK } from '@utils/constants';
 
@@ -18,7 +19,6 @@ interface RankingPageProps {
 }
 
 const Ranking: NextPage<RankingPageProps> = ({ ranking }) => {
-  useRefresh();
   const { t } = useTranslation(['ranking', 'common']);
   const [active, setActive] = useState<CubeRankType>(CUBE_RANK.ALL);
   const { data, refetch } = useQuery<RankingResponse[]>(
@@ -90,12 +90,24 @@ const Ranking: NextPage<RankingPageProps> = ({ ranking }) => {
 export default Ranking;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+        refetchOnMount: false,
+      },
+    },
+  });
+  await queryClient.prefetchQuery(['user'], () => requestTokenRefresh(context));
   const ranking = await requestTopRankingByScore({
     limit: 10,
   });
+  
   return {
     props: {
       ranking,
+      dehydratedState: dehydrate(queryClient),
       ...(await serverSideTranslations(context.locale as string, ['common', 'header', 'footer', 'tier', 'ranking'])),
     },
   };
