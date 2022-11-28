@@ -1,5 +1,6 @@
 import { Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { RankingLanguageDto } from './dto/ranking-language.dto';
 import { RankingPaginationDto } from './dto/ranking-pagination.dto';
 import { RankingUserDto } from './dto/ranking-user.dto';
 import { RankingService } from './ranking.service';
@@ -61,6 +62,23 @@ export class RankingController {
   ): Promise<RankingUserDto[]> {
     const users = await this.rankingService.getMostViewedRankings(limit);
     const rankings = users.map((user) => new RankingUserDto().of(user));
+    return rankings;
+  }
+
+  @Get('languages')
+  @ApiOperation({ summary: '가장 많이 사용하는 언어' })
+  @ApiQuery({ name: 'limit', required: false, description: '설정 안 할 경우 기본값 3' })
+  @ApiResponse({
+    status: 200,
+    description: 'limit 길이만큼의 많이 사용하는 언어 리스트',
+    type: RankingLanguageDto,
+    isArray: true,
+  })
+  async getMostUsedLanguages(
+    @Query('limit', new DefaultValuePipe(3), ParseIntPipe) limit: number,
+  ): Promise<RankingLanguageDto[]> {
+    const languages = await this.rankingService.getMostUsedLanguages(limit);
+    const rankings = languages.map((language) => new RankingLanguageDto().of(language.name, language.count));
     return rankings;
   }
 
