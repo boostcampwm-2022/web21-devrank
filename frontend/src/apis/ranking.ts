@@ -4,14 +4,14 @@ import axiosInstance from '@utils/axiosInstance';
 import { CUBE_RANK } from '@utils/constants';
 
 interface RequestTopRankingByScoreParams {
-  page?: number;
+  page?: string;
   limit?: number;
   tier?: CubeRankType;
   username?: string;
 }
 
 export const requestTopRankingByScore = async ({
-  page = 1,
+  page = '1',
   limit = 10,
   tier = CUBE_RANK.ALL,
   username = '',
