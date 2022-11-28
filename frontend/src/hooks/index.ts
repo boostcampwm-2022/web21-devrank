@@ -1,4 +1,5 @@
 import useDropdown from './useDropdown';
+import useInput from './useInput';
 import useQueryData from './useQueryData';
 
-export { useQueryData, useDropdown };
+export { useInput, useDropdown, useQueryData };
