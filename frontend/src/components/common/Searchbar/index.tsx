@@ -1,24 +1,21 @@
 import Image from 'next/image';
 import styled, { css } from 'styled-components';
-import { FormEvent, InputChangeEvent } from '@type/common';
+import { useInput } from '@hooks';
+import { FormEvent } from '@type/common';
 
 type SubmitAlign = 'left' | 'right';
 
 interface SearchbarProps {
   /** input 태그의 type 속성 */
   type: string;
-  /** 검색바 입력값 */
-  value: string;
   /** 검색바 placeholder */
   placeholder: string;
   /** 검색바 너비(px 빼고)  Ex 100 */
   width: number;
   /** 검색 버튼 위치 (left | right) */
   submitAlign: SubmitAlign;
-  /** 검색바 입력 이벤트 핸들러 함수 */
-  onChange: (e: InputChangeEvent) => void;
-  /** 검색폼 제출 이벤트 핸들러 함수 */
-  onSubmit: (e: FormEvent) => void;
+  /** 검색폼 제출 핸들러 함수 */
+  onSearch: (username: string) => void;
 }
 
 interface StyledFormProps {
@@ -26,19 +23,18 @@ interface StyledFormProps {
   submitAlign: SubmitAlign;
 }
 
-function Searchbar({
-  type = 'text',
-  value,
-  placeholder,
-  width,
-  submitAlign,
-  onChange,
-  onSubmit,
-  ...props
-}: SearchbarProps) {
+function Searchbar({ type = 'text', placeholder, width, submitAlign, onSearch, ...props }: SearchbarProps) {
+  const { input, onInputChange, inputReset } = useInput('');
+
+  const onInputSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    onSearch(input);
+    inputReset();
+  };
+
   return (
-    <Form width={width} submitAlign={submitAlign} onSubmit={onSubmit}>
-      <Input type={type} value={value} placeholder={placeholder} onChange={onChange} {...props} />
+    <Form width={width} submitAlign={submitAlign} onSubmit={onInputSubmit}>
+      <Input type={type} value={input} placeholder={placeholder} onChange={onInputChange} {...props} />
       <SearchButton type='submit'>
         <Image src='/icons/search.svg' alt='검색버튼' width={24} height={24} />
       </SearchButton>
