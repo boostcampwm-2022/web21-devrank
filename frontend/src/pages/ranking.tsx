@@ -5,7 +5,7 @@ import { useState } from 'react';
 import styled from 'styled-components';
 import { QueryClient, dehydrate, useQuery } from '@tanstack/react-query';
 import { CubeRankType } from '@type/common';
-import { RankingResponse } from '@type/response';
+import { RankingPaiginationResponse } from '@type/response';
 import Filterbar from '@components/Filterbar';
 import RankingTable from '@components/Ranking';
 import NotFound from '@components/Ranking/NotFound';
@@ -19,7 +19,7 @@ function Ranking() {
   const [tier, setTier] = useState<CubeRankType>(CUBE_RANK.ALL);
   const [username, setUsername] = useState('');
 
-  const { isLoading, data } = useQuery<RankingResponse[]>(['ranking', tier, username], () =>
+  const { isLoading, data } = useQuery<RankingPaiginationResponse>(['ranking', tier, username], () =>
     requestTopRankingByScore({ limit: COUNT_PER_PAGE, tier, username }),
   );
 
@@ -57,7 +57,7 @@ function Ranking() {
           <RankingTable.Element>{t('common:table-score')}</RankingTable.Element>
           <RankingTable.Element>{t('common:table-tech-stack')}</RankingTable.Element>
         </RankingTable.Head>
-        {data?.map(({ id, username, avatarUrl, tier, score }, index) => (
+        {data?.users.map(({ id, username, avatarUrl, tier, score }, index) => (
           <RankingTable.Row key={id}>
             <RankingTable.Element>{index + 1}</RankingTable.Element>
             <RankingTable.Element>
@@ -81,7 +81,7 @@ function Ranking() {
         ))}
       </RankingTable>
       {isLoading && Array.from({ length: COUNT_PER_PAGE }).map((_, index) => <RankingSkeleton key={index} />)}
-      {data?.length === 0 && <NotFound />}
+      {data?.users.length === 0 && <NotFound />}
     </Container>
   );
 }

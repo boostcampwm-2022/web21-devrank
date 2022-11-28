@@ -1,5 +1,5 @@
 import { CubeRankType } from '@type/common';
-import { RankingResponse } from '@type/response';
+import { RankingPaiginationResponse, RankingResponse } from '@type/response';
 import axiosInstance from '@utils/axiosInstance';
 import { CUBE_RANK } from '@utils/constants';
 
@@ -15,7 +15,7 @@ export const requestTopRankingByScore = async ({
   limit = 10,
   tier = CUBE_RANK.ALL,
   username = '',
-}: RequestTopRankingByScoreParams): Promise<RankingResponse[]> => {
+}: RequestTopRankingByScoreParams): Promise<RankingPaiginationResponse> => {
   const { data } = await axiosInstance.get('/rankings', {
     params: {
       page,
