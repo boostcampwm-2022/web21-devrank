@@ -4,7 +4,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Image from 'next/image';
 import styled from 'styled-components';
 import { QueryClient, dehydrate, useQuery } from '@tanstack/react-query';
-import { RankingResponse } from '@type/response';
+import { RankingPaiginationResponse, RankingResponse } from '@type/response';
 import Ranking from '@components/Ranking';
 import { Avatar, LanguageIcon } from '@components/common';
 import CubeIcon from '@components/common/CubeIcon';
@@ -15,7 +15,7 @@ import { mockLanguage } from '@utils/mockData';
 
 function Home() {
   const { t } = useTranslation(['index', 'common']);
-  const { data: rankingByScore } = useQuery<RankingResponse[]>(['top-ranking-by-score'], () =>
+  const { data: rankingByScore } = useQuery<RankingPaiginationResponse>(['top-ranking-by-score'], () =>
     requestTopRankingByScore({
       limit: 12,
     }),
@@ -34,13 +34,9 @@ function Home() {
       <Searchbar
         type='text'
         width={600}
-        value=''
         placeholder={t('index:search-placeholder')}
         submitAlign='right'
-        onChange={(e) => {
-          console.log(e);
-        }}
-        onSubmit={(e) => {
+        onSearch={(e) => {
           console.log(e);
         }}
       />
@@ -58,7 +54,7 @@ function Home() {
               <Ranking.Element>{t('common:table-user')}</Ranking.Element>
               <Ranking.Element>{t('common:table-score')}</Ranking.Element>
             </Ranking.Head>
-            {rankingByScore?.map(({ id, tier, avatarUrl, username, score }, index) => (
+            {rankingByScore?.users.map(({ id, tier, avatarUrl, username, score }, index) => (
               <Ranking.Row key={id}>
                 <Ranking.Element>
                   <CubeIcon tier={tier} />
