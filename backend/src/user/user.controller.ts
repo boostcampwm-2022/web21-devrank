@@ -1,9 +1,9 @@
-import { UPDATE_DELAY_TIME } from '@libs/const';
+import { UserGithubToken } from '@libs/common/decorators/user-github-token.decorator';
+import { UPDATE_DELAY_TIME } from '@libs/consts';
 import { BadRequestException, Controller, Get, Param, Patch } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { RealIP } from 'nestjs-real-ip';
-import { UserGithubToken } from '../../libs/common/decorators/user-github-token.decorator';
 import { UserDto } from './dto/user.dto';
 import { UserService } from './user.service';
 
@@ -40,6 +40,14 @@ export class UserController {
   @ApiOperation({ summary: '모든 유저의 점수 업데이트' })
   @ApiResponse({ status: 200, description: '업데이트된 유저들 정보' })
   async updateAllScore(@UserGithubToken() githubToken: string): Promise<UserDto[]> {
+    return this.userService.updateAllScore(githubToken || this.configService.get('GITHUB_PERSONAL_ACCESS_TOKEN'));
+  }
+
+  @Patch('')
+  @ApiBearerAuth('accessToken')
+  @ApiOperation({ summary: '모든 유저의 점수 업데이트' })
+  @ApiResponse({ status: 200, description: '업데이트된 유저들 정보' })
+  async findUserPinnedRepository(@UserGithubToken() githubToken: string): Promise<UserDto[]> {
     return this.userService.updateAllScore(githubToken || this.configService.get('GITHUB_PERSONAL_ACCESS_TOKEN'));
   }
 }
