@@ -246,7 +246,7 @@ export class UserService {
 
     const personalRepositories = personalResponse.user.repositories.nodes;
     const personalScore = personalRepositories.reduce(getScore, 0);
-    languagesScore = new Map([...languagesScore].sort((a, b) => a[1] - b[1]));
+    languagesScore = new Map([...languagesScore].sort((a, b) => b[1] - a[1]));
     user.commitsScore = parseInt(forkScore + personalScore);
     user.followers = followersScore;
     user.followersScore = followersScore;
