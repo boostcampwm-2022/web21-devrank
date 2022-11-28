@@ -1,4 +1,6 @@
 import Image from 'next/image';
+import { useState } from 'react';
+import { LANGUAGE_MAP } from '@utils/constants';
 import { languageToURL } from '@utils/utils';
 
 interface LanguageIconProps {
@@ -11,8 +13,21 @@ interface LanguageIconProps {
 }
 
 function LanguageIcon({ language, width = 50, height = 50 }: LanguageIconProps) {
-  const iconImgSrc = languageToURL(language.toLocaleLowerCase());
-  return <Image src={iconImgSrc} alt={`${language}`} width={width} height={height} quality={100} />;
+  let transLang = language.toLocaleLowerCase().replaceAll(' ', '');
+  transLang = LANGUAGE_MAP[transLang] ? LANGUAGE_MAP[transLang] : transLang;
+  const [iconUrl, setIconUrl] = useState(languageToURL(transLang));
+
+  return (
+    <Image
+      src={iconUrl}
+      alt={transLang}
+      width={width}
+      height={height}
+      quality={100}
+      onError={() => setIconUrl('/icons/default-language.svg')}
+      title={language}
+    />
+  );
 }
 
 export default LanguageIcon;

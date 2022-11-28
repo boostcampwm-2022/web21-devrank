@@ -25,6 +25,7 @@ function App({ Component, pageProps }: AppProps) {
             refetchOnWindowFocus: false,
             refetchOnReconnect: false,
             refetchOnMount: false,
+            retry: false,
             onError: queryErrorHandler,
           },
           mutations: {
