@@ -2,6 +2,7 @@ import { UserDto } from '@apps/user/dto/user.dto';
 import { UserRepository } from '@apps/user/user.repository';
 import { PAGE_RANGE_UNIT } from '@libs/consts';
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { RankingLanguageDto } from './dto/ranking-language.dto';
 import { RankingPaginationDto } from './dto/ranking-pagination.dto';
 import { RankingUserDto } from './dto/ranking-user.dto';
 
@@ -45,6 +46,10 @@ export class RankingService {
 
   async getMostViewedRankings(limit: number): Promise<UserDto[]> {
     return this.userRepository.findMostViewedRankings(limit);
+  }
+
+  async getMostUsedLanguages(limit: number): Promise<{ name: string; count: number }[]> {
+    return this.userRepository.findMostUsedLanguages(limit);
   }
 
   async getRankingsByUsername(limit: number, username: string): Promise<UserDto[]> {

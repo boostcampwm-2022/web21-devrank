@@ -52,6 +52,16 @@ export class UserRepository {
     return this.userModel.find().sort({ views: -1 }).limit(limit).lean().exec();
   }
 
+  async findMostUsedLanguages(limit = 3): Promise<{ name: string; count: number }[]> {
+    const result = await this.userModel.aggregate([
+      { $unwind: '$primaryLanguages' },
+      { $group: { _id: '$primaryLanguages', count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: limit },
+    ]);
+    return result.map((item) => ({ name: item._id, count: item.count }));
+  }
+
   async isDuplicatedRequestIp(ip: string, username: string): Promise<boolean> {
     return (await this.redis.sismember(ip, username)) !== 0;
   }
