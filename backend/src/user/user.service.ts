@@ -256,7 +256,7 @@ export class UserService {
 
   async findUserPinnedRepository() {
     `{
-      user(login: "wkddntjr1123") {
+      user(login: $username) {
         pinnedItems(first:10, types:REPOSITORY) {
           nodes {
             ... on Repository {
