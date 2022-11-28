@@ -1,3 +1,5 @@
+import { LanguageMap } from '@type/common';
+
 export const EXCEPTIONAL_LANGUAGE = ['rust'];
 
 export const DEVICON_URL = 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/';
@@ -7,6 +9,14 @@ export const DEVRANK_REPOSITORY_URL = 'https://github.com/boostcampwm-2022/web21
 export const GITHUB_AUTH_REQUEST_URL = `https://github.com/login/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID}&read=user`;
 
 export const COUNT_PER_PAGE = 10;
+
+export const LANGUAGE_MAP: LanguageMap = {
+  'c++': 'cplusplus',
+  'c#': 'csharp',
+  html: 'html5',
+  css: 'css3',
+  vimscript: 'vim',
+};
 
 export const CUBE_RANK = {
   ALL: 'all',
