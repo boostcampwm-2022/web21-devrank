@@ -1,5 +1,4 @@
 import { useTranslation } from 'next-i18next';
-import { Dispatch, SetStateAction } from 'react';
 import styled, { css } from 'styled-components';
 import { CubeRankType } from '@type/common';
 import { CubeIcon } from '@components/common';
@@ -9,7 +8,7 @@ interface FilterbarProps {
   /** 현재 필터링바에서  활성화 된 큐브 등급 탭  */
   active: CubeRankType;
   /** 필터링 바 활성화 탭 setter 함수 */
-  setActive: Dispatch<SetStateAction<CubeRankType>>;
+  setActive: (tier: CubeRankType) => void;
 }
 
 interface StyledFilterItemProps {
