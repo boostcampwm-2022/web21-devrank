@@ -77,6 +77,10 @@ export class User extends Document {
 
   @IsArray()
   repositories: number[];
+
+  @Prop()
+  @IsArray()
+  primaryLanguages: string[];
 }
 
 export const UserScheme = SchemaFactory.createForClass(User);

@@ -18,4 +18,5 @@ export class UserDto {
   scoreDifference?: number;
   updateDelayTime?: number;
   repositories?: number[];
+  primaryLanguages?: string[];
 }
