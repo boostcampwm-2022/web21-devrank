@@ -1,3 +1,4 @@
 {
-  "search-placeholder": "사용자명"
+  "search-placeholder": "사용자명",
+  "search-not-found": "사용자가 존재하지 않습니다."
 }
