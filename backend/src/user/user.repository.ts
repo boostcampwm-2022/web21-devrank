@@ -1,3 +1,4 @@
+import { RankingPaginationDto } from '@apps/ranking/dto/ranking-pagination.dto';
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -70,16 +71,31 @@ export class UserRepository {
     return timeToLive <= 0 ? 0 : timeToLive;
   }
 
-  async findPaginationRankings(page: number, limit: number, tier: string, username: string): Promise<UserDto[]> {
+  async findPaginationRankings(
+    page: number,
+    limit: number,
+    tier: string,
+    username: string,
+  ): Promise<Pick<RankingPaginationDto, 'metadata'> & { users: UserDto[] }> {
     const tierOption = tier === 'all' ? {} : { tier: tier };
     const usernameOption = username ? { username: { $regex: `^${username}` } } : {};
 
-    return this.userModel
-      .find({ ...tierOption, ...usernameOption })
-      .sort({ score: -1 })
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .lean()
-      .exec();
+    const result = (
+      await this.userModel.aggregate([
+        { $match: { ...tierOption, ...usernameOption } },
+        { $sort: { score: -1 } },
+        {
+          $facet: {
+            metadata: [
+              {
+                $count: 'total',
+              },
+            ],
+            users: [{ $skip: (page - 1) * limit }, { $limit: limit }],
+          },
+        },
+      ])
+    )[0];
+    return { metadata: result.metadata[0], users: result.users };
   }
 }
