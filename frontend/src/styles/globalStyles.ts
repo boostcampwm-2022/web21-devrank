@@ -22,10 +22,15 @@ const GlobalStyles = createGlobalStyle`
 
     body {
         background-color: ${({ theme }) => theme.colors.black1};
+        color: ${({ theme }) => theme.colors.text};
+    }
+
+    input, select, textarea, button {
+        font: inherit;
+        color: inherit;
     }
 
     * {
-        color: ${({ theme }) => theme.colors.text};
         box-sizing: border-box;
     }
 `;

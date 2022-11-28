@@ -16,7 +16,9 @@ import { mockLanguage } from '@utils/mockData';
 function Home() {
   const { t } = useTranslation(['index', 'common']);
   const { data: rankingByScore } = useQuery<RankingResponse[]>(['top-ranking-by-score'], () =>
-    requestTopRankingByScore(12),
+    requestTopRankingByScore({
+      limit: 12,
+    }),
   );
   const { data: rankingByRising } = useQuery<RankingResponse[]>(['top-ranking-by-rising'], () =>
     requestTopRankingByRising(),
@@ -175,7 +177,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     },
   });
 
-  await queryClient.prefetchQuery(['top-ranking-by-score'], () => requestTopRankingByScore(12));
+  await queryClient.prefetchQuery(['top-ranking-by-score'], () =>
+    requestTopRankingByScore({
+      limit: 12,
+    }),
+  );
   await queryClient.prefetchQuery(['top-ranking-by-rising'], () => requestTopRankingByRising());
   await queryClient.prefetchQuery(['top-ranking-by-views'], () => requestTopRankingByViews());
   await queryClient.prefetchQuery(['user'], () => requestTokenRefresh(context));

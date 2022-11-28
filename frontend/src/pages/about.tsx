@@ -4,10 +4,13 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Image from 'next/image';
 import React from 'react';
 import styled from 'styled-components';
+import { useQuery } from '@tanstack/react-query';
 import { CubeIcon } from '@components/common';
+import { requestTokenRefresh } from '@apis/auth';
 import { CUBE_RANK, DEVELOPER_INFORMATION } from '@utils/constants';
 
 function About() {
+  useQuery(['user'], () => requestTokenRefresh());
   const { t } = useTranslation(['tier', 'about']);
 
   return (

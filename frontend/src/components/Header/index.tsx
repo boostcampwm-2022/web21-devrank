@@ -4,18 +4,17 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { useQueryData } from '@hooks';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { Avatar, Button } from '@components/common';
 import Dropdown from '@components/common/Dropdown';
-import { requestTokenRefresh, requestUserLogout } from '@apis/auth';
+import { requestUserLogout } from '@apis/auth';
 import { GITHUB_AUTH_REQUEST_URL } from '@utils/constants';
 
 function Header() {
   const { mutate: logout } = useMutation({
     mutationFn: requestUserLogout,
   });
-  const { removeQueryData: removeUser } = useQueryData(['user']);
-  const { data: userData } = useQuery(['user'], () => requestTokenRefresh());
+  const { removeQueryData: removeUser, queryData: userData } = useQueryData(['user']);
 
   const { t } = useTranslation(['header', 'common']);
   const router = useRouter();
