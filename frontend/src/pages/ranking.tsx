@@ -8,7 +8,8 @@ import { CubeRankType } from '@type/common';
 import { RankingResponse } from '@type/response';
 import Filterbar from '@components/Filterbar';
 import RankingTable from '@components/Ranking';
-import { Avatar, CubeIcon, LanguageIcon, Searchbar } from '@components/common';
+import NotFound from '@components/Ranking/NotFound';
+import { Avatar, CubeIcon, LanguageIcon, RankingSkeleton, Searchbar } from '@components/common';
 import { requestTokenRefresh } from '@apis/auth';
 import { requestTopRankingByScore } from '@apis/ranking';
 import { CUBE_RANK } from '@utils/constants';
@@ -16,12 +17,8 @@ import { CUBE_RANK } from '@utils/constants';
 function Ranking() {
   const { t } = useTranslation(['ranking', 'common']);
   const [active, setActive] = useState<CubeRankType>(CUBE_RANK.ALL);
-  const { data } = useQuery<RankingResponse[]>(
-    ['ranking', active],
-    () => requestTopRankingByScore({ limit: 10, tier: active }),
-    {
-      keepPreviousData: true,
-    },
+  const { isLoading, data } = useQuery<RankingResponse[]>(['ranking', active], () =>
+    requestTopRankingByScore({ limit: 10, tier: active }),
   );
 
   return (
@@ -73,6 +70,8 @@ function Ranking() {
           </RankingTable.Row>
         ))}
       </RankingTable>
+      {isLoading && Array.from({ length: 10 }).map((_, index) => <RankingSkeleton key={index} />)}
+      {data?.length === 0 && <NotFound />}
     </Container>
   );
 }
