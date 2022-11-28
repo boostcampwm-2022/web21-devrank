@@ -1,7 +1,10 @@
 import { UserDto } from '@apps/user/dto/user.dto';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class ResponseRankingDto {
+export class RankingUserDto {
+  @ApiProperty()
+  _id: string;
+
   @ApiProperty()
   id: string;
 
@@ -23,7 +26,11 @@ export class ResponseRankingDto {
   @ApiProperty()
   tier: string;
 
-  of(user: UserDto): ResponseRankingDto {
+  @ApiProperty()
+  languages: string[];
+
+  of(user: UserDto): RankingUserDto {
+    this._id = user._id;
     this.id = user.id;
     this.username = user.username;
     this.avatarUrl = user.avatarUrl;
