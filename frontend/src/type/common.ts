@@ -9,3 +9,6 @@ export type ClickEvent = React.MouseEvent<HTMLElement>;
 export type InputChangeEvent = React.ChangeEvent<HTMLInputElement>;
 
 export type FormEvent = React.FormEvent<HTMLFormElement>;
+export interface LanguageMap {
+  [key: string]: string;
+}

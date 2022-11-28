@@ -15,6 +15,7 @@ export interface RankingResponse {
   dailyViews: number;
   score: number;
   scoreDifference: number;
+  primaryLanguages: string[];
 }
 
 export interface PageRange {
@@ -35,4 +36,9 @@ export interface RankingMeta {
 export interface RankingPaiginationResponse {
   metadata: RankingMeta;
   users: RankingResponse[];
+}
+
+export interface ProgrammingLanguageRankingResponse {
+  language: string;
+  count: number;
 }

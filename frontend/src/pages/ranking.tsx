@@ -19,7 +19,7 @@ function Ranking() {
   const [tier, setTier] = useState<CubeRankType>(CUBE_RANK.ALL);
   const [username, setUsername] = useState('');
 
-  const { isLoading, data } = useQuery<RankingPaiginationResponse>(['ranking', tier, username], () =>
+  const { isLoading, isError, data } = useQuery<RankingPaiginationResponse>(['ranking', tier, username], () =>
     requestTopRankingByScore({ limit: COUNT_PER_PAGE, tier, username }),
   );
 
@@ -57,7 +57,7 @@ function Ranking() {
           <RankingTable.Element>{t('common:table-score')}</RankingTable.Element>
           <RankingTable.Element>{t('common:table-tech-stack')}</RankingTable.Element>
         </RankingTable.Head>
-        {data?.users.map(({ id, username, avatarUrl, tier, score }, index) => (
+        {data?.users.map(({ id, username, avatarUrl, tier, score, primaryLanguages }, index) => (
           <RankingTable.Row key={id}>
             <RankingTable.Element>{index + 1}</RankingTable.Element>
             <RankingTable.Element>
@@ -66,22 +66,21 @@ function Ranking() {
             <RankingTable.Element>
               <CubeIcon tier={tier} />
             </RankingTable.Element>
-            <RankingTable.Element>{score}</RankingTable.Element>
+            <RankingTable.Element>{score.toLocaleString()}</RankingTable.Element>
             <RankingTable.Element>
-              {/* TODO: 기술스택 아이콘으로 변경
               <TechStackList>
-                {data.langs.map((lang) => (
+                {primaryLanguages.map((lang) => (
                   <li key={lang}>
                     <LanguageIcon language={lang} width={35} height={35} />
                   </li>
                 ))}
-              </TechStackList> */}
+              </TechStackList>
             </RankingTable.Element>
           </RankingTable.Row>
         ))}
       </RankingTable>
       {isLoading && Array.from({ length: COUNT_PER_PAGE }).map((_, index) => <RankingSkeleton key={index} />)}
-      {data?.users.length === 0 && <NotFound />}
+      {isError && <NotFound />}
     </Container>
   );
 }
