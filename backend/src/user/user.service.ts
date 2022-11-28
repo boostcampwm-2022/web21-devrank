@@ -253,4 +253,27 @@ export class UserService {
   async setUpdateScoreDelayTime(username: string, seconds: number): Promise<any> {
     return this.userRepository.setUpdateScoreDelayTime(username, seconds);
   }
+
+  async findUserPinnedRepository() {
+    `{
+      user(login: "wkddntjr1123") {
+        pinnedItems(first:10, types:REPOSITORY) {
+          nodes {
+            ... on Repository {
+              name
+              url
+              stargazerCount
+              forkCount
+              languages(first:5, orderBy: {field: SIZE, direction:DESC} ) {
+                totalSize
+                nodes{
+                  name
+                }
+              }
+            }
+          }
+        }
+      }
+    }`;
+  }
 }
