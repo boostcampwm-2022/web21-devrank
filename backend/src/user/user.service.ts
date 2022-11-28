@@ -110,13 +110,17 @@ export class UserService {
       `query repositories($username: String!, $id: ID) {
         user(login: $username) {
           repositories(
-            first: 50
+            first: 25
             isFork: true
             privacy: PUBLIC
             orderBy: {field: STARGAZERS, direction: DESC}
+            ownerAffiliations: [OWNER]
           ) {
             nodes {
               parent {
+                primaryLanguage {
+                  name
+                }
                 diskUsage
                 name
                 stargazerCount
@@ -152,12 +156,15 @@ export class UserService {
       `query repositories($username: String!, $id: ID) {
         user(login: $username) {
           repositories(
-            first: 50
+            first: 25
             isFork: false
             privacy: PUBLIC
             orderBy: {field: STARGAZERS, direction: DESC}
           ) {
             nodes {
+              primaryLanguage {
+                name
+              }
               diskUsage
               name
               stargazerCount
@@ -200,6 +207,8 @@ export class UserService {
         username: user.username,
       },
     );
+
+    let languagesScore = new Map();
     function getScore(acc: number, repository) {
       if (!repository.defaultBranchRef) {
         return acc + 0;
@@ -217,6 +226,16 @@ export class UserService {
       });
       repositoryScore /= 1000;
       console.log(repository.name, repositoryScore);
+      if (repository.primaryLanguage) {
+        if (languagesScore.has(repository.primaryLanguage.name)) {
+          languagesScore.set(
+            repository.primaryLanguage.name,
+            languagesScore.get(repository.primaryLanguage.name) + repositoryScore,
+          );
+        } else {
+          languagesScore.set(repository.primaryLanguage.name, repositoryScore);
+        }
+      }
       return acc + repositoryScore;
     }
     const forkRepositories = forkResponse.user.repositories.nodes.map((repository) => {
@@ -227,11 +246,13 @@ export class UserService {
 
     const personalRepositories = personalResponse.user.repositories.nodes;
     const personalScore = personalRepositories.reduce(getScore, 0);
+    languagesScore = new Map([...languagesScore].sort((a, b) => a[1] - b[1]));
     user.commitsScore = parseInt(forkScore + personalScore);
     user.followers = followersScore;
     user.followersScore = followersScore;
     user.score = user.commitsScore + user.followersScore;
     user.tier = getTier(user.score);
+    user.primaryLanguages = Array.from(languagesScore.keys()).slice(0, 3);
     return this.userRepository.createOrUpdate(user);
   }
 
