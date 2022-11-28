@@ -49,7 +49,17 @@ export const requestTopRankingByViews = async (limit = 3): Promise<RankingRespon
 };
 
 export const requestRankingByUsername = async (username: string) => {
-  const { data } = await axiosInstance.get(`/ranking/${username}`);
+  const { data } = await axiosInstance.get(`/rankings/${username}`);
+
+  return data;
+};
+
+export const requestProgrammingLanguageRanking = async (limit = 3) => {
+  const { data } = await axiosInstance.get('/rankings/languages', {
+    params: {
+      limit,
+    },
+  });
 
   return data;
 };

@@ -4,14 +4,18 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Image from 'next/image';
 import styled from 'styled-components';
 import { QueryClient, dehydrate, useQuery } from '@tanstack/react-query';
-import { RankingPaiginationResponse, RankingResponse } from '@type/response';
+import { ProgrammingLanguageRankingResponse, RankingPaiginationResponse, RankingResponse } from '@type/response';
 import Ranking from '@components/Ranking';
 import { Avatar, LanguageIcon } from '@components/common';
 import CubeIcon from '@components/common/CubeIcon';
 import Searchbar from '@components/common/Searchbar';
 import { requestTokenRefresh } from '@apis/auth';
-import { requestTopRankingByRising, requestTopRankingByScore, requestTopRankingByViews } from '@apis/ranking';
-import { mockLanguage } from '@utils/mockData';
+import {
+  requestProgrammingLanguageRanking,
+  requestTopRankingByRising,
+  requestTopRankingByScore,
+  requestTopRankingByViews,
+} from '@apis/ranking';
 
 function Home() {
   const { t } = useTranslation(['index', 'common']);
@@ -26,6 +30,11 @@ function Home() {
   const { data: rankingByViews } = useQuery<RankingResponse[]>(['top-ranking-by-views'], () =>
     requestTopRankingByViews(),
   );
+  const { data: rankingByProgrammingLang } = useQuery<ProgrammingLanguageRankingResponse[]>(
+    ['top-ranking-by-programming-lang'],
+    () => requestProgrammingLanguageRanking(),
+  );
+
   return (
     <Container>
       <h2>
@@ -142,7 +151,7 @@ function Home() {
               <Ranking.Element />
               <Ranking.Element>{t('common:table-user-num')}</Ranking.Element>
             </Ranking.Head>
-            {mockLanguage.map(({ language, count }) => (
+            {rankingByProgrammingLang?.map(({ language, count }) => (
               <Ranking.Row key={language}>
                 <Ranking.Element>
                   <LanguageIcon language={language} width={30} height={30} />
@@ -180,6 +189,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   );
   await queryClient.prefetchQuery(['top-ranking-by-rising'], () => requestTopRankingByRising());
   await queryClient.prefetchQuery(['top-ranking-by-views'], () => requestTopRankingByViews());
+  await queryClient.prefetchQuery(['top-ranking-by-programming-lang'], () => requestProgrammingLanguageRanking());
   await queryClient.prefetchQuery(['user'], () => requestTokenRefresh(context));
 
   return {
