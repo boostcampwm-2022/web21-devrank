@@ -12,27 +12,37 @@ import NotFound from '@components/Ranking/NotFound';
 import { Avatar, CubeIcon, LanguageIcon, RankingSkeleton, Searchbar } from '@components/common';
 import { requestTokenRefresh } from '@apis/auth';
 import { requestTopRankingByScore } from '@apis/ranking';
-import { CUBE_RANK } from '@utils/constants';
+import { COUNT_PER_PAGE, CUBE_RANK } from '@utils/constants';
 
 function Ranking() {
   const { t } = useTranslation(['ranking', 'common']);
-  const [active, setActive] = useState<CubeRankType>(CUBE_RANK.ALL);
-  const { isLoading, data } = useQuery<RankingResponse[]>(['ranking', active], () =>
-    requestTopRankingByScore({ limit: 10, tier: active }),
+  const [tier, setTier] = useState<CubeRankType>(CUBE_RANK.ALL);
+  const [username, setUsername] = useState('');
+
+  const { isLoading, data } = useQuery<RankingResponse[]>(['ranking', tier, username], () =>
+    requestTopRankingByScore({ limit: COUNT_PER_PAGE, tier, username }),
   );
+
+  const setFilter = (tier: CubeRankType) => {
+    setTier(tier);
+    setUsername('');
+  };
+
+  const onSearch = (input: string) => {
+    setUsername(input);
+  };
 
   return (
     <Container>
-      <Filterbar active={active} setActive={setActive} />
+      <Filterbar active={tier} setActive={setFilter} />
       <SearchbarContainer>
+        {username !== '' && <SearchInfo>&apos;{username}&apos;에 대한 검색 결과 입니다.</SearchInfo>}
         <Searchbar
           type='text'
-          value=''
           placeholder={t('ranking:search-placeholder')}
           width={200}
           submitAlign='left'
-          onChange={(e) => {}}
-          onSubmit={(e) => {}}
+          onSearch={onSearch}
         />
       </SearchbarContainer>
       <RankingTable
@@ -70,7 +80,7 @@ function Ranking() {
           </RankingTable.Row>
         ))}
       </RankingTable>
-      {isLoading && Array.from({ length: 10 }).map((_, index) => <RankingSkeleton key={index} />)}
+      {isLoading && Array.from({ length: COUNT_PER_PAGE }).map((_, index) => <RankingSkeleton key={index} />)}
       {data?.length === 0 && <NotFound />}
     </Container>
   );
@@ -89,7 +99,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     },
   });
   await queryClient.prefetchQuery(['user'], () => requestTokenRefresh(context));
-  await queryClient.prefetchQuery(['ranking', CUBE_RANK.ALL], () => requestTopRankingByScore({ limit: 10 }));
+  await queryClient.prefetchQuery(['ranking', CUBE_RANK.ALL, ''], () => requestTopRankingByScore({ limit: 10 }));
 
   return {
     props: {
@@ -106,10 +116,18 @@ const Container = styled.div`
 `;
 
 const SearchbarContainer = styled.div`
+  position: relative;
   ${({ theme }) => theme.common.flexRow};
   justify-content: flex-end;
   width: 100%;
   margin: 30px 0px 10px;
+`;
+
+const SearchInfo = styled.div`
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
 `;
 
 const TechStackList = styled.ul`
