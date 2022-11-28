@@ -1,4 +1,5 @@
 export class UserDto {
+  _id?: string;
   id: string;
   username: string;
   following: number;

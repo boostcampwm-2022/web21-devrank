@@ -4,3 +4,5 @@ export const EXPIRATION = {
 } as const;
 
 export const UPDATE_DELAY_TIME = 120;
+
+export const PAGE_RANGE_UNIT = 3;
