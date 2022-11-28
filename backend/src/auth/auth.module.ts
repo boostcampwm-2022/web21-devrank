@@ -1,6 +1,6 @@
 import { UserModule } from '@apps/user/user.module';
 import { RedisModule } from '@liaoliaots/nestjs-redis';
-import { EXPIRATION } from '@libs/const';
+import { EXPIRATION } from '@libs/consts';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';

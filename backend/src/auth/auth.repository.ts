@@ -1,5 +1,5 @@
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
-import { EXPIRATION } from '@libs/const';
+import { EXPIRATION } from '@libs/consts';
 import { Injectable } from '@nestjs/common';
 import Redis from 'ioredis';
 

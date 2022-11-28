@@ -1,4 +1,4 @@
-import { EXPIRATION } from '@libs/const';
+import { EXPIRATION } from '@libs/consts';
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
