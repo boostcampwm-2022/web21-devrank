@@ -1,12 +1,15 @@
 import { GetServerSideProps } from 'next';
+import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import styled from 'styled-components';
 import { QueryClient, dehydrate } from '@tanstack/react-query';
-import { EXPbar, PinnedRepository, ProfileCard } from '@components/Profile';
+import { CommitHistory, EXPbar, PinnedRepository, ProfileCard } from '@components/Profile';
 import { Paper } from '@components/common';
 import { requestTokenRefresh } from '@apis/auth';
 
 function Profile() {
+  const { t } = useTranslation('profile');
+
   const repositoriesMock = [
     {
       name: '레파지토리 이름',
@@ -57,8 +60,13 @@ function Profile() {
       <ProfileCard />
       <Title>EXP</Title>
       <EXPbar exp={260} />
-      <Title>Contributions</Title>
-      <Paper></Paper>
+      <ContributionHeader>
+        <Title>Contributions</Title>
+        <p>{`${t('maximum-continuous-commit-history')} : 10${t('day')}`}</p>
+      </ContributionHeader>
+      <Paper>
+        <CommitHistory />
+      </Paper>
       <Title>WakaTime</Title>
       <Paper></Paper>
       <Title>Github stats</Title>
@@ -81,7 +89,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   return {
     props: {
       dehydratedState: dehydrate(queryClient),
-      ...(await serverSideTranslations(context.locale as string, ['common', 'header', 'footer', 'tier', 'ranking'])),
+      ...(await serverSideTranslations(context.locale as string, ['common', 'header', 'footer', 'profile', 'tier'])),
     },
   };
 };
@@ -98,4 +106,14 @@ const Title = styled.h2`
   font-size: ${({ theme }) => theme.fontSize.xxl};
   font-weight: ${({ theme }) => theme.fontWeight.bold};
   margin: 80px 0px 30px 10px;
+`;
+
+const ContributionHeader = styled.div`
+  ${({ theme }) => theme.common.flexSpaceBetween};
+
+  p {
+    font-size: ${({ theme }) => theme.fontSize.lg};
+    font-weight: ${({ theme }) => theme.fontWeight.bold};
+    margin: 80px 0px 30px;
+  }
 `;
