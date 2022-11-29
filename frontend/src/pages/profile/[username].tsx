@@ -1,4 +1,5 @@
 import { GetServerSideProps } from 'next';
+import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import styled from 'styled-components';
 import { QueryClient, dehydrate } from '@tanstack/react-query';
@@ -7,6 +8,8 @@ import { Paper } from '@components/common';
 import { requestTokenRefresh } from '@apis/auth';
 
 function Profile() {
+  const { t } = useTranslation('profile');
+
   const repositoriesMock = [
     {
       name: '레파지토리 이름',
@@ -59,7 +62,7 @@ function Profile() {
       <EXPbar exp={260} />
       <ContributionHeader>
         <Title>Contributions</Title>
-        <p>최대 연속 커밋 일수 10일</p>
+        <p>{`${t('maximum-continuous-commit-history')} : 10${t('day')}`}</p>
       </ContributionHeader>
       <Paper>
         <CommitHistory />
@@ -86,7 +89,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   return {
     props: {
       dehydratedState: dehydrate(queryClient),
-      ...(await serverSideTranslations(context.locale as string, ['common', 'header', 'footer', 'tier', 'ranking'])),
+      ...(await serverSideTranslations(context.locale as string, ['common', 'header', 'footer', 'profile', 'tier'])),
     },
   };
 };

@@ -2,5 +2,6 @@
   "current-score": "Current score",
   "register-wakatime-api-key": "Register Wakatime API Key",
   "register-wakatime-button-label": "Register",
-  "maximum-continuous-commit-history": "Maximum continuous commit history"
+  "maximum-continuous-commit-history": "Maximum continuous commit history",
+  "day": "day"
 }
