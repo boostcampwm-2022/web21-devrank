@@ -11,7 +11,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - run: cd backend
     - uses: actions/setup-node@v3
       with:
         node-version: 16.x
@@ -24,4 +23,4 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
-    - run: yarn docker:build
+    - run: cd backend && yarn docker:build
