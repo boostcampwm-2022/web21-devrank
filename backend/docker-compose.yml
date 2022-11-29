@@ -1,0 +1,21 @@
+version: '3.7'
+
+services:
+  api:
+    image: 'devrank/backend-api:latest'
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - '${PORT}:${PORT}'
+      # - "3001:3001"
+    depends_on:
+      - redis
+  redis:
+    image: redis:6.2.5
+    command: redis-server --port 6379
+    ports:
+      - '${REDIS_PORT}:6379'
+      # - "6379:6379"
