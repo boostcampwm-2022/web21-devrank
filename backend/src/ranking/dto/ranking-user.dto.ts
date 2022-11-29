@@ -34,7 +34,7 @@ export class RankingUserDto {
     this.id = user.id;
     this.username = user.username;
     this.avatarUrl = user.avatarUrl;
-    this.score = user.commitsScore + user.followersScore;
+    this.score = user.commitsScore + user.followersScore + user.issuesScore;
     this.tier = user.tier;
     this.dailyViews = user.dailyViews;
     this.scoreDifference = user.scoreDifference;
