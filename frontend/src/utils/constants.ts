@@ -16,6 +16,7 @@ export const LANGUAGE_MAP: LanguageMap = {
   html: 'html5',
   css: 'css3',
   vimscript: 'vim',
+  jupyternotebook: 'jupyter',
 };
 
 export const CUBE_RANK = {
