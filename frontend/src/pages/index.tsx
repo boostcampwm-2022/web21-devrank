@@ -17,6 +17,7 @@ import {
   requestTopRankingByScore,
   requestTopRankingByViews,
 } from '@apis/ranking';
+import { MAIN_PAGE_RANK_COUNT } from '@utils/constants';
 
 function Home() {
   const { t } = useTranslation(['index', 'common']);
@@ -24,7 +25,7 @@ function Home() {
 
   const { data: rankingByScore } = useQuery<RankingPaiginationResponse>(['top-ranking-by-score'], () =>
     requestTopRankingByScore({
-      limit: 12,
+      limit: MAIN_PAGE_RANK_COUNT,
     }),
   );
   const { data: rankingByRising } = useQuery<RankingResponse[]>(['top-ranking-by-rising'], () =>
