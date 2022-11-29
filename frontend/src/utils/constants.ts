@@ -10,6 +10,8 @@ export const GITHUB_AUTH_REQUEST_URL = `https://github.com/login/oauth/authorize
 
 export const COUNT_PER_PAGE = 10;
 
+export const CACHE_TIME = 1000 * 60 * 2;
+
 export const LANGUAGE_MAP: LanguageMap = {
   'c++': 'cplusplus',
   'c#': 'csharp',

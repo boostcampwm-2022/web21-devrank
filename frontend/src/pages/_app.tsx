@@ -8,6 +8,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import Layout from '@components/Layout';
 import GlobalStyles from '@styles/globalStyles';
 import theme from '@styles/theme';
+import { CACHE_TIME } from '@utils/constants';
 import { lineSeedKR } from '@utils/fonts';
 
 function App({ Component, pageProps }: AppProps) {
@@ -26,6 +27,7 @@ function App({ Component, pageProps }: AppProps) {
             refetchOnReconnect: false,
             refetchOnMount: false,
             retry: false,
+            cacheTime: CACHE_TIME,
             onError: queryErrorHandler,
           },
           mutations: {
