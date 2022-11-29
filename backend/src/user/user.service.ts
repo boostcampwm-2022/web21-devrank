@@ -207,9 +207,35 @@ export class UserService {
         username: user.username,
       },
     );
+    const issuesResponse: any = await octokit.graphql(
+      `query repositories($username: String!) {
+        user(login: $username) {
+          issues(
+            first: 100
+            orderBy: {field: CREATED_AT, direction: DESC}
+          ) {
+            totalCount
+            edges {
+              node {
+                repository {
+                  stargazerCount
+                  forkCount
+                  nameWithOwner
+                }
+                title
+                createdAt
+              }
+            }
+          }
+        }
+      }`,
+      {
+        username: user.username,
+      },
+    );
 
     let languagesScore = new Map();
-    function getScore(acc: number, repository) {
+    function getCommitScore(acc: number, repository) {
       if (!repository.defaultBranchRef) {
         return acc + 0;
       }
@@ -241,16 +267,24 @@ export class UserService {
     const forkRepositories = forkResponse.user.repositories.nodes.map((repository) => {
       return repository.parent;
     });
-    const forkScore = forkRepositories.reduce(getScore, 0);
-    const followersScore = followersResponse.user.followers.totalCount;
-
+    const forkScore = forkRepositories.reduce(getCommitScore, 0);
+    const followersScore = followersResponse.user.followers.totalCount / 10;
     const personalRepositories = personalResponse.user.repositories.nodes;
-    const personalScore = personalRepositories.reduce(getScore, 0);
+    const personalScore = personalRepositories.reduce(getCommitScore, 0);
+    const issuesScore = issuesResponse.user.issues.edges.reduce((acc, issue) => {
+      const time = +new Date() - +new Date(issue.node.createdAt);
+      const timeWeight = (1 / 1.0019) ** (time / 1000 / 60 / 60 / 24);
+      const repositoryWeight = issue.node.repository.stargazerCount;
+      const issueScore = repositoryWeight * timeWeight;
+      return acc + issueScore;
+    }, 0);
+
     languagesScore = new Map([...languagesScore].sort((a, b) => b[1] - a[1]));
     user.commitsScore = parseInt(forkScore + personalScore);
-    user.followers = followersScore;
-    user.followersScore = followersScore;
-    user.score = user.commitsScore + user.followersScore;
+    user.issuesScore = Math.floor(issuesScore / 1000);
+    user.followers = followersResponse.user.followers.totalCount;
+    user.followersScore = Math.floor(followersScore);
+    user.score = user.commitsScore + user.followersScore + user.issuesScore;
     user.tier = getTier(user.score);
     user.primaryLanguages = Array.from(languagesScore.keys()).slice(0, 3);
     return this.userRepository.createOrUpdate(user);

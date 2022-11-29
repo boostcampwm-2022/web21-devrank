@@ -33,6 +33,10 @@ export class User extends Document {
 
   @Prop({ required: true })
   @IsInt()
+  issuesScore: number;
+
+  @Prop({ required: true })
+  @IsInt()
   score: number;
 
   @Prop({ default: 0 })
