@@ -93,7 +93,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return {
       props: {
         dehydratedState: dehydrate(queryClient),
-        ...(await serverSideTranslations(context.locale as string, ['common', 'header', 'footer', 'tier', 'ranking'])),
+        ...(await serverSideTranslations(context.locale as string, [
+          'common',
+          'header',
+          'footer',
+          'tier',
+          'ranking',
+          'profile',
+        ])),
       },
     };
   } catch (error) {
