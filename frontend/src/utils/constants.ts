@@ -34,6 +34,16 @@ export const CUBE_RANK = {
   RED: 'red',
 } as const;
 
+export const CUBE_RANK_RANGE = {
+  yellow: [0, 99],
+  green: [100, 199],
+  mint: [200, 299],
+  blue: [300, 399],
+  purple: [400, 499],
+  orange: [500, 599],
+  red: [600, 699],
+};
+
 export const DEVELOPER_INFORMATION = [
   {
     name: '장우석',
