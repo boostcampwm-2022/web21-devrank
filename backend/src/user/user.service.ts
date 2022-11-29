@@ -217,14 +217,17 @@ export class UserService {
         return acc + 0;
       }
       let repositoryScore = 0;
-      const repositoryWeight = repository.stargazerCount + repository.forkCount;
+      const repositoryWeight = repository.stargazerCount;
       repository.defaultBranchRef.target.history.nodes.forEach((commit) => {
         const time = +new Date() - +new Date(commit.committedDate);
         //TODO: 매직넘버 제거
         const timeWeight = (1 / 1.0019) ** (time / 1000 / 60 / 60 / 24);
         repositoryScore += repositoryWeight * timeWeight;
       });
-      repositoryScore /= 1000;
+      repositoryScore /= 100;
+      if (repositoryScore == 0) {
+        return acc + 0;
+      }
       console.log(repository.name, repositoryScore);
       if (repository.primaryLanguage) {
         if (languagesScore.has(repository.primaryLanguage.name)) {
@@ -242,13 +245,13 @@ export class UserService {
       return repository.parent;
     });
     const forkScore = forkRepositories.reduce(getScore, 0);
-    const followersScore = followersResponse.user.followers.totalCount;
+    const followersScore = (followersResponse.user.followers.totalCount /= 10);
 
     const personalRepositories = personalResponse.user.repositories.nodes;
     const personalScore = personalRepositories.reduce(getScore, 0);
     languagesScore = new Map([...languagesScore].sort((a, b) => b[1] - a[1]));
     user.commitsScore = parseInt(forkScore + personalScore);
-    user.followers = followersScore;
+    user.followers = followersScore * 10;
     user.followersScore = followersScore;
     user.score = user.commitsScore + user.followersScore;
     user.tier = getTier(user.score);
