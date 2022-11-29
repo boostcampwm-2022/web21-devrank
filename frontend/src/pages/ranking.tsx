@@ -22,7 +22,7 @@ function Ranking() {
   const [page, setPage] = useState(1);
 
   const { isLoading, isError, data } = useQuery<RankingPaiginationResponse>(['ranking', tier, username, page], () =>
-    requestTopRankingByScore({ limit: COUNT_PER_PAGE, tier, username, page: page.toString() }),
+    requestTopRankingByScore({ limit: COUNT_PER_PAGE, tier, username, page }),
   );
 
   const setFilter = (tier: CubeRankType) => {
@@ -32,6 +32,7 @@ function Ranking() {
   };
 
   const onSearch = (input: string) => {
+    setPage(1);
     setUsername(input);
   };
 
