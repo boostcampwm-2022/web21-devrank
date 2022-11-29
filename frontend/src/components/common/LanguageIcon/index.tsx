@@ -18,15 +18,17 @@ function LanguageIcon({ language, width = 50, height = 50 }: LanguageIconProps) 
   const [iconUrl, setIconUrl] = useState(languageToURL(transLang));
 
   return (
-    <Image
-      src={iconUrl}
-      alt={transLang}
-      width={width}
-      height={height}
-      quality={100}
-      onError={() => setIconUrl('/icons/default-language.svg')}
-      title={language}
-    />
+    <div style={{ width, height }}>
+      <Image
+        src={iconUrl}
+        alt={transLang}
+        width={width}
+        height={height}
+        quality={100}
+        onError={() => setIconUrl('/icons/default-language.svg')}
+        title={language}
+      />
+    </div>
   );
 }
 
