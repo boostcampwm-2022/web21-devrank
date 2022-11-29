@@ -7,6 +7,7 @@ import { QueryClient, dehydrate, useQuery } from '@tanstack/react-query';
 import { CubeRankType } from '@type/common';
 import { RankingPaiginationResponse } from '@type/response';
 import Filterbar from '@components/Filterbar';
+import Pagination from '@components/Pagination';
 import RankingTable from '@components/Ranking';
 import NotFound from '@components/Ranking/NotFound';
 import { Avatar, CubeIcon, LanguageIcon, RankingSkeleton, Searchbar } from '@components/common';
@@ -18,13 +19,15 @@ function Ranking() {
   const { t } = useTranslation(['ranking', 'common']);
   const [tier, setTier] = useState<CubeRankType>(CUBE_RANK.ALL);
   const [username, setUsername] = useState('');
+  const [page, setPage] = useState(1);
 
-  const { isLoading, isError, data } = useQuery<RankingPaiginationResponse>(['ranking', tier, username], () =>
-    requestTopRankingByScore({ limit: COUNT_PER_PAGE, tier, username }),
+  const { isLoading, isError, data } = useQuery<RankingPaiginationResponse>(['ranking', tier, username, page], () =>
+    requestTopRankingByScore({ limit: COUNT_PER_PAGE, tier, username, page: page.toString() }),
   );
 
   const setFilter = (tier: CubeRankType) => {
     setTier(tier);
+    setPage(1);
     setUsername('');
   };
 
@@ -59,14 +62,18 @@ function Ranking() {
         </RankingTable.Head>
         {data?.users.map(({ id, username, avatarUrl, tier, score, primaryLanguages }, index) => (
           <RankingTable.Row key={id}>
-            <RankingTable.Element>{index + 1}</RankingTable.Element>
+            <RankingTable.Element>
+              <GrayText>{(page - 1) * COUNT_PER_PAGE + index + 1}</GrayText>
+            </RankingTable.Element>
             <RankingTable.Element>
               <Avatar src={avatarUrl} name={username} />
             </RankingTable.Element>
             <RankingTable.Element>
               <CubeIcon tier={tier} />
             </RankingTable.Element>
-            <RankingTable.Element>{score.toLocaleString()}</RankingTable.Element>
+            <RankingTable.Element>
+              <GrayText>{score.toLocaleString()}</GrayText>
+            </RankingTable.Element>
             <RankingTable.Element>
               <TechStackList>
                 {primaryLanguages.map((lang) => (
@@ -81,6 +88,19 @@ function Ranking() {
       </RankingTable>
       {isLoading && Array.from({ length: COUNT_PER_PAGE }).map((_, index) => <RankingSkeleton key={index} />)}
       {isError && <NotFound />}
+      {data?.metadata && (
+        <PaginationContainer>
+          <Pagination
+            currentPage={page}
+            range={data.metadata.range}
+            firstPage={data.metadata.firstPage}
+            lastPage={data.metadata.lastPage}
+            canMoveLeft={data.metadata.left}
+            canMoveRight={data.metadata.right}
+            setCurrentPage={setPage}
+          />
+        </PaginationContainer>
+      )}
     </Container>
   );
 }
@@ -98,7 +118,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     },
   });
   await queryClient.prefetchQuery(['user'], () => requestTokenRefresh(context));
-  await queryClient.prefetchQuery(['ranking', CUBE_RANK.ALL, ''], () => requestTopRankingByScore({ limit: 10 }));
+  await queryClient.prefetchQuery(['ranking', CUBE_RANK.ALL, ''], () =>
+    requestTopRankingByScore({ limit: COUNT_PER_PAGE }),
+  );
 
   return {
     props: {
@@ -135,4 +157,12 @@ const TechStackList = styled.ul`
   li + li {
     margin-left: 8px;
   }
+`;
+
+const GrayText = styled.span`
+  color: ${({ theme }) => theme.colors.gray6};
+`;
+
+const PaginationContainer = styled.div`
+  margin-top: 40px;
 `;
