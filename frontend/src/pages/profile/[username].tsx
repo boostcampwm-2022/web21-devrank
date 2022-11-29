@@ -5,6 +5,7 @@ import { QueryClient, dehydrate } from '@tanstack/react-query';
 import { EXPbar, PinnedRepository, ProfileCard } from '@components/Profile';
 import { Paper } from '@components/common';
 import { requestTokenRefresh } from '@apis/auth';
+import { requestUserInfoByUsername } from '@apis/profile';
 
 function Profile() {
   const repositoriesMock = [
@@ -74,16 +75,27 @@ function Profile() {
 export default Profile;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const queryClient = new QueryClient();
+  const username = context.query.username as string;
 
+  const queryClient = new QueryClient();
   await queryClient.prefetchQuery(['user'], () => requestTokenRefresh(context));
 
-  return {
-    props: {
-      dehydratedState: dehydrate(queryClient),
-      ...(await serverSideTranslations(context.locale as string, ['common', 'header', 'footer', 'tier', 'ranking'])),
-    },
-  };
+  try {
+    await requestUserInfoByUsername({ username });
+    return {
+      props: {
+        dehydratedState: dehydrate(queryClient),
+        ...(await serverSideTranslations(context.locale as string, ['common', 'header', 'footer', 'tier', 'ranking'])),
+      },
+    };
+  } catch (error) {
+    return {
+      redirect: {
+        destination: '/profile/404',
+        permanent: false,
+      },
+    };
+  }
 };
 
 const Container = styled.div`
