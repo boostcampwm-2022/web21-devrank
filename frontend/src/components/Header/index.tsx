@@ -55,12 +55,12 @@ function Header() {
             </Dropdown.Trigger>
             <Dropdown.ItemList>
               <Dropdown.Item>
-                <Link href={router.pathname} locale='ko'>
+                <Link href={router.asPath} locale='ko'>
                   한국어
                 </Link>
               </Dropdown.Item>
               <Dropdown.Item>
-                <Link href={router.pathname} locale='en'>
+                <Link href={router.asPath} locale='en'>
                   English
                 </Link>
               </Dropdown.Item>
@@ -73,7 +73,7 @@ function Header() {
                   <Avatar src={userData.avatarUrl} />
                 </Dropdown.Trigger>
                 <Dropdown.ItemList>
-                  <Dropdown.Item>
+                  <Dropdown.Item onClick={() => router.push(`/profile/${userData.username}`)}>
                     <Image src='/icons/profile.svg' alt='프로필 아이콘' width={17} height={17} quality={100} />
                     {t('common:my-profile')}
                   </Dropdown.Item>
