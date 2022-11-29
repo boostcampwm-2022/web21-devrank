@@ -18,7 +18,7 @@ function NotFound() {
   return (
     <Container className={aldrich.className}>
       <div>
-        <h2>Github에 등록되지 않은 사용자입니다.</h2>
+        <h2>{t('user-not-found')}</h2>
         <CubeImage
           src='/icons/cube-large-background.svg'
           alt='큐브 이미지'
@@ -28,7 +28,7 @@ function NotFound() {
           priority
         />
       </div>
-      <p className={lineSeedKR.className}>오타를 확인 후 다시 검색해주세요.</p>
+      <p className={lineSeedKR.className}>{t('check-username')}</p>
       <HomeButton onClick={() => router.push('/')}>GO TO MAIN PAGE</HomeButton>
     </Container>
   );
