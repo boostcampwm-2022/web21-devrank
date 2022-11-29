@@ -19,7 +19,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "docker:build": "cp .env.prod .env && docker build -t devrank/backend-api:latest -f Dockerfile . --platform linux/x86_64 && docker push devrank/backend-api:latest"
+    "docker:build": "docker build -t devrank/backend-api:latest -f Dockerfile . --platform linux/x86_64 && docker push devrank/backend-api:latest"
   },
   "dependencies": {
     "@liaoliaots/nestjs-redis": "^9.0.4",
