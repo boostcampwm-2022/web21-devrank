@@ -1,5 +1,5 @@
 import { CubeRankType } from '@type/common';
-import { RankingPaiginationResponse, RankingResponse } from '@type/response';
+import { ProgrammingLanguageRankingResponse, RankingPaiginationResponse, RankingResponse } from '@type/response';
 import axiosInstance from '@utils/axiosInstance';
 import { CUBE_RANK } from '@utils/constants';
 
@@ -48,13 +48,13 @@ export const requestTopRankingByViews = async (limit = 3): Promise<RankingRespon
   return data;
 };
 
-export const requestRankingByUsername = async (username: string) => {
+export const requestRankingByUsername = async (username: string): Promise<RankingResponse[]> => {
   const { data } = await axiosInstance.get(`/rankings/${username}`);
 
   return data;
 };
 
-export const requestProgrammingLanguageRanking = async (limit = 3) => {
+export const requestProgrammingLanguageRanking = async (limit = 3): Promise<ProgrammingLanguageRankingResponse[]> => {
   const { data } = await axiosInstance.get('/rankings/languages', {
     params: {
       limit,

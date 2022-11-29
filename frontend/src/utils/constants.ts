@@ -8,7 +8,11 @@ export const DEVRANK_REPOSITORY_URL = 'https://github.com/boostcampwm-2022/web21
 
 export const GITHUB_AUTH_REQUEST_URL = `https://github.com/login/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID}&read=user`;
 
+export const MAIN_PAGE_RANK_COUNT = 12;
+
 export const COUNT_PER_PAGE = 10;
+
+export const CACHE_TIME = 1000 * 60 * 2;
 
 export const LANGUAGE_MAP: LanguageMap = {
   'c++': 'cplusplus',
@@ -16,6 +20,7 @@ export const LANGUAGE_MAP: LanguageMap = {
   html: 'html5',
   css: 'css3',
   vimscript: 'vim',
+  jupyternotebook: 'jupyter',
 };
 
 export const CUBE_RANK = {
