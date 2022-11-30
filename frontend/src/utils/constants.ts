@@ -14,6 +14,10 @@ export const COUNT_PER_PAGE = 10;
 
 export const CACHE_TIME = 1000 * 60 * 2;
 
+export const SEARCH_DEBOUNCE_DELAY = 300;
+
+export const AUTO_COMPLETE_LIMIT = 5;
+
 export const LANGUAGE_MAP: LanguageMap = {
   'c++': 'cplusplus',
   'c#': 'csharp',
