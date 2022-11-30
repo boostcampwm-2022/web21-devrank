@@ -4,6 +4,7 @@ import { Octokit } from '@octokit/core';
 import { ConnectableObservable } from 'rxjs';
 import { AutoCompleteDto } from './dto/auto-complete.dto';
 import { History } from './dto/history.dto';
+import { OrganizationDto } from './dto/organization.dto';
 import { PinnedRepositoryDto } from './dto/pinned-repository.dto';
 import { UserDto } from './dto/user.dto';
 import { UserProfileDto } from './dto/user.profile.dto';
@@ -55,16 +56,16 @@ export class UserService {
     const octokit = new Octokit({
       auth: githubToken,
     });
-    const [scores, history, pinnedRepositories] = await Promise.all([
+    const [scores, history, { organizations, pinnedRepositories }] = await Promise.all([
       this.getUserScore(username, octokit),
       this.getUserHistory(username, octokit),
-      this.getUserPinnedRepositories(username, octokit),
+      this.getUserOrganizationAndPinnedRepositories(username, octokit),
     ]);
-    console.log(scores);
     const updatedUser: UserDto = {
       ...user,
       ...scores,
       history,
+      organizations,
       pinnedRepositories,
     };
     return this.userRepository.createOrUpdate(updatedUser);
@@ -399,11 +400,21 @@ export class UserService {
     };
   }
 
-  async getUserPinnedRepositories(username: string, octokit: Octokit): Promise<PinnedRepositoryDto[]> {
+  async getUserOrganizationAndPinnedRepositories(
+    username: string,
+    octokit: Octokit,
+  ): Promise<{ organizations: OrganizationDto[]; pinnedRepositories: PinnedRepositoryDto[] }> {
     const response: any = await octokit.graphql(
       `query pinnedReposities($username: String!) {
         user(login: $username) {
-          pinnedItems(first: 3, types: REPOSITORY) {
+          organizations(first:100) {
+            nodes {
+              name
+              url
+              avatarUrl
+            }
+          }
+            pinnedItems(first: 6, types: REPOSITORY) {
             nodes {
               ... on Repository {
                 name
@@ -425,11 +436,15 @@ export class UserService {
         username,
       },
     );
+    const organizations = response.user.organizations.nodes;
     const pinnedRepositories = response.user.pinnedItems.nodes;
-    return pinnedRepositories.map((repo) => {
-      repo.languages = repo.languages.nodes.map((lang) => lang.name);
-      return repo;
-    });
+    return {
+      organizations: organizations,
+      pinnedRepositories: pinnedRepositories.map((repo) => {
+        repo.languages = repo.languages.nodes.map((lang) => lang.name);
+        return repo;
+      }),
+    };
   }
 
   async getUserRelativeRanking(user: UserDto): Promise<{ totalRank: number; tierRank: number }> {
