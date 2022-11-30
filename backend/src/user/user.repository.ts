@@ -14,8 +14,10 @@ export class UserRepository {
     @InjectRedis() private readonly redis: Redis,
   ) {}
 
-  async findAll(): Promise<UserDto[]> {
-    return this.userModel.find().lean().exec();
+  async findAll(filter = {}, isSort = false, fields = []): Promise<UserDto[]> {
+    return isSort
+      ? this.userModel.find(filter).select(fields.join(' ')).sort({ score: -1 }).lean().exec()
+      : this.userModel.find(filter).select(fields.join(' ')).lean().exec();
   }
 
   async findOneByFilter(filter: object): Promise<UserDto> {
@@ -27,7 +29,10 @@ export class UserRepository {
   }
 
   async findOneByUsernameAndUpdateViews(username: string): Promise<UserDto> {
-    return this.userModel.findOneAndUpdate({ username: username }, { $inc: { dailyViews: 1 } }, { new: true }).exec();
+    return this.userModel
+      .findOneAndUpdate({ username: username }, { $inc: { dailyViews: 1 } }, { new: true })
+      .lean()
+      .exec();
   }
 
   async createOrUpdate(user: UserDto): Promise<UserDto> {
