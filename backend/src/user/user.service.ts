@@ -95,14 +95,42 @@ export class UserService {
     return user;
   }
 
-  async updateScore(username: string, githubToken: string): Promise<UserDto> {
-    const user = await this.userRepository.findOneByUsername(username);
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
+  async setUpdateScoreDelayTime(username: string, seconds: number): Promise<any> {
+    return this.userRepository.setUpdateScoreDelayTime(username, seconds);
+  }
+
+  async createOrUpdate(user: UserDto): Promise<UserDto> {
+    return this.userRepository.createOrUpdate(user);
+  }
+
+  async getAnonymousUserInfo(githubToken: string, username: string): Promise<UserDto> {
     const octokit = new Octokit({
       auth: githubToken,
     });
+    try {
+      const response = await octokit.request('GET /users/{username}', {
+        username: username,
+      });
+      const user: UserDto = {
+        id: response.data.node_id,
+        username: response.data.login,
+        following: response.data.following,
+        followers: response.data.followers,
+        avatarUrl: response.data.avatar_url,
+        name: response.data.name,
+        company: response.data.company,
+        blogUrl: response.data.blog,
+        location: response.data.location,
+        bio: response.data.bio,
+        email: response.data.email,
+      };
+      return user;
+    } catch {
+      throw new NotFoundException('User not found.');
+    }
+  }
+
+  async getUserScore(username: string, octokit: Octokit): Promise<Partial<UserDto>> {
     const res: any = await octokit.request('GET /users/{username}', {
       username: user.username,
     });
