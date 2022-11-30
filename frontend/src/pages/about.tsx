@@ -59,7 +59,7 @@ function About() {
       </Content>
       <Content>
         <Title>Developed By</Title>
-        {DEVELOPER_INFORMATION.map(({ name, github, blog, introduction, field, career }) => (
+        {DEVELOPER_INFORMATION.map(({ name, introduction, field, career }) => (
           <Profile key={name}>
             <Name>
               {name}
