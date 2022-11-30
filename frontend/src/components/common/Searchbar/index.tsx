@@ -1,9 +1,9 @@
 import Image from 'next/image';
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useInput } from '@hooks';
 import { FormEvent } from '@type/common';
-import useDebounce from '@hooks/useDebounce';
+import AutoCompleteList from '@components/common/Searchbar/AutoComplete';
 
 type SubmitAlign = 'left' | 'right';
 
@@ -16,6 +16,8 @@ interface SearchbarProps {
   width: number;
   /** 검색 버튼 위치 (left | right) */
   submitAlign: SubmitAlign;
+  /** 자동 완성 */
+  autoComplete: boolean;
   /** 검색폼 제출 핸들러 함수 */
   onSearch: (username: string) => void;
 }
@@ -25,14 +27,17 @@ interface StyledFormProps {
   submitAlign: SubmitAlign;
 }
 
-function Searchbar({ type = 'text', placeholder, width, submitAlign, onSearch, ...props }: SearchbarProps) {
-  const { input, onInputChange, inputReset } = useInput('');
-
-  const debounceValue = useDebounce({ value: input, delay: 300 });
-
-  useEffect(() => {
-    console.log(debounceValue);
-  }, [debounceValue]);
+function Searchbar({
+  type = 'text',
+  placeholder,
+  width,
+  submitAlign,
+  onSearch,
+  autoComplete,
+  ...props
+}: SearchbarProps) {
+  const { input, setInput, onInputChange, inputReset } = useInput('');
+  const [test, setTest] = useState(0);
 
   const onInputSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -40,12 +45,33 @@ function Searchbar({ type = 'text', placeholder, width, submitAlign, onSearch, .
     inputReset();
   };
 
+  const ref = useRef<HTMLFormElement | null>(null);
+
+  const keyhandler = (e: React.KeyboardEvent) => {
+    switch (e.key) {
+      case 'ArrowDown':
+        setTest(test + 1);
+        break;
+      case 'ArrowUp':
+        setTest(test - 1);
+        break;
+    }
+  };
+
   return (
-    <Form width={width} submitAlign={submitAlign} onSubmit={onInputSubmit}>
-      <Input type={type} value={input} placeholder={placeholder} onChange={onInputChange} {...props} />
+    <Form ref={ref} width={width} submitAlign={submitAlign} onSubmit={onInputSubmit}>
+      <Input
+        type={type}
+        value={input}
+        placeholder={placeholder}
+        onChange={onInputChange}
+        onKeyDown={keyhandler}
+        {...props}
+      />
       <SearchButton type='submit'>
         <Image src='/icons/search.svg' alt='검색버튼' width={24} height={24} />
       </SearchButton>
+      {autoComplete && <AutoCompleteList input={input} setInput={setInput} inputRef={ref} />}
     </Form>
   );
 }
@@ -53,11 +79,11 @@ function Searchbar({ type = 'text', placeholder, width, submitAlign, onSearch, .
 export default Searchbar;
 
 const Form = styled.form<StyledFormProps>`
-  ${({ theme }) => theme.common.flexSpaceBetween};
+  position: relative;
   background-color: ${({ theme }) => theme.colors.black4};
   border: 1px solid ${({ theme }) => theme.colors.gray1};
   border-radius: 10px;
-  padding: 10px;
+  padding: 10px 15px;
 
   ${(props) =>
     props.width &&
@@ -91,7 +117,9 @@ const Input = styled.input`
 `;
 
 const SearchButton = styled.button`
-  ${({ theme }) => theme.common.flexCenter};
+  position: absolute;
+  right: 8px;
+  top: 8px;
   background-color: transparent;
   border: none;
 `;
