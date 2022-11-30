@@ -66,8 +66,10 @@ export class AuthController {
       bio: userInfo.bio,
       email: userInfo.email,
     };
-    await this.userService.createOrUpdate(user);
-    this.userService.updateScore(user.username, githubToken);
+    if (!this.userService.findOneByFilter({ username: user.username })) {
+      await this.userService.createOrUpdate(user);
+      await this.userService.updateUser(user.username, githubToken);
+    }
 
     const accessToken = this.authService.issueAccessToken(user.id, githubToken);
     const refreshToken = this.authService.issueRefreshToken(user.id, githubToken);
