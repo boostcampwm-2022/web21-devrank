@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory, SchemaOptions } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { History } from './dto/history.dto';
+import { OrganizationDto } from './dto/organization.dto';
 import { PinnedRepositoryDto } from './dto/pinned-repository.dto';
 
 const options: SchemaOptions = {
@@ -67,6 +68,9 @@ export class User extends Document {
 
   @Prop()
   pinnedRepositories: PinnedRepositoryDto[];
+
+  @Prop()
+  organizations: OrganizationDto[];
 
   @Prop()
   primaryLanguages: string[];
