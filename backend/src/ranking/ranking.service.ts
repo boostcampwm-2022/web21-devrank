@@ -51,9 +51,4 @@ export class RankingService {
   async getMostUsedLanguages(limit: number): Promise<{ name: string; count: number }[]> {
     return this.userRepository.findMostUsedLanguages(limit);
   }
-
-  async getRankingsByUsername(limit: number, username: string): Promise<UserDto[]> {
-    const users = await this.userRepository.findAllByUsername(limit, username);
-    return users;
-  }
 }

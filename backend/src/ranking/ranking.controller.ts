@@ -5,7 +5,7 @@ import { RankingPaginationDto } from './dto/ranking-pagination.dto';
 import { RankingUserDto } from './dto/ranking-user.dto';
 import { RankingService } from './ranking.service';
 
-@ApiTags('Ranking')
+@ApiTags('Rankings')
 @Controller('rankings')
 export class RankingController {
   constructor(private readonly rankingService: RankingService) {}
@@ -79,28 +79,6 @@ export class RankingController {
   ): Promise<RankingLanguageDto[]> {
     const languages = await this.rankingService.getMostUsedLanguages(limit);
     const rankings = languages.map((language) => new RankingLanguageDto().of(language.name, language.count));
-    return rankings;
-  }
-
-  @Get(':username')
-  @ApiOperation({ summary: 'username이 앞부분부터 일치하는 랭킹 리스트' })
-  @ApiParam({
-    name: 'username',
-    required: true,
-    description: '사용자의 아이디 앞부분 (대소문자 구분 O)',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'param으로 넘어온 username 문자열이 유저 아이디의 접두어인 유저 리스트',
-    type: RankingUserDto,
-    isArray: true,
-  })
-  async getRankingsByUsername(
-    @Query('limit', new DefaultValuePipe(15), ParseIntPipe) limit: number,
-    @Param('username') username: string,
-  ): Promise<RankingUserDto[]> {
-    const users = await this.rankingService.getRankingsByUsername(limit, username);
-    const rankings = users.map((user) => new RankingUserDto().of(user));
     return rankings;
   }
 }
