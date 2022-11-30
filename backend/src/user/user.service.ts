@@ -19,21 +19,24 @@ export class UserService {
     return user;
   }
 
-  async findOneByUsername(username: string): Promise<UserDto> {
-    const user = await this.userRepository.findOneByUsername(username);
-    if (!user) {
-      const octokit = new Octokit();
-      const res = await octokit.request('GET /users/{username}', {
-        username: username,
-      });
-      const userDto = new UserDto();
-      userDto.username = res.data.login;
-      userDto.avatarUrl = res.data.avatar_url;
-      userDto.commitsScore = 0;
-      userDto.followersScore = 0;
-      userDto.score = 0;
-      return this.userRepository.createOrUpdate(userDto);
+  async findOneByUsername(githubToken: string, ip: string, username: string): Promise<UserProfileDto> {
+    const updateDelayTime = await this.userRepository.findUpdateScoreTimeToLive(username);
+    let user = null;
+    if (await this.userRepository.isDuplicatedRequestIp(ip, username)) {
+      user = await this.userRepository.findOneByUsername(username);
+    } else {
+      user = await this.userRepository.findOneByUsernameAndUpdateViews(username);
     }
+    if (!user) {
+      user = await this.getAnonymousUserInfo(githubToken, username);
+      await this.userRepository.createOrUpdate(user);
+      await this.updateUser(user.username, githubToken);
+    }
+    const { totalRank, tierRank } = await this.getUserRelativeRanking(user);
+    this.userRepository.setDuplicatedRequestIp(ip, username);
+    user.updateDelayTime = updateDelayTime;
+    user.totalRank = totalRank;
+    user.tierRank = tierRank;
     return user;
   }
 
