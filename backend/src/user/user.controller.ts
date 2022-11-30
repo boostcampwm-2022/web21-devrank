@@ -18,8 +18,16 @@ export class UserController {
     status: 200,
     description: '특정 유저의 정보를 가져오고, 금일 조회하지 않은 IP주소라면 조회수도 +1 업데이트',
   })
-  async findOneByUsername(@RealIP() ip: string, @Param('username') username: string): Promise<UserDto> {
-    return this.userService.findOneWithUpdateViews(ip, username);
+  async findOneByUsername(
+    @UserGithubToken() githubToken: string,
+    @RealIP() ip: string,
+    @Param('username') username: string,
+  ): Promise<UserDto> {
+    return this.userService.findOneWithUpdateViews(
+      githubToken || this.configService.get('GITHUB_PERSONAL_ACCESS_TOKEN'),
+      ip,
+      username,
+    );
   }
 
   @Patch(':username')
@@ -43,11 +51,27 @@ export class UserController {
     return this.userService.updateAllScore(githubToken || this.configService.get('GITHUB_PERSONAL_ACCESS_TOKEN'));
   }
 
-  @Patch('')
+  @Get('')
   @ApiBearerAuth('accessToken')
-  @ApiOperation({ summary: '모든 유저의 점수 업데이트' })
-  @ApiResponse({ status: 200, description: '업데이트된 유저들 정보' })
-  async findUserPinnedRepository(@UserGithubToken() githubToken: string): Promise<UserDto[]> {
+  @ApiOperation({ summary: '유저의 pinned 레포지토리 정보' })
+  @ApiResponse({ status: 200, description: '유저의 pinned 레포지토리 정보' })
+  async f2indUserPinnedRepository(@UserGithubToken() githubToken: string): Promise<UserDto[]> {
+    return this.userService.updateAllScore(githubToken || this.configService.get('GITHUB_PERSONAL_ACCESS_TOKEN'));
+  }
+
+  @Get('')
+  @ApiBearerAuth('accessToken')
+  @ApiOperation({ summary: '유저의 활동 history 정보' })
+  @ApiResponse({ status: 200, description: '유저의 활동 history 정보' })
+  async f3indUserPinnedRepository(@UserGithubToken() githubToken: string): Promise<UserDto[]> {
+    return this.userService.updateAllScore(githubToken || this.configService.get('GITHUB_PERSONAL_ACCESS_TOKEN'));
+  }
+
+  @Get('')
+  @ApiBearerAuth('accessToken')
+  @ApiOperation({ summary: '유저의 github 활동 정보' })
+  @ApiResponse({ status: 200, description: '유저의 활동 history 정보' })
+  async f4indUserPinnedRepository(@UserGithubToken() githubToken: string): Promise<UserDto[]> {
     return this.userService.updateAllScore(githubToken || this.configService.get('GITHUB_PERSONAL_ACCESS_TOKEN'));
   }
 }
