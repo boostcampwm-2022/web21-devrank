@@ -53,11 +53,25 @@ export class UserService {
     const octokit = new Octokit({
       auth: githubToken,
     });
-    const res = await octokit.request('GET /users/{username}/repos', {
-      username: user.username,
-    });
-    const repositories = res.data.map((repo) => {
-      return repo.id;
+    const [scores, history, pinnedRepositories] = await Promise.all([
+      this.getUserScore(username, octokit),
+      this.getUserHistory(username, octokit),
+      this.getUserPinnedRepositories(username, octokit),
+    ]);
+    console.log(scores);
+    const updatedUser: UserDto = {
+      ...user,
+      ...scores,
+      history,
+      pinnedRepositories,
+    };
+    return this.userRepository.createOrUpdate(updatedUser);
+  }
+
+  async updateAllUsers(githubToken: string): Promise<UserDto[]> {
+    const users = await this.userRepository.findAll({}, false, ['username']);
+    const promises = users.map((user) => {
+      return this.updateUser(user.username, githubToken);
     });
     user.repositories = repositories;
     return this.userRepository.createOrUpdate(user);
