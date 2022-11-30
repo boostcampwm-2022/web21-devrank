@@ -40,14 +40,9 @@ export class UserService {
     return user;
   }
 
-  async createOrUpdate(user: UserDto): Promise<UserDto> {
-    if (!user.commitsScore) {
-      user.commitsScore = 0;
-    }
-    if (!user.followersScore) {
-      user.followersScore = 0;
-    }
-    return this.userRepository.createOrUpdate(user);
+  async findAllByPrefixUsername(limit: number, username: string): Promise<AutoCompleteDto[]> {
+    const users = await this.userRepository.findAllByPrefixUsername(limit, username);
+    return users.map((user) => new AutoCompleteDto().of(user));
   }
 
   async updateRepositories(username: string, githubToken: string): Promise<UserDto> {
