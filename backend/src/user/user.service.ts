@@ -425,8 +425,20 @@ export class UserService {
     });
   }
 
-  async findAllByPrefixUsername(limit: number, username: string): Promise<AutoCompleteDto[]> {
-    const users = await this.userRepository.findAllByPrefixUsername(limit, username);
-    return users.map((user) => new AutoCompleteDto().of(user));
+  async getUserRelativeRanking(user: UserDto): Promise<{ totalRank: number; tierRank: number }> {
+    // if not cached
+    const users = await this.userRepository.findAll({}, true, ['username', 'tier', 'score']);
+    let tierRank = 0;
+    for (let rank = 0; rank < users.length; rank++) {
+      if (users[rank].username === user.username) {
+        return {
+          totalRank: rank + 1,
+          tierRank: tierRank + 1,
+        };
+      }
+      if (users[rank].tier === user.tier) {
+        tierRank += 1;
+      }
+    }
   }
 }
