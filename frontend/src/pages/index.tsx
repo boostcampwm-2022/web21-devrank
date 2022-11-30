@@ -54,6 +54,7 @@ function Home() {
         placeholder={t('index:search-placeholder')}
         submitAlign='right'
         onSearch={onSearch}
+        autoComplete={true}
       />
       <Content>
         <OverallRanking>
