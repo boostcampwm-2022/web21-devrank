@@ -73,7 +73,7 @@ function Ranking() {
               <CubeIcon tier={tier} />
             </RankingTable.Element>
             <RankingTable.Element>
-              <GrayText>{score.toLocaleString()}</GrayText>
+              <GrayText>{score?.toLocaleString()}</GrayText>
             </RankingTable.Element>
             <RankingTable.Element>
               <TechStackList>

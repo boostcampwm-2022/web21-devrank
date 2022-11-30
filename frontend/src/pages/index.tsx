@@ -39,8 +39,8 @@ function Home() {
     () => requestProgrammingLanguageRanking(),
   );
 
-  const onSearch = () => {
-    router.push('/profile/404');
+  const onSearch = (input: string) => {
+    router.push(`/profile/${input}`);
   };
 
   return (

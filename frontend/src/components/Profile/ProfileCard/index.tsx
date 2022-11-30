@@ -1,8 +1,11 @@
+import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { ProfileLabel } from '@components/Profile';
 import { Avatar, CubeIcon, Paper } from '@components/common';
 
 function ProfileCard() {
+  const { t } = useTranslation('tier');
+
   return (
     <Paper>
       <Avatar src='/profile-dummy.png' size='lg' />
@@ -37,7 +40,7 @@ function ProfileCard() {
       </ProfileInfos>
       <ProfileRank>
         <CubeIcon tier='mint' size={160} />
-        <p>전체: 1000등</p>
+        <p>{`${t('all')}: 1000등`}</p>
         <p>레드: 10등</p>
       </ProfileRank>
     </Paper>

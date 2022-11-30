@@ -1,3 +1,4 @@
+import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { CUBE_RANK_RANGE } from '@utils/constants';
 import { getTierFromExp } from '@utils/utils';
@@ -15,13 +16,14 @@ interface StyledActiveProps {
 }
 
 function EXPbar({ exp }: EXPbarProps) {
+  const { t } = useTranslation('profile');
   const tier = getTierFromExp(exp);
   const [min, max] = CUBE_RANK_RANGE[tier];
   const percent = ((exp - min) / (max - min)) * 100;
 
   return (
     <>
-      <Score>현재 점수 : {exp}</Score>
+      <Score>{`${t('current-score')} : ${exp}`}</Score>
       <ProgressBar>
         <Active percent={percent} tier={tier} />
       </ProgressBar>

@@ -14,7 +14,6 @@ Main.args = {
   placeholder: '유저를 검색해주세요',
   width: 600,
   submitAlign: 'right',
-  onChange: (e) => {},
 };
 
 export const Short = Template.bind({});
@@ -23,5 +22,4 @@ Short.args = {
   placeholder: '사용자명',
   width: 200,
   submitAlign: 'left',
-  onChange: (e) => {},
 };

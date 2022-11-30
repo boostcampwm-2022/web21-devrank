@@ -1,3 +1,5 @@
 {
-  "404-information": "We're sorry, the page you requested could not be found. Please go back to the homepage"
+  "404-information": "We're sorry, the page you requested could not be found. Please go back to the homepage",
+  "user-not-found": "User not registered with Github.",
+  "check-username": "Please check the user's name and search again."
 }

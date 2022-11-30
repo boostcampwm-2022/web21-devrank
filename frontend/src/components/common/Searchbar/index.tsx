@@ -1,7 +1,9 @@
 import Image from 'next/image';
+import { useEffect } from 'react';
 import styled, { css } from 'styled-components';
 import { useInput } from '@hooks';
 import { FormEvent } from '@type/common';
+import useDebounce from '@hooks/useDebounce';
 
 type SubmitAlign = 'left' | 'right';
 
@@ -25,6 +27,12 @@ interface StyledFormProps {
 
 function Searchbar({ type = 'text', placeholder, width, submitAlign, onSearch, ...props }: SearchbarProps) {
   const { input, onInputChange, inputReset } = useInput('');
+
+  const debounceValue = useDebounce({ value: input, delay: 300 });
+
+  useEffect(() => {
+    console.log(debounceValue);
+  }, [debounceValue]);
 
   const onInputSubmit = (e: FormEvent) => {
     e.preventDefault();
