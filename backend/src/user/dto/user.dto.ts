@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { History } from './history.dto';
+import { OrganizationDto } from './organization.dto';
 import { PinnedRepositoryDto } from './pinned-repository.dto';
 
 export class UserDto {
@@ -68,4 +69,7 @@ export class UserDto {
 
   @ApiProperty({ isArray: true, type: PinnedRepositoryDto })
   pinnedRepositories?: PinnedRepositoryDto[];
+
+  @ApiProperty({ isArray: true, type: OrganizationDto })
+  organizations?: OrganizationDto[];
 }
