@@ -63,7 +63,7 @@ export class UserService {
     return this.userRepository.createOrUpdate(user);
   }
 
-  async findOneWithUpdateViews(ip: string, username: string): Promise<UserDto> {
+  async findOneWithUpdateViews(githubToken: string, ip: string, username: string): Promise<UserDto> {
     const updateDelayTime = await this.userRepository.findUpdateScoreTimeToLive(username);
     let user = null;
     if (await this.userRepository.isDuplicatedRequestIp(ip, username)) {
@@ -73,22 +73,24 @@ export class UserService {
     }
     if (!user) {
       const octokit = new Octokit();
-      const res = await octokit.request('GET /users/{username}', {
-        username: username,
-      });
-      const userDto = new UserDto();
-      userDto.id = res.data.node_id;
-      userDto.username = res.data.login;
-      userDto.avatarUrl = res.data.avatar_url;
-      userDto.commitsScore = 0;
-      userDto.followersScore = 0;
-      userDto.score = 0;
-      user = await this.userRepository.createOrUpdate(userDto);
-      console.log(user);
+      try {
+        const res = await octokit.request('GET /users/{username}', {
+          username: username,
+        });
+        const userDto = new UserDto();
+        userDto.id = res.data.node_id;
+        userDto.username = res.data.login;
+        userDto.avatarUrl = res.data.avatar_url;
+        userDto.commitsScore = 0;
+        userDto.followersScore = 0;
+        userDto.score = 0;
+        user = await this.userRepository.createOrUpdate(userDto);
+        await this.updateScore(userDto.username, githubToken);
+      } catch {
+        throw new NotFoundException('User not found.');
+      }
     }
-    console.log(user);
     this.userRepository.setDuplicatedRequestIp(ip, username);
-    console.log(updateDelayTime);
     user.updateDelayTime = updateDelayTime;
     return user;
   }
