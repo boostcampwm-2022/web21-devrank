@@ -1,16 +1,45 @@
 import { UserGithubToken } from '@libs/common/decorators/user-github-token.decorator';
 import { UPDATE_DELAY_TIME } from '@libs/consts';
-import { BadRequestException, Controller, Get, Param, Patch } from '@nestjs/common';
+import {
+  BadRequestException,
+  Controller,
+  DefaultValuePipe,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Query,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { RealIP } from 'nestjs-real-ip';
+import { AutoCompleteDto } from './dto/auto-complete.dto';
 import { UserDto } from './dto/user.dto';
 import { UserService } from './user.service';
 
-@ApiTags('User')
+@ApiTags('Users')
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService, private readonly configService: ConfigService) {}
+  @Get('prefix')
+  @ApiOperation({ summary: '아이디의 prefix가 일치하는 유저들 목록 가져오기' })
+  @ApiQuery({ name: 'limit', required: false, description: '설정 안 할 경우 기본값 5' })
+  @ApiQuery({ name: 'username', required: false, description: `설정 안 할 경우 기본값 ''` })
+  @ApiResponse({
+    status: 200,
+    description: '아이디의 prefix가 일치한 유저들의 username과 avatarUrl 리스트',
+    type: AutoCompleteDto,
+    isArray: true,
+  })
+  async findAllByPrefixUsername(
+    @Query('limit', new DefaultValuePipe(3), ParseIntPipe) limit: number,
+    @Query('username', new DefaultValuePipe('')) username: string,
+  ): Promise<AutoCompleteDto[]> {
+    if (!username) {
+      throw new BadRequestException('username is required.');
+    }
+    return this.userService.findAllByPrefixUsername(limit, username);
+  }
 
   @Get(':username')
   @ApiOperation({ summary: '특정 유저 정보 가져오기' })
@@ -48,30 +77,6 @@ export class UserController {
   @ApiOperation({ summary: '모든 유저의 점수 업데이트' })
   @ApiResponse({ status: 200, description: '업데이트된 유저들 정보' })
   async updateAllScore(@UserGithubToken() githubToken: string): Promise<UserDto[]> {
-    return this.userService.updateAllScore(githubToken || this.configService.get('GITHUB_PERSONAL_ACCESS_TOKEN'));
-  }
-
-  @Get('')
-  @ApiBearerAuth('accessToken')
-  @ApiOperation({ summary: '유저의 pinned 레포지토리 정보' })
-  @ApiResponse({ status: 200, description: '유저의 pinned 레포지토리 정보' })
-  async f2indUserPinnedRepository(@UserGithubToken() githubToken: string): Promise<UserDto[]> {
-    return this.userService.updateAllScore(githubToken || this.configService.get('GITHUB_PERSONAL_ACCESS_TOKEN'));
-  }
-
-  @Get('')
-  @ApiBearerAuth('accessToken')
-  @ApiOperation({ summary: '유저의 활동 history 정보' })
-  @ApiResponse({ status: 200, description: '유저의 활동 history 정보' })
-  async f3indUserPinnedRepository(@UserGithubToken() githubToken: string): Promise<UserDto[]> {
-    return this.userService.updateAllScore(githubToken || this.configService.get('GITHUB_PERSONAL_ACCESS_TOKEN'));
-  }
-
-  @Get('')
-  @ApiBearerAuth('accessToken')
-  @ApiOperation({ summary: '유저의 github 활동 정보' })
-  @ApiResponse({ status: 200, description: '유저의 활동 history 정보' })
-  async f4indUserPinnedRepository(@UserGithubToken() githubToken: string): Promise<UserDto[]> {
     return this.userService.updateAllScore(githubToken || this.configService.get('GITHUB_PERSONAL_ACCESS_TOKEN'));
   }
 }
