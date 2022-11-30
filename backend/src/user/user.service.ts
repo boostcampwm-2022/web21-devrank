@@ -338,13 +338,52 @@ export class UserService {
     return this.userRepository.createOrUpdate(user);
   }
 
-  async updateAllScore(githubToken: string): Promise<UserDto[]> {
-    const users = await this.userRepository.findAll();
-    const promises = users.map((user) => {
-      return this.updateScore(user.username, githubToken);
-    });
-    return Promise.all(promises);
-  }
+  async getUserHistory(username: string, octokit: Octokit): Promise<History> {
+    const { user: response }: any = await octokit.graphql(
+      `query ContributionsView($username: String!) {
+        user(login: $username) {
+          contributionsCollection {
+            contributionCalendar{
+              totalContributions
+              colors
+              weeks{
+                contributionDays{
+                  date
+                  contributionCount
+                  color
+                }
+              }
+            }
+            totalCommitContributions
+            totalIssueContributions
+            totalPullRequestContributions
+            totalPullRequestReviewContributions
+            totalRepositoryContributions
+          }
+          repositories(
+            first: 100
+            ownerAffiliations: OWNER
+            isFork: false
+            orderBy: {direction: DESC, field: STARGAZERS}
+          ) {
+            totalCount
+            nodes {
+              name
+              stargazerCount
+              forkCount
+            }
+          }
+        }
+      }`,
+      { username },
+    );
+    const {
+      totalCommitContributions,
+      totalIssueContributions,
+      totalPullRequestContributions,
+      totalPullRequestReviewContributions,
+      totalRepositoryContributions,
+    } = response.contributionsCollection;
 
   async isDuplicatedRequestIp(ip: string, username: string): Promise<boolean> {
     return this.userRepository.isDuplicatedRequestIp(ip, username);
