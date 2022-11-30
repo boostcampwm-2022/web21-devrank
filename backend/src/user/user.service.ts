@@ -1,13 +1,18 @@
 import { getTier } from '@libs/utils';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Octokit } from '@octokit/core';
+import { ConnectableObservable } from 'rxjs';
+import { AutoCompleteDto } from './dto/auto-complete.dto';
+import { History } from './dto/history.dto';
+import { OrganizationDto } from './dto/organization.dto';
+import { PinnedRepositoryDto } from './dto/pinned-repository.dto';
 import { UserDto } from './dto/user.dto';
-import { RepositoryService } from './repository.service';
+import { UserProfileDto } from './dto/user.profile.dto';
 import { UserRepository } from './user.repository';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly userRepository: UserRepository, private readonly repositoryService: RepositoryService) {}
+  constructor(private readonly userRepository: UserRepository) {}
 
   async findOneByFilter(filter: object): Promise<UserDto> {
     const user = await this.userRepository.findOneByFilter(filter);
@@ -17,53 +22,7 @@ export class UserService {
     return user;
   }
 
-  async findOneByUsername(username: string): Promise<UserDto> {
-    const user = await this.userRepository.findOneByUsername(username);
-    if (!user) {
-      const octokit = new Octokit();
-      const res = await octokit.request('GET /users/{username}', {
-        username: username,
-      });
-      const userDto = new UserDto();
-      userDto.username = res.data.login;
-      userDto.avatarUrl = res.data.avatar_url;
-      userDto.commitsScore = 0;
-      userDto.followersScore = 0;
-      userDto.score = 0;
-      return this.userRepository.createOrUpdate(userDto);
-    }
-    return user;
-  }
-
-  async createOrUpdate(user: UserDto): Promise<UserDto> {
-    if (!user.commitsScore) {
-      user.commitsScore = 0;
-    }
-    if (!user.followersScore) {
-      user.followersScore = 0;
-    }
-    return this.userRepository.createOrUpdate(user);
-  }
-
-  async updateRepositories(username: string, githubToken: string): Promise<UserDto> {
-    const user = await this.userRepository.findOneByUsername(username);
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-    const octokit = new Octokit({
-      auth: githubToken,
-    });
-    const res = await octokit.request('GET /users/{username}/repos', {
-      username: user.username,
-    });
-    const repositories = res.data.map((repo) => {
-      return repo.id;
-    });
-    user.repositories = repositories;
-    return this.userRepository.createOrUpdate(user);
-  }
-
-  async findOneWithUpdateViews(ip: string, username: string): Promise<UserDto> {
+  async findOneByUsername(githubToken: string, ip: string, username: string): Promise<UserProfileDto> {
     const updateDelayTime = await this.userRepository.findUpdateScoreTimeToLive(username);
     let user = null;
     if (await this.userRepository.isDuplicatedRequestIp(ip, username)) {
@@ -72,28 +31,24 @@ export class UserService {
       user = await this.userRepository.findOneByUsernameAndUpdateViews(username);
     }
     if (!user) {
-      const octokit = new Octokit();
-      const res = await octokit.request('GET /users/{username}', {
-        username: username,
-      });
-      const userDto = new UserDto();
-      userDto.id = res.data.node_id;
-      userDto.username = res.data.login;
-      userDto.avatarUrl = res.data.avatar_url;
-      userDto.commitsScore = 0;
-      userDto.followersScore = 0;
-      userDto.score = 0;
-      user = await this.userRepository.createOrUpdate(userDto);
-      console.log(user);
+      user = await this.getAnonymousUserInfo(githubToken, username);
+      await this.userRepository.createOrUpdate(user);
+      await this.updateUser(user.username, githubToken);
     }
-    console.log(user);
+    const { totalRank, tierRank } = await this.getUserRelativeRanking(user);
     this.userRepository.setDuplicatedRequestIp(ip, username);
-    console.log(updateDelayTime);
     user.updateDelayTime = updateDelayTime;
+    user.totalRank = totalRank;
+    user.tierRank = tierRank;
     return user;
   }
 
-  async updateScore(username: string, githubToken: string): Promise<UserDto> {
+  async findAllByPrefixUsername(limit: number, username: string): Promise<AutoCompleteDto[]> {
+    const users = await this.userRepository.findAllByPrefixUsername(limit, username);
+    return users.map((user) => new AutoCompleteDto().of(user));
+  }
+
+  async updateUser(username: string, githubToken: string): Promise<UserDto> {
     const user = await this.userRepository.findOneByUsername(username);
     if (!user) {
       throw new NotFoundException('User not found');
@@ -101,10 +56,76 @@ export class UserService {
     const octokit = new Octokit({
       auth: githubToken,
     });
-    const res: any = await octokit.request('GET /users/{username}', {
-      username: user.username,
+    const [scores, history, { organizations, pinnedRepositories }] = await Promise.all([
+      this.getUserScore(username, octokit),
+      this.getUserHistory(username, octokit),
+      this.getUserOrganizationAndPinnedRepositories(username, octokit),
+    ]);
+    const updatedUser: UserDto = {
+      ...user,
+      ...scores,
+      history,
+      organizations,
+      pinnedRepositories,
+    };
+    return this.userRepository.createOrUpdate(updatedUser);
+  }
+
+  async updateAllUsers(githubToken: string): Promise<UserDto[]> {
+    const users = await this.userRepository.findAll({}, false, ['username']);
+    const promises = users.map((user) => {
+      return this.updateUser(user.username, githubToken);
     });
-    const userId = res.data.node_id;
+    return Promise.all(promises);
+  }
+
+  async isDuplicatedRequestIp(ip: string, username: string): Promise<boolean> {
+    return this.userRepository.isDuplicatedRequestIp(ip, username);
+  }
+  async findUpdateScoreTimeToLive(username: string): Promise<number> {
+    return this.userRepository.findUpdateScoreTimeToLive(username);
+  }
+
+  async setUpdateScoreDelayTime(username: string, seconds: number): Promise<any> {
+    return this.userRepository.setUpdateScoreDelayTime(username, seconds);
+  }
+
+  async createOrUpdate(user: UserDto): Promise<UserDto> {
+    return this.userRepository.createOrUpdate(user);
+  }
+
+  async getAnonymousUserInfo(githubToken: string, username: string): Promise<UserDto> {
+    const octokit = new Octokit({
+      auth: githubToken,
+    });
+    try {
+      const response = await octokit.request('GET /users/{username}', {
+        username: username,
+      });
+      const user: UserDto = {
+        id: response.data.node_id,
+        username: response.data.login,
+        following: response.data.following,
+        followers: response.data.followers,
+        avatarUrl: response.data.avatar_url,
+        name: response.data.name,
+        company: response.data.company,
+        blogUrl: response.data.blog,
+        location: response.data.location,
+        bio: response.data.bio,
+        email: response.data.email,
+      };
+      return user;
+    } catch {
+      throw new NotFoundException('User not found.');
+    }
+  }
+
+  async getUserScore(username: string, octokit: Octokit): Promise<Partial<UserDto>> {
+    const res: any = await octokit.request('GET /users/{username}', {
+      username,
+    });
+    const id = res.data.node_id;
     //TODO: parent orderBy 적용되어야함
     const forkResponse: any = await octokit.graphql(
       `query repositories($username: String!, $id: ID) {
@@ -148,8 +169,8 @@ export class UserService {
         }
       }`,
       {
-        username: user.username,
-        id: userId,
+        username,
+        id,
       },
     );
     const personalResponse: any = await octokit.graphql(
@@ -191,8 +212,8 @@ export class UserService {
         }
       }`,
       {
-        username: user.username,
-        id: userId,
+        username,
+        id,
       },
     );
     const followersResponse: any = await octokit.graphql(
@@ -204,7 +225,7 @@ export class UserService {
         }
       }`,
       {
-        username: user.username,
+        username,
       },
     );
     const issuesResponse: any = await octokit.graphql(
@@ -230,7 +251,7 @@ export class UserService {
         }
       }`,
       {
-        username: user.username,
+        username,
       },
     );
 
@@ -275,64 +296,171 @@ export class UserService {
     const followersScore = followersResponse.user.followers.totalCount / 10;
     const personalRepositories = personalResponse.user.repositories.nodes;
     const personalScore = personalRepositories.reduce(getCommitScore, 0);
-    const issuesScore = issuesResponse.user.issues.edges.reduce((acc, issue) => {
-      const time = +new Date() - +new Date(issue.node.createdAt);
-      const timeWeight = (1 / 1.0019) ** (time / 1000 / 60 / 60 / 24);
-      const repositoryWeight = issue.node.repository.stargazerCount;
-      const issueScore = repositoryWeight * timeWeight;
-      return acc + issueScore;
-    }, 0);
-
+    const commitsScore = parseInt(forkScore + personalScore);
+    const issuesScore = Math.floor(
+      issuesResponse.user.issues.edges.reduce((acc, issue) => {
+        const time = +new Date() - +new Date(issue.node.createdAt);
+        const timeWeight = (1 / 1.0019) ** (time / 1000 / 60 / 60 / 24);
+        const repositoryWeight = issue.node.repository.stargazerCount;
+        const issueScore = repositoryWeight * timeWeight;
+        return acc + issueScore;
+      }, 0) / 1000,
+    );
+    const score = commitsScore + followersScore + issuesScore;
     languagesScore = new Map([...languagesScore].sort((a, b) => b[1] - a[1]));
-    user.commitsScore = parseInt(forkScore + personalScore);
-    user.issuesScore = Math.floor(issuesScore / 1000);
-    user.followers = followersResponse.user.followers.totalCount;
-    user.followersScore = Math.floor(followersScore);
-    user.score = user.commitsScore + user.followersScore + user.issuesScore;
-    user.tier = getTier(user.score);
-    user.primaryLanguages = Array.from(languagesScore.keys()).slice(0, 3);
-    return this.userRepository.createOrUpdate(user);
+    return {
+      commitsScore,
+      issuesScore,
+      followersScore: Math.floor(followersScore),
+      score,
+      tier: getTier(score),
+      primaryLanguages: Array.from(languagesScore.keys()).slice(0, 3),
+    };
   }
 
-  async updateAllScore(githubToken: string): Promise<UserDto[]> {
-    const users = await this.userRepository.findAll();
-    const promises = users.map((user) => {
-      return this.updateScore(user.username, githubToken);
-    });
-    return Promise.all(promises);
-  }
-
-  async isDuplicatedRequestIp(ip: string, username: string): Promise<boolean> {
-    return this.userRepository.isDuplicatedRequestIp(ip, username);
-  }
-  async findUpdateScoreTimeToLive(username: string): Promise<number> {
-    return this.userRepository.findUpdateScoreTimeToLive(username);
-  }
-
-  async setUpdateScoreDelayTime(username: string, seconds: number): Promise<any> {
-    return this.userRepository.setUpdateScoreDelayTime(username, seconds);
-  }
-
-  async findUserPinnedRepository() {
-    `{
-      user(login: $username) {
-        pinnedItems(first:10, types:REPOSITORY) {
-          nodes {
-            ... on Repository {
+  async getUserHistory(username: string, octokit: Octokit): Promise<History> {
+    const { user: response }: any = await octokit.graphql(
+      `query ContributionsView($username: String!) {
+        user(login: $username) {
+          contributionsCollection {
+            contributionCalendar{
+              totalContributions
+              colors
+              weeks{
+                contributionDays{
+                  date
+                  contributionCount
+                  color
+                }
+              }
+            }
+            totalCommitContributions
+            totalIssueContributions
+            totalPullRequestContributions
+            totalPullRequestReviewContributions
+            totalRepositoryContributions
+          }
+          repositories(
+            first: 100
+            ownerAffiliations: OWNER
+            isFork: false
+            orderBy: {direction: DESC, field: STARGAZERS}
+          ) {
+            totalCount
+            nodes {
               name
-              url
               stargazerCount
               forkCount
-              languages(first:5, orderBy: {field: SIZE, direction:DESC} ) {
-                totalSize
-                nodes{
-                  name
+            }
+          }
+        }
+      }`,
+      { username },
+    );
+    const {
+      totalCommitContributions,
+      totalIssueContributions,
+      totalPullRequestContributions,
+      totalPullRequestReviewContributions,
+      totalRepositoryContributions,
+    } = response.contributionsCollection;
+
+    const { colors, weeks } = response.contributionsCollection.contributionCalendar;
+    let [continuosCount, maxContinuosCount] = [0, 0];
+    const contributionHistory = weeks.reduce((acc, week) => {
+      week.contributionDays.forEach((day) => {
+        acc[day.date] = { count: day.contributionCount, level: colors.indexOf(day.color) + 1 };
+        if (day.contributionCount !== 0) {
+          maxContinuosCount = Math.max(++continuosCount, maxContinuosCount);
+        } else {
+          continuosCount = 0;
+        }
+      });
+      return acc;
+    }, {});
+
+    const { stargazerCount, forkCount } = response.repositories.nodes.reduce(
+      (acc, cur) => {
+        acc.stargazerCount += cur.stargazerCount;
+        acc.forkCount += cur.forkCount;
+        return acc;
+      },
+      { stargazerCount: 0, forkCount: 0 },
+    );
+    return {
+      totalCommitContributions,
+      totalIssueContributions,
+      totalPullRequestContributions,
+      totalPullRequestReviewContributions,
+      totalRepositoryContributions,
+      stargazerCount,
+      forkCount,
+      maxContinuosCount,
+      contributionHistory,
+    };
+  }
+
+  async getUserOrganizationAndPinnedRepositories(
+    username: string,
+    octokit: Octokit,
+  ): Promise<{ organizations: OrganizationDto[]; pinnedRepositories: PinnedRepositoryDto[] }> {
+    const response: any = await octokit.graphql(
+      `query pinnedReposities($username: String!) {
+        user(login: $username) {
+          organizations(first:100) {
+            nodes {
+              name
+              url
+              avatarUrl
+            }
+          }
+            pinnedItems(first: 6, types: REPOSITORY) {
+            nodes {
+              ... on Repository {
+                name
+                url
+                description
+                stargazerCount
+                forkCount
+                languages(first: 3, orderBy: {field: SIZE, direction: DESC}) {
+                  nodes {
+                    name
+                  }
                 }
               }
             }
           }
         }
+      }`,
+      {
+        username,
+      },
+    );
+    const organizations = response.user.organizations.nodes;
+    const pinnedRepositories = response.user.pinnedItems.nodes;
+    return {
+      organizations: organizations,
+      pinnedRepositories: pinnedRepositories.map((repo) => {
+        repo.languages = repo.languages.nodes.map((lang) => lang.name);
+        return repo;
+      }),
+    };
+  }
+
+  async getUserRelativeRanking(user: UserDto): Promise<{ totalRank: number; tierRank: number }> {
+    // if not cached
+    const users = await this.userRepository.findAll({}, true, ['username', 'tier', 'score']);
+    let tierRank = 0;
+    for (let rank = 0; rank < users.length; rank++) {
+      if (users[rank].username === user.username) {
+        return {
+          totalRank: rank + 1,
+          tierRank: tierRank + 1,
+        };
       }
-    }`;
+      if (users[rank].tier === user.tier) {
+        tierRank += 1;
+      }
+    }
   }
 }
