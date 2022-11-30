@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory, SchemaOptions } from '@nestjs/mongoose';
-import { IsArray, IsEmail, IsInt, IsNumber, IsString } from 'class-validator';
 import { Document } from 'mongoose';
+import { History } from './dto/history.dto';
+import { PinnedRepositoryDto } from './dto/pinned-repository.dto';
 
 const options: SchemaOptions = {
   timestamps: true,
@@ -8,82 +9,66 @@ const options: SchemaOptions = {
 @Schema(options)
 export class User extends Document {
   @Prop({ required: true })
-  @IsInt()
   id: string;
 
   @Prop({ required: true })
-  @IsString()
   username: string;
 
   @Prop({ required: true })
-  @IsInt()
   following: number;
 
   @Prop({ required: true })
-  @IsInt()
   followers: number;
 
-  @Prop({ required: true })
-  @IsInt()
+  @Prop({ default: 0 })
   commitsScore: number;
 
-  @Prop({ required: true })
-  @IsInt()
+  @Prop({ default: 0 })
   followersScore: number;
 
-  @Prop({ required: true })
-  @IsInt()
+  @Prop({ default: 0 })
   issuesScore: number;
 
-  @Prop({ required: true })
-  @IsInt()
+  @Prop({ default: 0 })
   score: number;
 
   @Prop({ default: 0 })
-  @IsInt()
   dailyViews: number;
 
   @Prop({ default: 0 })
-  @IsNumber()
   scoreDifference: number;
 
   @Prop({ default: 'default-image-path' })
-  @IsString()
   avatarUrl: string;
 
-  @Prop()
-  @IsString()
+  @Prop({ default: 'yellow' })
   tier: string;
 
   @Prop()
-  @IsString()
   name: string;
 
   @Prop()
-  @IsString()
   company: string;
 
   @Prop()
-  @IsString()
   blogUrl: string;
 
   @Prop()
-  @IsString()
   location: string;
 
   @Prop()
-  @IsEmail()
   email: string;
 
   @Prop()
-  @IsString()
   bio: string;
 
-  @IsArray()
-  repositories: number[];
+  @Prop()
+  history: History;
 
   @Prop()
-  @IsArray()
+  pinnedRepositories: PinnedRepositoryDto[];
+
+  @Prop()
   primaryLanguages: string[];
 }
 
