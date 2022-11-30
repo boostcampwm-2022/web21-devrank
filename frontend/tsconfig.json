@@ -19,6 +19,14 @@
       "@*": ["src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".eslintrc.js", "next.config.js", "next-i18next.config.js"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".eslintrc.js",
+    "next.config.js",
+    "next-i18next.config.js",
+    "src/hooks/useDebounce"
+  ],
+  "exclude": ["node_modules", "**/*.stories.tsx"]
 }

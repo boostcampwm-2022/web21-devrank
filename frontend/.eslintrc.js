@@ -57,5 +57,5 @@ module.exports = {
       },
     ],
   },
-  ignorePatterns: ['build', 'dist', 'public', 'node_modules/'],
+  ignorePatterns: ['build', 'dist', 'public', 'node_modules/', '**/*.stories.tsx'],
 };
