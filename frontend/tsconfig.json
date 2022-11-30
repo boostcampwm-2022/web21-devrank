@@ -28,5 +28,5 @@
     "next-i18next.config.js",
     "src/hooks/useDebounce"
   ],
-  "exclude": ["node_modules", "**/*.stories.tsx"]
+  "exclude": ["node_modules"]
 }
