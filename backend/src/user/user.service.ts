@@ -392,8 +392,37 @@ export class UserService {
     return this.userRepository.findUpdateScoreTimeToLive(username);
   }
 
-  async setUpdateScoreDelayTime(username: string, seconds: number): Promise<any> {
-    return this.userRepository.setUpdateScoreDelayTime(username, seconds);
+  async getUserPinnedRepositories(username: string, octokit: Octokit): Promise<PinnedRepositoryDto[]> {
+    const response: any = await octokit.graphql(
+      `query pinnedReposities($username: String!) {
+        user(login: $username) {
+          pinnedItems(first: 3, types: REPOSITORY) {
+            nodes {
+              ... on Repository {
+                name
+                url
+                description
+                stargazerCount
+                forkCount
+                languages(first: 3, orderBy: {field: SIZE, direction: DESC}) {
+                  nodes {
+                    name
+                  }
+                }
+              }
+            }
+          }
+        }
+      }`,
+      {
+        username,
+      },
+    );
+    const pinnedRepositories = response.user.pinnedItems.nodes;
+    return pinnedRepositories.map((repo) => {
+      repo.languages = repo.languages.nodes.map((lang) => lang.name);
+      return repo;
+    });
   }
 
   async findAllByPrefixUsername(limit: number, username: string): Promise<AutoCompleteDto[]> {
