@@ -3,9 +3,6 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class RankingUserDto {
   @ApiProperty()
-  _id: string;
-
-  @ApiProperty()
   id: string;
 
   @ApiProperty()
@@ -30,7 +27,6 @@ export class RankingUserDto {
   primaryLanguages: string[];
 
   of(user: UserDto): RankingUserDto {
-    this._id = user._id;
     this.id = user.id;
     this.username = user.username;
     this.avatarUrl = user.avatarUrl;
