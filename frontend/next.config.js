@@ -4,6 +4,9 @@ const { i18n } = require('./next-i18next.config');
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   compiler: {
     styledComponents: true, // styled-components 적용
     removeConsole: process.env.NODE_ENV === 'production', // 배포 환경일시 console.* 제거
