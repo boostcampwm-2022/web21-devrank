@@ -1,6 +1,8 @@
 import { getTier } from '@libs/utils';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Octokit } from '@octokit/core';
+import { AutoCompleteDto } from './dto/auto-complete.dto';
+import { PinnedRepositoryDto } from './dto/pinned-repository.dto';
 import { UserDto } from './dto/user.dto';
 import { RepositoryService } from './repository.service';
 import { UserRepository } from './user.repository';
@@ -315,26 +317,8 @@ export class UserService {
     return this.userRepository.setUpdateScoreDelayTime(username, seconds);
   }
 
-  async findUserPinnedRepository() {
-    `{
-      user(login: $username) {
-        pinnedItems(first:10, types:REPOSITORY) {
-          nodes {
-            ... on Repository {
-              name
-              url
-              stargazerCount
-              forkCount
-              languages(first:5, orderBy: {field: SIZE, direction:DESC} ) {
-                totalSize
-                nodes{
-                  name
-                }
-              }
-            }
-          }
-        }
-      }
-    }`;
+  async findAllByPrefixUsername(limit: number, username: string): Promise<AutoCompleteDto[]> {
+    const users = await this.userRepository.findAllByPrefixUsername(limit, username);
+    return users.map((user) => new AutoCompleteDto().of(user));
   }
 }
