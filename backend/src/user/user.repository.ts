@@ -35,10 +35,9 @@ export class UserRepository {
     return this.userModel.findOneAndUpdate(filter, user, { upsert: true, new: true }).lean().exec();
   }
 
-  async findAllByUsername(limit = 15, username: string): Promise<UserDto[]> {
+  async findAllByPrefixUsername(limit: number, username: string): Promise<UserDto[]> {
     return this.userModel
       .find({ username: { $regex: `^${username}` } })
-      .sort({ score: -1 })
       .limit(limit)
       .lean()
       .exec();
