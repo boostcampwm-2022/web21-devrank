@@ -3,7 +3,7 @@ import { useDebounce } from '@hooks';
 import { useQuery } from '@tanstack/react-query';
 import { RankingResponse } from '@type/response';
 import { requestRankingByUsername } from '@apis/ranking';
-import { AUTO_COMPLETE_LIMIT, SEARCH_DEBOUNCE_DELAY } from '@utils/constants';
+import { AUTO_COMPLETE_LIMIT, KEYBOARD_KEY, SEARCH_DEBOUNCE_DELAY } from '@utils/constants';
 
 interface useAutoCompleteProps {
   input: string;
@@ -43,13 +43,13 @@ function useAutoComplete({ input, setInput, inputReset }: useAutoCompleteProps) 
     const userCount = searchList.length;
 
     switch (e.key) {
-      case 'ArrowDown':
+      case KEYBOARD_KEY.ARROW_DOWN:
         setFocusIdx((focusIdx + 1) % userCount);
         break;
-      case 'ArrowUp':
+      case KEYBOARD_KEY.ARROW_UP:
         setFocusIdx(focusIdx <= 0 ? userCount - 1 : focusIdx - 1);
         break;
-      case 'Escape':
+      case KEYBOARD_KEY.ESCAPE:
         inputReset();
         clearFocus();
         break;
