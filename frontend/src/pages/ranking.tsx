@@ -10,7 +10,8 @@ import Filterbar from '@components/Filterbar';
 import Pagination from '@components/Pagination';
 import RankingTable from '@components/Ranking';
 import NotFound from '@components/Ranking/NotFound';
-import { Avatar, CubeIcon, LanguageIcon, RankingSkeleton, Searchbar } from '@components/common';
+import RankingSearchbar from '@components/Ranking/RankingSearchbar';
+import { Avatar, CubeIcon, LanguageIcon, RankingSkeleton } from '@components/common';
 import { requestTokenRefresh } from '@apis/auth';
 import { requestTopRankingByScore } from '@apis/ranking';
 import { COUNT_PER_PAGE, CUBE_RANK } from '@utils/constants';
@@ -41,13 +42,7 @@ function Ranking() {
       <Filterbar active={tier} setActive={setFilter} />
       <SearchbarContainer>
         {username !== '' && <SearchInfo>&apos;{username}&apos;에 대한 검색 결과 입니다.</SearchInfo>}
-        <Searchbar
-          type='text'
-          placeholder={t('ranking:search-placeholder')}
-          width={200}
-          submitAlign='left'
-          onSearch={onSearch}
-        />
+        <RankingSearchbar placeholder={t('ranking:search-placeholder')} width={200} onSearch={onSearch} />
       </SearchbarContainer>
       <RankingTable
         width={'100%'}
@@ -109,15 +104,7 @@ function Ranking() {
 export default Ranking;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        refetchOnWindowFocus: false,
-        refetchOnReconnect: false,
-        refetchOnMount: false,
-      },
-    },
-  });
+  const queryClient = new QueryClient();
   await queryClient.prefetchQuery(['user'], () => requestTokenRefresh(context));
   await queryClient.prefetchQuery(['ranking', CUBE_RANK.ALL, ''], () =>
     requestTopRankingByScore({ limit: COUNT_PER_PAGE }),

@@ -6,17 +6,22 @@ import { Avatar } from '@components/common';
 interface AutoCompleteProps {
   searchList: RankingResponse[];
   focusIdx: number;
+  width: number;
+}
+
+interface StyledContainerProps {
+  width: number;
 }
 
 interface StyledUserProps {
   isFocus: boolean;
 }
 
-function AutoComplete({ searchList, focusIdx }: AutoCompleteProps) {
+function AutoComplete({ searchList, focusIdx, width }: AutoCompleteProps) {
   if (searchList.length === 0) return null;
 
   return (
-    <Container>
+    <Container width={width}>
       <ul>
         {searchList.map((user, index) => (
           <li key={user.id}>
@@ -35,13 +40,13 @@ function AutoComplete({ searchList, focusIdx }: AutoCompleteProps) {
 
 export default AutoComplete;
 
-const Container = styled.div`
+const Container = styled.div<StyledContainerProps>`
   background-color: ${({ theme }) => theme.colors.black4};
   border: 1px solid ${({ theme }) => theme.colors.gray1};
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
   border-top: none;
-  width: 600px;
+  width: ${(props) => props.width}px;
   height: max-content;
   padding: 0 15px;
 

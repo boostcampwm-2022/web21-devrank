@@ -2,14 +2,13 @@ import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Image from 'next/image';
-import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { QueryClient, dehydrate, useQuery } from '@tanstack/react-query';
 import { ProgrammingLanguageRankingResponse, RankingPaiginationResponse, RankingResponse } from '@type/response';
 import Ranking from '@components/Ranking';
 import { Avatar, LanguageIcon } from '@components/common';
 import CubeIcon from '@components/common/CubeIcon';
-import Searchbar from '@components/common/Searchbar';
+import AutoCompleteSearchbar from '@components/common/Searchbar/AutoComplete';
 import { requestTokenRefresh } from '@apis/auth';
 import {
   requestProgrammingLanguageRanking,
@@ -21,7 +20,6 @@ import { MAIN_PAGE_RANK_COUNT } from '@utils/constants';
 
 function Home() {
   const { t } = useTranslation(['index', 'common']);
-  const router = useRouter();
 
   const { data: rankingByScore } = useQuery<RankingPaiginationResponse>(['top-ranking-by-score'], () =>
     requestTopRankingByScore({
@@ -39,23 +37,12 @@ function Home() {
     () => requestProgrammingLanguageRanking(),
   );
 
-  const onSearch = (input: string) => {
-    router.push(`/profile/${input}`);
-  };
-
   return (
     <Container>
       <h2>
         <Image src='/icons/logo-main.svg' alt='Devrank 로고' width={550} height={230} quality={100} priority />
       </h2>
-      <Searchbar
-        type='text'
-        width={600}
-        placeholder={t('index:search-placeholder')}
-        submitAlign='right'
-        onSearch={onSearch}
-        autoComplete={true}
-      />
+      <AutoCompleteSearchbar type='text' width={600} placeholder={t('index:search-placeholder')} submitAlign='right' />
       <Content>
         <OverallRanking>
           <Title>{t('index:overall-ranking')}</Title>

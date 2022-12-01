@@ -1,12 +1,11 @@
 import Image from 'next/image';
 import styled, { css } from 'styled-components';
-import AutoComplete from './AutoComplete';
-import { useAutoComplete, useInput } from '@hooks';
 import { FormEvent } from '@type/common';
 
 type SubmitAlign = 'left' | 'right';
 
 interface SearchbarProps {
+  children?: React.ReactNode;
   /** input 태그의 type 속성 */
   type: string;
   /** 검색바 placeholder */
@@ -15,10 +14,14 @@ interface SearchbarProps {
   width: number;
   /** 검색 버튼 위치 (left | right) */
   submitAlign: SubmitAlign;
-  /** 자동 완성 */
-  autoComplete: boolean;
+  /** 검색바 input string */
+  input: string;
+  /** 검색바 입력 이벤트 핸들러 함수 */
+  onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   /** 검색폼 제출 핸들러 함수 */
-  onSearch: (username: string) => void;
+  onSearch: (e: FormEvent) => void;
+  /** 검색바 키보드 이벤트 핸들러 함수 */
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 }
 
 interface StyledFormProps {
@@ -27,37 +30,23 @@ interface StyledFormProps {
 }
 
 function Searchbar({
+  children,
   type = 'text',
   placeholder,
   width,
   submitAlign,
+  input,
+  onInputChange,
   onSearch,
-  autoComplete,
-  ...props
+  onKeyDown,
 }: SearchbarProps) {
-  const { input, setInput, onInputChange, inputReset } = useInput('');
-  const { searchList, focusIdx, focusControlHandler } = useAutoComplete({ input, setInput, inputReset });
-
-  const onInputSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    onSearch(input);
-    inputReset();
-  };
-
   return (
-    <Form width={width} submitAlign={submitAlign} onSubmit={onInputSubmit}>
-      <Input
-        type={type}
-        value={input}
-        placeholder={placeholder}
-        onChange={onInputChange}
-        onKeyDown={focusControlHandler}
-        {...props}
-      />
+    <Form width={width} submitAlign={submitAlign} onSubmit={onSearch}>
+      <Input type={type} value={input} placeholder={placeholder} onChange={onInputChange} onKeyDown={onKeyDown} />
       <SearchButton type='submit'>
         <Image src='/icons/search.svg' alt='검색버튼' width={24} height={24} />
       </SearchButton>
-      {autoComplete && searchList && <AutoComplete searchList={searchList} focusIdx={focusIdx} />}
+      {children}
     </Form>
   );
 }
