@@ -1,4 +1,4 @@
-import { useRouter } from 'next/router';
+import Link from 'next/link';
 import styled, { css } from 'styled-components';
 import { RankingResponse } from '@type/response';
 import { Avatar } from '@components/common';
@@ -13,22 +13,20 @@ interface StyledUserProps {
 }
 
 function AutoComplete({ searchList, focusIdx }: AutoCompleteProps) {
-  const router = useRouter();
-
-  const searchUser = (username: string) => {
-    router.push(`/profile/${username}`);
-  };
-
   if (searchList.length === 0) return null;
 
   return (
     <Container>
       <ul>
         {searchList.map((user, index) => (
-          <User key={user.id} onClick={() => searchUser(user.username)} isFocus={index === focusIdx}>
-            <Avatar src={user.avatarUrl} size='sm' />
-            <span>{user.username}</span>
-          </User>
+          <li key={user.id}>
+            <Link href={`/profile/${user.username}`}>
+              <User key={user.id} isFocus={index === focusIdx}>
+                <Avatar src={user.avatarUrl} size='sm' />
+                <span>{user.username}</span>
+              </User>
+            </Link>
+          </li>
         ))}
       </ul>
     </Container>
@@ -62,7 +60,7 @@ const Container = styled.div`
   }
 `;
 
-const User = styled.li<StyledUserProps>`
+const User = styled.div<StyledUserProps>`
   ${({ theme }) => theme.common.flexCenter};
   justify-content: flex-start;
   border-radius: 8px;
