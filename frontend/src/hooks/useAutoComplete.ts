@@ -11,22 +11,24 @@ interface useAutoCompleteProps {
   inputReset: () => void;
 }
 
+const INACTIVE_FOCUS_IDX = -1;
+
 function useAutoComplete({ input, setInput, inputReset }: useAutoCompleteProps) {
   const searchInput = useDebounce({ value: input, delay: SEARCH_DEBOUNCE_DELAY });
-  const [focusIdx, setFocusIdx] = useState(-1);
+  const [focusIdx, setFocusIdx] = useState(INACTIVE_FOCUS_IDX);
 
   const { data: searchList } = useQuery<RankingResponse[]>(
     ['search', searchInput],
     () => requestRankingByUsername({ username: searchInput, limit: AUTO_COMPLETE_LIMIT }),
     {
-      enabled: searchInput.length > 0 && focusIdx === -1,
+      enabled: searchInput.length > 0 && focusIdx === INACTIVE_FOCUS_IDX,
       keepPreviousData: searchInput.length > 0,
       cacheTime: 0,
     },
   );
 
   useEffect(() => {
-    if (focusIdx === -1) return;
+    if (focusIdx === INACTIVE_FOCUS_IDX) return;
 
     if (searchList) {
       setInput(searchList[focusIdx].username);
