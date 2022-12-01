@@ -53,7 +53,7 @@ export class UserRepository {
   }
 
   async findMostViewedRankings(limit = 3): Promise<UserDto[]> {
-    return this.userModel.find().sort({ views: -1 }).limit(limit).lean().exec();
+    return this.userModel.find().sort({ dailyViews: -1 }).limit(limit).lean().exec();
   }
 
   async findMostUsedLanguages(limit = 3): Promise<{ name: string; count: number }[]> {
