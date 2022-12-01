@@ -1,13 +1,8 @@
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { useDebounce, useInput } from '@hooks';
-import { useQuery } from '@tanstack/react-query';
+import AutoComplete from './AutoComplete';
+import { useAutoComplete, useInput } from '@hooks';
 import { FormEvent } from '@type/common';
-import { RankingResponse } from '@type/response';
-import AutoCompleteList from '@components/common/Searchbar/AutoComplete';
-import { requestRankingByUsername } from '@apis/ranking';
-import { AUTO_COMPLETE_LIMIT, SEARCH_DEBOUNCE_DELAY } from '@utils/constants';
 
 type SubmitAlign = 'left' | 'right';
 
@@ -41,57 +36,13 @@ function Searchbar({
   ...props
 }: SearchbarProps) {
   const { input, setInput, onInputChange, inputReset } = useInput('');
-  const searchInput = useDebounce({ value: input, delay: SEARCH_DEBOUNCE_DELAY });
-  const [focusIdx, setFocusIdx] = useState(-1);
-
-  const { data } = useQuery<RankingResponse[]>(
-    ['search', searchInput],
-    () => requestRankingByUsername({ username: searchInput, limit: AUTO_COMPLETE_LIMIT }),
-    {
-      enabled: searchInput.length > 0 && focusIdx === -1,
-      keepPreviousData: searchInput.length > 0,
-      cacheTime: 0,
-    },
-  );
+  const { searchList, focusIdx, focusControlHandler } = useAutoComplete({ input, setInput, inputReset });
 
   const onInputSubmit = (e: FormEvent) => {
     e.preventDefault();
     onSearch(input);
     inputReset();
   };
-
-  const initFocus = () => {
-    setFocusIdx(-1);
-  };
-
-  const focusHandler = (e: React.KeyboardEvent) => {
-    if (!data) return;
-
-    const userCount = data.length;
-
-    switch (e.key) {
-      case 'ArrowDown':
-        setFocusIdx((focusIdx + 1) % userCount);
-        break;
-      case 'ArrowUp':
-        setFocusIdx(focusIdx <= 0 ? userCount - 1 : focusIdx - 1);
-        break;
-      case 'Escape':
-        inputReset();
-        initFocus();
-        break;
-      default:
-        initFocus();
-    }
-  };
-
-  useEffect(() => {
-    if (focusIdx === -1) return;
-
-    if (data) {
-      setInput(data[focusIdx].username);
-    }
-  }, [focusIdx]);
 
   return (
     <Form width={width} submitAlign={submitAlign} onSubmit={onInputSubmit}>
@@ -100,13 +51,13 @@ function Searchbar({
         value={input}
         placeholder={placeholder}
         onChange={onInputChange}
-        onKeyDown={focusHandler}
+        onKeyDown={focusControlHandler}
         {...props}
       />
       <SearchButton type='submit'>
         <Image src='/icons/search.svg' alt='검색버튼' width={24} height={24} />
       </SearchButton>
-      {autoComplete && data && <AutoCompleteList data={data} focusIdx={focusIdx} />}
+      {autoComplete && searchList && <AutoComplete searchList={searchList} focusIdx={focusIdx} />}
     </Form>
   );
 }

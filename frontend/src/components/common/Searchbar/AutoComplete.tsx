@@ -4,27 +4,27 @@ import { RankingResponse } from '@type/response';
 import { Avatar } from '@components/common';
 
 interface AutoCompleteProps {
+  searchList: RankingResponse[];
   focusIdx: number;
-  data: RankingResponse[];
 }
 
 interface StyledUserProps {
   isFocus: boolean;
 }
 
-function AutoComplete({ data, focusIdx }: AutoCompleteProps) {
+function AutoComplete({ searchList, focusIdx }: AutoCompleteProps) {
   const router = useRouter();
 
   const searchUser = (username: string) => {
     router.push(`/profile/${username}`);
   };
 
-  if (data.length === 0) return null;
+  if (searchList.length === 0) return null;
 
   return (
     <Container>
       <ul>
-        {data.map((user, index) => (
+        {searchList.map((user, index) => (
           <User key={user.id} onClick={() => searchUser(user.username)} isFocus={index === focusIdx}>
             <Avatar src={user.avatarUrl} size='sm' />
             <span>{user.username}</span>
