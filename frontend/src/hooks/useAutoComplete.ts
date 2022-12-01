@@ -40,7 +40,7 @@ function useAutoComplete({ input, setInput, inputReset }: useAutoCompleteProps) 
   };
 
   const focusControlHandler = (e: React.KeyboardEvent) => {
-    if (!searchList) return;
+    if (!searchList || searchList.length === 0) return;
 
     const userCount = searchList.length;
 
