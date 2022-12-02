@@ -24,7 +24,7 @@ function AutoComplete({ searchList, focusIdx, width }: AutoCompleteProps) {
     <Container width={width}>
       <ul>
         {searchList.map((user, index) => (
-          <li key={user.username}>
+          <li key={user.id}>
             <Link href={`/profile/${user.username}`}>
               <User key={user.username} isFocus={index === focusIdx}>
                 <Avatar src={user.avatarUrl} size='sm' />
