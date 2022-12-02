@@ -1,12 +1,12 @@
-import { RankingPaiginationResponse } from '@type/response';
+import { ProfileUserResponse } from '@type/response';
 import axiosInstance from '@utils/axiosInstance';
 
-interface RequestTopRankingByScoreParams {
+interface RequestProfilUserParams {
   username: string;
 }
 export const requestUserInfoByUsername = async ({
   username,
-}: RequestTopRankingByScoreParams): Promise<RankingPaiginationResponse> => {
+}: RequestProfilUserParams): Promise<ProfileUserResponse> => {
   const { data } = await axiosInstance.get(`/users/${username}`);
 
   return data;
