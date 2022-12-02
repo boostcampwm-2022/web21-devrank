@@ -48,8 +48,21 @@ export const requestTopRankingByViews = async (limit = 3): Promise<RankingRespon
   return data;
 };
 
-export const requestRankingByUsername = async (username: string): Promise<RankingResponse[]> => {
-  const { data } = await axiosInstance.get(`/rankings/${username}`);
+interface RequestRankingByUsernameParams {
+  username: string;
+  limit: number;
+}
+
+export const requestRankingByUsername = async ({
+  username,
+  limit,
+}: RequestRankingByUsernameParams): Promise<RankingResponse[]> => {
+  const { data } = await axiosInstance.get(`/rankings/${username}`, {
+    params: {
+      username,
+      limit,
+    },
+  });
 
   return data;
 };
