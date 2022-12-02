@@ -36,7 +36,7 @@ function Searchbar({ type = 'text', placeholder, width, submitAlign, onSearch, .
 
   const onInputSubmit = (e: FormEvent) => {
     e.preventDefault();
-    onSearch(input);
+    onSearch(input.trim());
     inputReset();
   };
 
