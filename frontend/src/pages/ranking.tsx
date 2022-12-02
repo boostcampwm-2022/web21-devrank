@@ -1,6 +1,7 @@
 import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 import styled from 'styled-components';
 import { QueryClient, dehydrate, useQuery } from '@tanstack/react-query';
@@ -16,6 +17,7 @@ import { requestTopRankingByScore } from '@apis/ranking';
 import { COUNT_PER_PAGE, CUBE_RANK } from '@utils/constants';
 
 function Ranking() {
+  const router = useRouter();
   const { t } = useTranslation(['ranking', 'common']);
   const [tier, setTier] = useState<CubeRankType>(CUBE_RANK.ALL);
   const [username, setUsername] = useState('');
@@ -34,6 +36,10 @@ function Ranking() {
   const onSearch = (input: string) => {
     setPage(1);
     setUsername(input);
+  };
+
+  const searchUser = (username: string) => {
+    router.push(`/profile/${username}`);
   };
 
   return (
@@ -62,7 +68,7 @@ function Ranking() {
           <RankingTable.Element>{t('common:table-tech-stack')}</RankingTable.Element>
         </RankingTable.Head>
         {data?.users.map(({ id, username, avatarUrl, tier, score, primaryLanguages }, index) => (
-          <RankingTable.Row key={id}>
+          <RankingTable.Row key={id} onClick={() => searchUser(username)}>
             <RankingTable.Element>
               <GrayText>{(page - 1) * COUNT_PER_PAGE + index + 1}</GrayText>
             </RankingTable.Element>
