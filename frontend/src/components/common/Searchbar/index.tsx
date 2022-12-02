@@ -1,13 +1,11 @@
 import Image from 'next/image';
-import { useEffect } from 'react';
 import styled, { css } from 'styled-components';
-import { useInput } from '@hooks';
 import { FormEvent } from '@type/common';
-import useDebounce from '@hooks/useDebounce';
 
 type SubmitAlign = 'left' | 'right';
 
 interface SearchbarProps {
+  children?: React.ReactNode;
   /** input 태그의 type 속성 */
   type: string;
   /** 검색바 placeholder */
@@ -16,8 +14,14 @@ interface SearchbarProps {
   width: number;
   /** 검색 버튼 위치 (left | right) */
   submitAlign: SubmitAlign;
+  /** 검색바 input string */
+  input: string;
+  /** 검색바 입력 이벤트 핸들러 함수 */
+  onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   /** 검색폼 제출 핸들러 함수 */
-  onSearch: (username: string) => void;
+  onSearch: (e: FormEvent) => void;
+  /** 검색바 키보드 이벤트 핸들러 함수 */
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 }
 
 interface StyledFormProps {
@@ -25,27 +29,24 @@ interface StyledFormProps {
   submitAlign: SubmitAlign;
 }
 
-function Searchbar({ type = 'text', placeholder, width, submitAlign, onSearch, ...props }: SearchbarProps) {
-  const { input, onInputChange, inputReset } = useInput('');
-
-  const debounceValue = useDebounce({ value: input, delay: 300 });
-
-  useEffect(() => {
-    console.log(debounceValue);
-  }, [debounceValue]);
-
-  const onInputSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    onSearch(input.trim());
-    inputReset();
-  };
-
+function Searchbar({
+  children,
+  type = 'text',
+  placeholder,
+  width,
+  submitAlign,
+  input,
+  onInputChange,
+  onSearch,
+  onKeyDown,
+}: SearchbarProps) {
   return (
-    <Form width={width} submitAlign={submitAlign} onSubmit={onInputSubmit}>
-      <Input type={type} value={input} placeholder={placeholder} onChange={onInputChange} {...props} />
+    <Form width={width} submitAlign={submitAlign} onSubmit={onSearch}>
+      <Input type={type} value={input} placeholder={placeholder} onChange={onInputChange} onKeyDown={onKeyDown} />
       <SearchButton type='submit'>
         <Image src='/icons/search.svg' alt='검색버튼' width={24} height={24} />
       </SearchButton>
+      {children}
     </Form>
   );
 }
@@ -53,11 +54,11 @@ function Searchbar({ type = 'text', placeholder, width, submitAlign, onSearch, .
 export default Searchbar;
 
 const Form = styled.form<StyledFormProps>`
-  ${({ theme }) => theme.common.flexSpaceBetween};
+  position: relative;
   background-color: ${({ theme }) => theme.colors.black4};
   border: 1px solid ${({ theme }) => theme.colors.gray1};
   border-radius: 10px;
-  padding: 10px;
+  padding: 10px 15px;
 
   ${(props) =>
     props.width &&
@@ -91,7 +92,9 @@ const Input = styled.input`
 `;
 
 const SearchButton = styled.button`
-  ${({ theme }) => theme.common.flexCenter};
+  position: absolute;
+  right: 8px;
+  top: 8px;
   background-color: transparent;
   border: none;
 `;

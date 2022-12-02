@@ -12,7 +12,7 @@ function useInput(initialInput: string) {
     setInput('');
   };
 
-  return { input, onInputChange, inputReset };
+  return { input, setInput, onInputChange, inputReset };
 }
 
 export default useInput;
