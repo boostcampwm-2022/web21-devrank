@@ -9,6 +9,7 @@ interface HeadProps {
 
 interface RowProps {
   children?: React.ReactNode;
+  onClick?: () => void;
 }
 
 interface ElementProps {
@@ -45,8 +46,8 @@ function Head({ children }: HeadProps) {
 /**
  * Row 컴포넌트는 Ranking 컴포넌트의 자식 컴포넌트로 사용되어야 합니다.
  */
-function Row({ children }: RowProps) {
-  return <tr>{children}</tr>;
+function Row({ children, onClick }: RowProps) {
+  return <tr onClick={onClick}>{children}</tr>;
 }
 
 /**

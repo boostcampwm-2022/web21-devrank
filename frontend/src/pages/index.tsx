@@ -37,6 +37,10 @@ function Home() {
     () => requestProgrammingLanguageRanking(),
   );
 
+  const searchUser = (username: string) => {
+    router.push(`/profile/${username}`);
+  };
+  
   return (
     <Container>
       <h2>
@@ -58,7 +62,7 @@ function Home() {
               <Ranking.Element>{t('common:table-score')}</Ranking.Element>
             </Ranking.Head>
             {rankingByScore?.users.map(({ id, tier, avatarUrl, username, score }, index) => (
-              <Ranking.Row key={id}>
+              <Ranking.Row key={id} onClick={() => searchUser(username)}>
                 <Ranking.Element>
                   <CubeIcon tier={tier} />
                 </Ranking.Element>
@@ -89,7 +93,7 @@ function Home() {
               <Ranking.Element>{t('common:table-score')}</Ranking.Element>
             </Ranking.Head>
             {rankingByRising?.map(({ id, tier, username, avatarUrl, score }, index) => (
-              <Ranking.Row key={id}>
+              <Ranking.Row key={id} onClick={() => searchUser(username)}>
                 <Ranking.Element>
                   <CubeIcon tier={tier} />
                 </Ranking.Element>
@@ -120,7 +124,7 @@ function Home() {
               <Ranking.Element>{t('common:table-views')}</Ranking.Element>
             </Ranking.Head>
             {rankingByViews?.map(({ id, tier, username, avatarUrl, dailyViews }, index) => (
-              <Ranking.Row key={id}>
+              <Ranking.Row key={id} onClick={() => searchUser(username)}>
                 <Ranking.Element>
                   <CubeIcon tier={tier} />
                 </Ranking.Element>
