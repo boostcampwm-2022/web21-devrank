@@ -3,5 +3,6 @@
   "register-wakatime-api-key": "Register Wakatime API Key",
   "register-wakatime-button-label": "Register",
   "maximum-continuous-commit-history": "Maximum continuous commit history",
-  "day": "day"
+  "day": "day",
+  "total": "total"
 }
