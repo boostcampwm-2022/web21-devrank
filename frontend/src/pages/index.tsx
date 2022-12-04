@@ -2,6 +2,7 @@ import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Image from 'next/image';
+import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { QueryClient, dehydrate, useQuery } from '@tanstack/react-query';
 import { ProgrammingLanguageRankingResponse, RankingPaiginationResponse, RankingResponse } from '@type/response';
@@ -20,6 +21,7 @@ import { MAIN_PAGE_RANK_COUNT } from '@utils/constants';
 
 function Home() {
   const { t } = useTranslation(['index', 'common']);
+  const router = useRouter();
 
   const { data: rankingByScore } = useQuery<RankingPaiginationResponse>(['top-ranking-by-score'], () =>
     requestTopRankingByScore({
@@ -36,6 +38,10 @@ function Home() {
     ['top-ranking-by-programming-lang'],
     () => requestProgrammingLanguageRanking(),
   );
+
+  const searchUser = (username: string) => {
+    router.push(`/profile/${username}`);
+  };
 
   return (
     <Container>
@@ -58,7 +64,7 @@ function Home() {
               <Ranking.Element>{t('common:table-score')}</Ranking.Element>
             </Ranking.Head>
             {rankingByScore?.users.map(({ id, tier, avatarUrl, username, score }, index) => (
-              <Ranking.Row key={id}>
+              <Ranking.Row key={id} onClick={() => searchUser(username)}>
                 <Ranking.Element>
                   <CubeIcon tier={tier} />
                 </Ranking.Element>
@@ -89,7 +95,7 @@ function Home() {
               <Ranking.Element>{t('common:table-score')}</Ranking.Element>
             </Ranking.Head>
             {rankingByRising?.map(({ id, tier, username, avatarUrl, score }, index) => (
-              <Ranking.Row key={id}>
+              <Ranking.Row key={id} onClick={() => searchUser(username)}>
                 <Ranking.Element>
                   <CubeIcon tier={tier} />
                 </Ranking.Element>
@@ -120,7 +126,7 @@ function Home() {
               <Ranking.Element>{t('common:table-views')}</Ranking.Element>
             </Ranking.Head>
             {rankingByViews?.map(({ id, tier, username, avatarUrl, dailyViews }, index) => (
-              <Ranking.Row key={id}>
+              <Ranking.Row key={id} onClick={() => searchUser(username)}>
                 <Ranking.Element>
                   <CubeIcon tier={tier} />
                 </Ranking.Element>

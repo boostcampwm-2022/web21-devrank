@@ -6,4 +6,7 @@ export class OrganizationDto {
 
   @ApiProperty()
   avatarUrl: string;
+
+  @ApiProperty()
+  url: string;
 }

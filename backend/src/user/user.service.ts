@@ -293,7 +293,7 @@ export class UserService {
     });
 
     const forkScore = forkRepositories.reduce(getCommitScore, 0);
-    const followersScore = followersResponse.user.followers.totalCount / 10;
+    const followersScore = Math.floor(followersResponse.user.followers.totalCount / 10);
     const personalRepositories = personalResponse.user.repositories.nodes;
     const personalScore = personalRepositories.reduce(getCommitScore, 0);
     const commitsScore = parseInt(forkScore + personalScore);
@@ -311,7 +311,7 @@ export class UserService {
     return {
       commitsScore,
       issuesScore,
-      followersScore: Math.floor(followersScore),
+      followersScore,
       score,
       tier: getTier(score),
       primaryLanguages: Array.from(languagesScore.keys()).slice(0, 3),

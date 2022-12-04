@@ -1,5 +1,6 @@
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
+import { RANK } from '@type/common';
 import { CUBE_RANK_RANGE } from '@utils/constants';
 import { getTierFromExp } from '@utils/utils';
 
@@ -8,11 +9,9 @@ interface EXPbarProps {
   exp: number;
 }
 
-type Tier = 'green' | 'blue' | 'purple' | 'orange' | 'red' | 'yellow' | 'mint';
-
 interface StyledActiveProps {
   percent: number;
-  tier: Tier;
+  tier: RANK;
 }
 
 function EXPbar({ exp }: EXPbarProps) {
@@ -20,7 +19,6 @@ function EXPbar({ exp }: EXPbarProps) {
   const tier = getTierFromExp(exp);
   const [min, max] = CUBE_RANK_RANGE[tier];
   const percent = ((exp - min) / (max - min)) * 100;
-
   return (
     <>
       <Score>{`${t('current-score')} : ${exp}`}</Score>
@@ -43,7 +41,7 @@ const ProgressBar = styled.div`
   width: 100%;
   height: 38px;
   border-radius: 19px;
-  margin-top: 40px;
+  margin-top: 20px;
   overflow: hidden;
   background-color: ${({ theme }) => theme.colors.text};
 `;

@@ -1,10 +1,10 @@
 import Link from 'next/link';
 import styled, { css } from 'styled-components';
-import { RankingResponse } from '@type/response';
+import { UserByPrefixResponse } from '@type/response';
 import { Avatar } from '@components/common';
 
 interface AutoCompleteProps {
-  searchList: RankingResponse[];
+  searchList: UserByPrefixResponse[];
   focusIdx: number;
   width: number;
 }
@@ -26,7 +26,7 @@ function AutoComplete({ searchList, focusIdx, width }: AutoCompleteProps) {
         {searchList.map((user, index) => (
           <li key={user.id}>
             <Link href={`/profile/${user.username}`}>
-              <User key={user.id} isFocus={index === focusIdx}>
+              <User key={user.username} isFocus={index === focusIdx}>
                 <Avatar src={user.avatarUrl} size='sm' />
                 <span>{user.username}</span>
               </User>
