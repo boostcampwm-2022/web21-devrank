@@ -14,7 +14,7 @@ export class PinnedRepositoryDto {
   stargazerCount: number;
 
   @ApiProperty()
-  forks: number;
+  forkCount: number;
 
   @ApiProperty()
   languages: string[];

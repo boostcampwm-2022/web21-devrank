@@ -1,8 +1,8 @@
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useDebounce } from '@hooks';
 import { useQuery } from '@tanstack/react-query';
-import { RankingResponse } from '@type/response';
-import { requestRankingByUsername } from '@apis/ranking';
+import { UserByPrefixResponse } from '@type/response';
+import { requestUserListByPrefix } from '@apis/users';
 import { AUTO_COMPLETE_LIMIT, KEYBOARD_KEY, SEARCH_DEBOUNCE_DELAY } from '@utils/constants';
 
 interface useAutoCompleteProps {
@@ -17,9 +17,9 @@ function useAutoComplete({ input, setInput, inputReset }: useAutoCompleteProps) 
   const searchInput = useDebounce({ value: input, delay: SEARCH_DEBOUNCE_DELAY });
   const [focusIdx, setFocusIdx] = useState(INACTIVE_FOCUS_IDX);
 
-  const { data: searchList } = useQuery<RankingResponse[]>(
+  const { data: searchList } = useQuery<UserByPrefixResponse[]>(
     ['search', searchInput],
-    () => requestRankingByUsername({ username: searchInput, limit: AUTO_COMPLETE_LIMIT }),
+    () => requestUserListByPrefix({ username: searchInput, limit: AUTO_COMPLETE_LIMIT }),
     {
       enabled: searchInput.length > 0 && focusIdx === INACTIVE_FOCUS_IDX,
       keepPreviousData: searchInput.length > 0,

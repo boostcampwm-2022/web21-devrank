@@ -1,0 +1,36 @@
+version: '3.7'
+
+services:
+  nginx:
+    image: nginx
+    container_name: nginx
+    restart: always
+    ports:
+      - '80:80'
+    volumes:
+      - ./nginx/:/etc/nginx/conf.d/
+  blue:
+    image: devrank/backend-api:latest
+    container_name: blue
+    restart: always
+    env_file:
+      - ./.env
+    expose:
+      - 3001
+    depends_on:
+      - redis
+  green:
+    image: devrank/backend-api:latest
+    container_name: green
+    restart: always
+    env_file:
+      - ./.env
+    expose:
+      - 3001
+    depends_on:
+      - redis
+  redis:
+    image: redis:6.2.5
+    command: redis-server
+    ports:
+      - 6379:6379
