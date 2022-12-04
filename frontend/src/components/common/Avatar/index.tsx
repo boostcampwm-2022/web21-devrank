@@ -23,7 +23,7 @@ function Avatar({ src, size = 'md', name, onClick }: AvatarProps) {
   return (
     <Container>
       <ImageContainer size={size} onClick={onClick}>
-        <Image src={src} alt='프로필 이미지' sizes='50vw' fill />
+        <Image src={src} alt='프로필 이미지' sizes='50vw' fill priority />
       </ImageContainer>
       {name && <span>{name}</span>}
     </Container>

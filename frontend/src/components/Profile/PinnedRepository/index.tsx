@@ -1,24 +1,17 @@
 import Image from 'next/image';
 import styled from 'styled-components';
+import { PinnedRepositoryType } from '@type/common';
 import { LanguageIcon } from '@components/common';
 import { numberCompactFormatter } from '@utils/utils';
 
-interface RepositoryResponse {
-  name: string;
-  description: string;
-  languages: string[];
-  forks: number;
-  stars: number;
-}
-
 interface PinnedRepositoryProps {
-  repositories: RepositoryResponse[];
+  repositories: PinnedRepositoryType[];
 }
 
 function PinnedRepository({ repositories }: PinnedRepositoryProps) {
   return (
     <Container>
-      {repositories.map(({ name, description, languages, forks, stars }) => (
+      {repositories.map(({ name, description, languages, forkCount, stargazerCount }) => (
         <Repository key={`${name}-${description}`}>
           <Name>{name}</Name>
           <Description>{description}</Description>
@@ -33,11 +26,11 @@ function PinnedRepository({ repositories }: PinnedRepositoryProps) {
             <Info>
               <li>
                 <Image src={'/icons/star.svg'} alt='star' width={24} height={24} />
-                {numberCompactFormatter(stars)}
+                {numberCompactFormatter(stargazerCount)}
               </li>
               <li>
                 <Image src={'/icons/fork.svg'} alt='star' width={24} height={24} />
-                {numberCompactFormatter(forks)}
+                {numberCompactFormatter(forkCount)}
               </li>
             </Info>
           </Meta>
@@ -51,12 +44,11 @@ export default PinnedRepository;
 
 const Container = styled.section`
   display: grid;
-  grid-template-rows: repeat(3, 1fr);
+  grid-template-rows: auto;
   grid-template-columns: repeat(2, 1fr);
   align-items: center;
   gap: 30px;
   width: 100%;
-  height: 580px;
 `;
 
 const Repository = styled.section`
@@ -67,15 +59,29 @@ const Repository = styled.section`
 `;
 
 const Name = styled.h4`
+  width: 100%;
+  font-weight: 700;
   font-size: ${({ theme }) => theme.fontSize.lg};
-  height: 50px;
+  height: 40px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 const Description = styled.p`
-  height: 40px;
+  width: 100%;
+  height: 38px;
+  line-height: 18px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  word-wrap: break-word;
 `;
 
 const Meta = styled.div`
+  margin-top: 24px;
   ${({ theme }) => theme.common.flexSpaceBetween}
 `;
 

@@ -1,12 +1,10 @@
-import { LanguageMap } from '@type/common';
-
 export const EXCEPTIONAL_LANGUAGE = ['rust'];
 
 export const DEVICON_URL = 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/';
 
 export const DEVRANK_REPOSITORY_URL = 'https://github.com/boostcampwm-2022/web21-devrank';
 
-export const GITHUB_AUTH_REQUEST_URL = `https://github.com/login/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID}&read=user`;
+export const GITHUB_AUTH_REQUEST_URL = `https://github.com/login/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID}&scope=user%20read:org`;
 
 export const MAIN_PAGE_RANK_COUNT = 12;
 
@@ -24,7 +22,9 @@ export const KEYBOARD_KEY = {
   ESCAPE: 'Escape',
 };
 
-export const LANGUAGE_MAP: LanguageMap = {
+export const LANGUAGE_MAP: {
+  [key: string]: string;
+} = {
   'c++': 'cplusplus',
   'c#': 'csharp',
   html: 'html5',
@@ -89,4 +89,19 @@ export const DEVELOPER_INFORMATION = [
   },
 ];
 
-export const MONTH_LIST = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+export const MONTH_LABEL_MAPPING: {
+  [key: string]: string;
+} = {
+  1: 'Jan',
+  2: 'Feb',
+  3: 'Mar',
+  4: 'Apr',
+  5: 'May',
+  6: 'Jun',
+  7: 'Jul',
+  8: 'Aug',
+  9: 'Sep',
+  10: 'Oct',
+  11: 'Nov',
+  12: 'Dec',
+};

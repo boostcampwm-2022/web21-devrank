@@ -1,4 +1,4 @@
-import { CubeRankType } from '@type/common';
+import { CubeRankType, HistoryType, OrganizationType, PinnedRepositoryType, RANK } from '@type/common';
 
 export interface UserByPrefixResponse {
   username: string;
@@ -46,4 +46,32 @@ export interface RankingPaiginationResponse {
 export interface ProgrammingLanguageRankingResponse {
   language: string;
   count: number;
+}
+
+export interface ProfileUserResponse {
+  id: string;
+  username: string;
+  following: number;
+  followers: number;
+  commitsScore: number;
+  issuesScore: number;
+  followersScore: number;
+  score: number;
+  tier: RANK;
+  avatarUrl: string;
+  name: string;
+  company: string;
+  blogUrl: string;
+  location: string;
+  bio: string;
+  email: string;
+  dailyViews: number;
+  scoreDifference: number;
+  updateDelayTime: number;
+  primaryLanguages: [string];
+  history: HistoryType;
+  pinnedRepositories: PinnedRepositoryType[];
+  organizations: OrganizationType[];
+  totalRank: number;
+  tierRank: number;
 }

@@ -1,47 +1,104 @@
 import { useTranslation } from 'next-i18next';
+import Image from 'next/image';
 import styled from 'styled-components';
+import { CubeRankType, OrganizationType } from '@type/common';
 import { ProfileLabel } from '@components/Profile';
 import { Avatar, CubeIcon, Paper } from '@components/common';
 
-function ProfileCard() {
-  const { t } = useTranslation('tier');
+interface ProfileCardProps {
+  profileData: {
+    username: string;
+    name: string;
+    location: string;
+    followers: number;
+    following: number;
+    company: string;
+    email: string;
+    avatarUrl: string;
+    organizations: OrganizationType[];
+    tier: CubeRankType;
+    tierRank: number;
+    totalRank: number;
+  };
+}
 
+function ProfileCard({ profileData }: ProfileCardProps) {
+  const {
+    username,
+    name,
+    location,
+    followers,
+    following,
+    company,
+    email,
+    organizations,
+    avatarUrl,
+    tier,
+    tierRank,
+    totalRank,
+  } = profileData;
+
+  const { t } = useTranslation('profile');
   return (
     <Paper>
-      <Avatar src='/profile-dummy.png' size='lg' />
+      <Avatar src={avatarUrl} size='lg' />
       <ProfileInfos>
         <li>
-          <h3>wkddntjr1123</h3>
+          <a href={`https://github.com/${username}`}>
+            <h3>{username}</h3>
+          </a>
         </li>
-        <ProfileLabel>
-          <ProfileLabel.Icon src='/icons/username.svg' />
-          <ProfileLabel.Contents>장우석</ProfileLabel.Contents>
-        </ProfileLabel>
-        <ProfileLabel>
-          <ProfileLabel.Icon src='/icons/location.svg' />
-          <ProfileLabel.Contents>Ganwondo, Korea</ProfileLabel.Contents>
-        </ProfileLabel>
+        {name && (
+          <ProfileLabel>
+            <ProfileLabel.Icon src='/icons/username.svg' />
+            <ProfileLabel.Contents>{name}</ProfileLabel.Contents>
+          </ProfileLabel>
+        )}
+        {location && (
+          <ProfileLabel>
+            <ProfileLabel.Icon src='/icons/location.svg' />
+            <ProfileLabel.Contents>{location}</ProfileLabel.Contents>
+          </ProfileLabel>
+        )}
         <ProfileLabel>
           <ProfileLabel.Icon src='/icons/people.svg' />
-          <ProfileLabel.Contents>19 followers - 21 following</ProfileLabel.Contents>
+          <ProfileLabel.Contents>
+            {followers || 0} followers - {following || 0} following
+          </ProfileLabel.Contents>
         </ProfileLabel>
-        <ProfileLabel>
-          <ProfileLabel.Icon src='/icons/company.svg' />
-          <ProfileLabel.Contents>naver</ProfileLabel.Contents>
-        </ProfileLabel>
-        <ProfileLabel>
-          <ProfileLabel.Icon src='/icons/link.svg' />
-          <ProfileLabel.Contents>https://wkddntjr1123.github.io</ProfileLabel.Contents>
-        </ProfileLabel>
-        <ProfileLabel>
-          <ProfileLabel.Icon src='/icons/organization.svg' />
-          <ProfileLabel.Contents>부스트캠프</ProfileLabel.Contents>
-        </ProfileLabel>
+        {company && (
+          <ProfileLabel>
+            <ProfileLabel.Icon src='/icons/company.svg' />
+            <ProfileLabel.Contents>{company}</ProfileLabel.Contents>
+          </ProfileLabel>
+        )}
+        {email && (
+          <ProfileLabel>
+            <ProfileLabel.Icon src='/icons/link.svg' />
+            <ProfileLabel.Contents>{email}</ProfileLabel.Contents>
+          </ProfileLabel>
+        )}
+        {organizations && organizations.length > 0 && (
+          <ProfileLabel>
+            <ProfileLabel.Icon src='/icons/organization.svg' />
+            <ProfileLabel.Contents>
+              {organizations?.map(({ avatarUrl, name, url }) => (
+                <a key={name} href={url}>
+                  <Image src={avatarUrl} width={27} height={27} alt={name} quality={100} style={ImageStyle} />
+                </a>
+              ))}
+            </ProfileLabel.Contents>
+          </ProfileLabel>
+        )}
       </ProfileInfos>
       <ProfileRank>
-        <CubeIcon tier='mint' size={160} />
-        <p>{`${t('all')}: 1000등`}</p>
-        <p>레드: 10등</p>
+        <CubeIcon tier={tier} size={160} />
+        <p>
+          {t('total')}: {totalRank}등
+        </p>
+        <p>
+          {tier}: {tierRank}등
+        </p>
       </ProfileRank>
     </Paper>
   );
@@ -50,13 +107,14 @@ function ProfileCard() {
 export default ProfileCard;
 
 const ProfileInfos = styled.ul`
-  ${({ theme }) => theme.common.flexColumn};
-  flex: 1;
+  width: 100%;
+  height: 220px;
   margin-left: 30px;
 
   h3 {
     font-size: ${({ theme }) => theme.fontSize.xxl};
     font-weight: ${({ theme }) => theme.fontWeight.bold};
+    margin-bottom: 10px;
   }
 
   > li + li {
@@ -75,3 +133,8 @@ const ProfileRank = styled.div`
 
   transform: translateZ(-50);
 `;
+
+const ImageStyle = {
+  borderRadius: 5,
+  marginRight: 5,
+};
