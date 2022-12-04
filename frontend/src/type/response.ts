@@ -1,6 +1,7 @@
 import { CubeRankType, HistoryType, OrganizationType, PinnedRepositoryType, RANK } from '@type/common';
 
 export interface UserByPrefixResponse {
+  id: number;
   username: string;
   avatarUrl: string;
 }
