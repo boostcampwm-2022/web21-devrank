@@ -1,13 +1,20 @@
 import { getTier } from '@libs/utils';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Octokit } from '@octokit/core';
-import { ConnectableObservable } from 'rxjs';
 import { AutoCompleteDto } from './dto/auto-complete.dto';
 import { History } from './dto/history.dto';
 import { OrganizationDto } from './dto/organization.dto';
 import { PinnedRepositoryDto } from './dto/pinned-repository.dto';
 import { UserDto } from './dto/user.dto';
 import { UserProfileDto } from './dto/user.profile.dto';
+import {
+  followersQuery,
+  forkRepositoryQuery,
+  issueQuery,
+  nonForkRepositoryQuery,
+  pinnedRepositoriesQuery,
+  userHistoryQuery,
+} from './utils/query';
 import { UserRepository } from './user.repository';
 
 @Injectable()
@@ -127,133 +134,20 @@ export class UserService {
     });
     const id = res.data.node_id;
     //TODO: parent orderBy 적용되어야함
-    const forkResponse: any = await octokit.graphql(
-      `query repositories($username: String!, $id: ID) {
-        user(login: $username) {
-          repositories(
-            first: 25
-            isFork: true
-            privacy: PUBLIC
-            orderBy: {field: STARGAZERS, direction: DESC}
-            ownerAffiliations: [OWNER]
-          ) {
-            nodes {
-              parent {
-                primaryLanguage {
-                  name
-                }
-                diskUsage
-                name
-                stargazerCount
-                forkCount
-                defaultBranchRef {
-                  target {
-                    ... on Commit {
-                      history(
-                        author: {id: $id}
-                        first: 100
-                      ) {
-                        nodes {
-                          committedDate
-                        }
-                      }
-                    }
-                  }
-                }
-                languages(first: 50, orderBy: {field: SIZE, direction: DESC}) {
-                  totalSize
-                }
-              }
-            }
-          }
-        }
-      }`,
-      {
-        username,
-        id,
-      },
-    );
-    const personalResponse: any = await octokit.graphql(
-      `query repositories($username: String!, $id: ID) {
-        user(login: $username) {
-          repositories(
-            first: 25
-            isFork: false
-            privacy: PUBLIC
-            orderBy: {field: STARGAZERS, direction: DESC}
-          ) {
-            nodes {
-              primaryLanguage {
-                name
-              }
-              diskUsage
-              name
-              stargazerCount
-              forkCount
-              defaultBranchRef {
-                target {
-                  ... on Commit {
-                    history(
-                      author: {id: $id}
-                      first: 100
-                    ) {
-                      nodes {
-                        committedDate
-                      }
-                    }
-                  }
-                }
-              }
-              languages(first: 50, orderBy: {field: SIZE, direction: DESC}) {
-                totalSize
-              }
-            }
-          }
-        }
-      }`,
-      {
-        username,
-        id,
-      },
-    );
-    const followersResponse: any = await octokit.graphql(
-      `query repositories($username: String!) {
-        user(login: $username) {
-          followers {
-            totalCount
-          }
-        }
-      }`,
-      {
-        username,
-      },
-    );
-    const issuesResponse: any = await octokit.graphql(
-      `query repositories($username: String!) {
-        user(login: $username) {
-          issues(
-            first: 100
-            orderBy: {field: CREATED_AT, direction: DESC}
-          ) {
-            totalCount
-            edges {
-              node {
-                repository {
-                  stargazerCount
-                  forkCount
-                  nameWithOwner
-                }
-                title
-                createdAt
-              }
-            }
-          }
-        }
-      }`,
-      {
-        username,
-      },
-    );
+    const forkResponse: any = await octokit.graphql(forkRepositoryQuery, {
+      username,
+      id,
+    });
+    const personalResponse: any = await octokit.graphql(nonForkRepositoryQuery, {
+      username,
+      id,
+    });
+    const followersResponse: any = await octokit.graphql(followersQuery, {
+      username,
+    });
+    const issuesResponse: any = await octokit.graphql(issueQuery, {
+      username,
+    });
 
     let languagesScore = new Map();
     function getCommitScore(acc: number, repository) {
@@ -319,44 +213,7 @@ export class UserService {
   }
 
   async getUserHistory(username: string, octokit: Octokit): Promise<History> {
-    const { user: response }: any = await octokit.graphql(
-      `query ContributionsView($username: String!) {
-        user(login: $username) {
-          contributionsCollection {
-            contributionCalendar{
-              totalContributions
-              colors
-              weeks{
-                contributionDays{
-                  date
-                  contributionCount
-                  color
-                }
-              }
-            }
-            totalCommitContributions
-            totalIssueContributions
-            totalPullRequestContributions
-            totalPullRequestReviewContributions
-            totalRepositoryContributions
-          }
-          repositories(
-            first: 100
-            ownerAffiliations: OWNER
-            isFork: false
-            orderBy: {direction: DESC, field: STARGAZERS}
-          ) {
-            totalCount
-            nodes {
-              name
-              stargazerCount
-              forkCount
-            }
-          }
-        }
-      }`,
-      { username },
-    );
+    const { user: response }: any = await octokit.graphql(userHistoryQuery, { username });
     const {
       totalCommitContributions,
       totalIssueContributions,
@@ -404,38 +261,9 @@ export class UserService {
     username: string,
     octokit: Octokit,
   ): Promise<{ organizations: OrganizationDto[]; pinnedRepositories: PinnedRepositoryDto[] }> {
-    const response: any = await octokit.graphql(
-      `query pinnedReposities($username: String!) {
-        user(login: $username) {
-          organizations(first:100) {
-            nodes {
-              name
-              url
-              avatarUrl
-            }
-          }
-            pinnedItems(first: 6, types: REPOSITORY) {
-            nodes {
-              ... on Repository {
-                name
-                url
-                description
-                stargazerCount
-                forkCount
-                languages(first: 3, orderBy: {field: SIZE, direction: DESC}) {
-                  nodes {
-                    name
-                  }
-                }
-              }
-            }
-          }
-        }
-      }`,
-      {
-        username,
-      },
-    );
+    const response: any = await octokit.graphql(pinnedRepositoriesQuery, {
+      username,
+    });
     const organizations = response.user.organizations.nodes;
     const pinnedRepositories = response.user.pinnedItems.nodes;
     return {
