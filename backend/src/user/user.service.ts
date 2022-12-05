@@ -38,9 +38,13 @@ export class UserService {
       user = await this.userRepository.findOneByUsernameAndUpdateViews(username);
     }
     if (!user) {
-      user = await this.getAnonymousUserInfo(githubToken, username);
+      try {
+        user = await this.getAnonymousUserInfo(githubToken, username);
+      } catch {
+        throw new NotFoundException('User not found.');
+      }
       await this.userRepository.createOrUpdate(user);
-      await this.updateUser(user.username, githubToken);
+      user = await this.updateUser(user.username, githubToken);
     }
     const { totalRank, tierRank } = await this.getUserRelativeRanking(user);
     this.userRepository.setDuplicatedRequestIp(ip, username);
