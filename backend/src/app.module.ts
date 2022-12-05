@@ -1,6 +1,6 @@
 import { RedisModule } from '@liaoliaots/nestjs-redis';
-import { LoggerMiddleware } from '@libs/common/middlewares/console-logger.middleware';
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { LoggerMiddleware } from '@libs/common/middlewares/logger.middleware';
+import { Logger, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
@@ -35,13 +35,13 @@ import { AppService } from './app.service';
     RankingModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, Logger],
 })
 export class AppModule implements NestModule {
   private readonly isDev = process.env.NODE_ENV === 'development';
   configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
     if (this.isDev) {
-      consumer.apply(LoggerMiddleware).forRoutes('*');
       mongoose.set('debug', true);
     }
   }
