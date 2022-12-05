@@ -1,8 +1,8 @@
-name: deploy
+name: deploy-alpha
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "develop" ]
   workflow_dispatch:
 
 jobs:
@@ -23,4 +23,4 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
-    - run: yarn deploy:prod
+    - run: yarn deploy:alpha
