@@ -15,7 +15,7 @@ jobs:
       with:
         node-version: 16.x
         cache: 'yarn'
-    - run: cd backend
+        cache-dependency-path: 'backend/yarn.lock'
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
     - name: Login to Docker Hub
@@ -23,4 +23,4 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
-    - run: yarn deploy:prod
+    - run: cd backend && yarn deploy:prod
