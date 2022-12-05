@@ -4,5 +4,6 @@
   "register-wakatime-button-label": "Register",
   "maximum-continuous-commit-history": "Maximum continuous commit history",
   "day": "day",
-  "total": "total"
+  "total": "Total",
+  "rank": "Rank"
 }

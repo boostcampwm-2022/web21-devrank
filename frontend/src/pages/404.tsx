@@ -1,6 +1,7 @@
 import { GetStaticProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import Head from 'next/head';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
@@ -13,25 +14,30 @@ function NotFound() {
   useQuery(['user'], () => requestTokenRefresh());
   const router = useRouter();
 
-  const { t } = useTranslation(['404']);
+  const { t } = useTranslation(['404', 'meta']);
 
   return (
-    <Container className={aldrich.className}>
-      <div>
-        <h2>Oops!</h2>
-        <CubeImage
-          src='/icons/cube-large-background.svg'
-          alt='큐브 이미지'
-          width={220}
-          height={250}
-          quality={100}
-          priority
-        />
-      </div>
-      <strong>404 - PAGE NOT FOUND</strong>
-      <p className={lineSeedKR.className}>{t('404-information')}</p>
-      <HomeButton onClick={() => router.push('/')}>GO TO MAIN PAGE</HomeButton>
-    </Container>
+    <>
+      <Head>
+        <title>{t('meta:not-found-title')}</title>
+      </Head>
+      <Container className={aldrich.className}>
+        <div>
+          <h2>Oops!</h2>
+          <CubeImage
+            src='/icons/cube-large-background.svg'
+            alt='큐브 이미지'
+            width={220}
+            height={250}
+            quality={100}
+            priority
+          />
+        </div>
+        <strong>404 - PAGE NOT FOUND</strong>
+        <p className={lineSeedKR.className}>{t('404:404-information')}</p>
+        <HomeButton onClick={() => router.push('/')}>GO TO MAIN PAGE</HomeButton>
+      </Container>
+    </>
   );
 }
 
@@ -40,7 +46,7 @@ export default NotFound;
 export const getStaticProps: GetStaticProps = async (context) => {
   return {
     props: {
-      ...(await serverSideTranslations(context.locale as string, ['common', 'footer', 'header', '404'])),
+      ...(await serverSideTranslations(context.locale as string, ['common', 'footer', 'header', '404', 'meta'])),
     },
   };
 };
