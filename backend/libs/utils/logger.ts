@@ -1,64 +1,40 @@
-import 'process';
-import { createLogger, format, transports } from 'winston';
-import 'winston-daily-rotate-file';
+import * as dotenv from 'dotenv';
+import { WinstonModule, utilities } from 'nest-winston';
+import { join } from 'path';
+import * as winston from 'winston';
+import * as winstonDaily from 'winston-daily-rotate-file';
 
-const logDir = 'logs';
+dotenv.config();
+const logDir = join(__dirname, '..', '..', '..', 'logs');
 
-const { combine, timestamp, printf } = format;
-
-const logFormat = printf(({ level, message, timestamp }) => {
-  return `${timestamp} ${level}: ${message}`;
-});
-
-const options = {
-  file: {
-    level: 'info',
-    filename: `%DATE%.log`,
-    dirname: logDir,
+const dailyOptions = (level: string) => {
+  return {
+    level,
+    datePattern: 'YYYY-MM-DD',
+    dirname: logDir + `/${level}`,
+    filename: `%DATE%.${level}.log`,
     maxFiles: 30,
     zippedArchive: true,
-    format: combine(timestamp(), format.json()),
-  },
-  console: {
-    level: 'debug',
-    handleExceptions: true,
-    json: false,
-    colorize: true,
-    format: combine(
-      format.colorize(),
-      timestamp({
-        format: 'YYYY-MM-DD HH:mm:ss',
-      }),
-      logFormat,
-    ),
-  },
+  };
 };
 
-export const logger = createLogger({
-  transports: [
-    new transports.DailyRotateFile(options.file),
-    new transports.DailyRotateFile({
-      ...options.file,
-      level: 'error',
-      filename: `%DATE%.error.log`,
-    }),
-  ],
-  exceptionHandlers: [
-    new transports.DailyRotateFile({
-      ...options.file,
-      level: 'error',
-      filename: `%DATE%.exception.log`,
-    }),
-  ],
-});
+const transportOption = [new winstonDaily(dailyOptions('info')), new winstonDaily(dailyOptions('error'))] as any;
 
-// morgan wiston 설정
-export const stream = {
-  write: (message) => {
-    logger.info(message);
-  },
-};
-
-if (process.env.NODE_ENV !== 'prod' && process.env.NODE_ENV !== 'test') {
-  logger.add(new transports.Console(options.console));
+if (process.env.NODE_ENV === 'development') {
+  transportOption.push(
+    new winston.transports.Console({
+      level: 'silly',
+      format: winston.format.combine(
+        winston.format.timestamp(),
+        utilities.format.nestLike('devrank', {
+          prettyPrint: true,
+          colors: true,
+        }),
+      ),
+    }),
+  );
 }
+
+export const logger = WinstonModule.createLogger({
+  transports: transportOption,
+});
