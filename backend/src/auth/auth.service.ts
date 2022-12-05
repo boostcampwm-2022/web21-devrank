@@ -85,11 +85,12 @@ export class AuthService {
 
   getCookieOption = (): CookieOptions => {
     const maxAge = EXPIRATION.REFRESH_TOKEN * 1000;
+    const domain = this.configService.get('CLIENT_URL');
 
-    if (this.configService.get('NODE_ENV') === 'prod') {
-      return { httpOnly: true, secure: true, sameSite: 'lax', maxAge };
+    if (this.configService.get('NODE_ENV') === 'production') {
+      return { httpOnly: true, secure: true, sameSite: 'lax', maxAge, domain };
     } else if (this.configService.get('NODE_ENV') === 'alpha') {
-      return { httpOnly: true, secure: true, sameSite: 'none', maxAge };
+      return { httpOnly: true, secure: true, sameSite: 'none', maxAge, domain };
     }
 
     return { httpOnly: true, maxAge };

@@ -54,16 +54,12 @@ function Header() {
               </LanguageButton>
             </Dropdown.Trigger>
             <Dropdown.ItemList>
-              <Dropdown.Item>
-                <Link href={router.asPath} locale='ko'>
-                  한국어
-                </Link>
-              </Dropdown.Item>
-              <Dropdown.Item>
-                <Link href={router.asPath} locale='en'>
-                  English
-                </Link>
-              </Dropdown.Item>
+              <Link href={router.asPath} locale='ko'>
+                <Dropdown.Item>한국어</Dropdown.Item>
+              </Link>
+              <Link href={router.asPath} locale='en'>
+                <Dropdown.Item>English</Dropdown.Item>
+              </Link>
             </Dropdown.ItemList>
           </Dropdown>
           <div className='button-right'>

@@ -9,12 +9,15 @@ services:
       - '80:80'
     volumes:
       - ./nginx/:/etc/nginx/conf.d/
+      - ./logs/nginx/:/var/log/nginx/
   blue:
     image: devrank/backend-api:latest
     container_name: blue
     restart: always
     env_file:
       - ./.env
+    volumes:
+      - ./logs/nest/:/logs/
     expose:
       - 3001
     depends_on:
@@ -25,6 +28,8 @@ services:
     restart: always
     env_file:
       - ./.env
+    volumes:
+      - ./logs/nest/:/logs/
     expose:
       - 3001
     depends_on:

@@ -4,5 +4,6 @@
   "register-wakatime-button-label": "등록",
   "maximum-continuous-commit-history": "최대 연속 커밋 일수",
   "day": "일",
-  "total": "전체 등수"
+  "total": "전체 등수",
+  "rank": "등급"
 }

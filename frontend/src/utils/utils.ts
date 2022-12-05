@@ -1,3 +1,4 @@
+import { ProfileUserResponse } from '@type/response';
 import { CUBE_RANK_RANGE, DEVICON_URL, EXCEPTIONAL_LANGUAGE } from '@utils/constants';
 
 export const languageToURL = (language: string): string => {
@@ -38,4 +39,18 @@ export const getDate = (dateString: string) => {
   const date = newDate.getDate();
   const day = newDate.getDay();
   return { year, month, date, day };
+};
+
+export const getProfileDescription = (data: ProfileUserResponse) => {
+  const { username, tier, score, totalRank, tierRank, primaryLanguages } = data;
+  const languageStr = primaryLanguages.join(', ');
+
+  return (
+    `${username} / ` +
+    `등급: ${tier} / ` +
+    `점수: ${score} / ` +
+    `전체 등수: ${totalRank} / ` +
+    `${tier} 등수: ${tierRank} / ` +
+    languageStr
+  );
 };

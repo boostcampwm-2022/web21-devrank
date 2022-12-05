@@ -66,7 +66,10 @@ export class AuthController {
       bio: userInfo.bio,
       email: userInfo.email,
     };
-    if (!this.userService.findOneByFilter({ username: user.username })) {
+
+    try {
+      await this.userService.findOneByFilter({ username: user.username });
+    } catch {
       await this.userService.createOrUpdate(user);
       await this.userService.updateUser(user.username, githubToken);
     }

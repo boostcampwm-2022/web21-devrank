@@ -8,6 +8,7 @@ import { QueryClient, dehydrate, useQuery } from '@tanstack/react-query';
 import { CubeRankType } from '@type/common';
 import { RankingPaiginationResponse } from '@type/response';
 import Filterbar from '@components/Filterbar';
+import HeadMeta from '@components/HeadMeta';
 import Pagination from '@components/Pagination';
 import RankingTable from '@components/Ranking';
 import NotFound from '@components/Ranking/NotFound';
@@ -19,7 +20,7 @@ import { COUNT_PER_PAGE, CUBE_RANK } from '@utils/constants';
 
 function Ranking() {
   const router = useRouter();
-  const { t } = useTranslation(['ranking', 'common']);
+  const { t } = useTranslation(['ranking', 'common', 'meta']);
   const [tier, setTier] = useState<CubeRankType>(CUBE_RANK.ALL);
   const [username, setUsername] = useState('');
   const [page, setPage] = useState(1);
@@ -44,66 +45,69 @@ function Ranking() {
   };
 
   return (
-    <Container>
-      <Filterbar active={tier} setActive={setFilter} />
-      <SearchbarContainer>
-        {username !== '' && <SearchInfo>&apos;{username}&apos;에 대한 검색 결과 입니다.</SearchInfo>}
-        <RankingSearchbar placeholder={t('ranking:search-placeholder')} width={200} onSearch={onSearch} />
-      </SearchbarContainer>
-      <RankingTable
-        width={'100%'}
-        columnWidthList={['8%', '52%', '10%', '10%', '20%']}
-        columnAlignList={['center', 'left', 'left', 'left', 'center']}
-      >
-        <RankingTable.Head>
-          <RankingTable.Element>#</RankingTable.Element>
-          <RankingTable.Element>{t('common:table-user')}</RankingTable.Element>
-          <RankingTable.Element>{t('common:table-tier')}</RankingTable.Element>
-          <RankingTable.Element>{t('common:table-score')}</RankingTable.Element>
-          <RankingTable.Element>{t('common:table-tech-stack')}</RankingTable.Element>
-        </RankingTable.Head>
-        {data?.users.map(({ id, username, avatarUrl, tier, score, primaryLanguages }, index) => (
-          <RankingTable.Row key={id} onClick={() => searchUser(username)}>
-            <RankingTable.Element>
-              <GrayText>{(page - 1) * COUNT_PER_PAGE + index + 1}</GrayText>
-            </RankingTable.Element>
-            <RankingTable.Element>
-              <Avatar src={avatarUrl} name={username} />
-            </RankingTable.Element>
-            <RankingTable.Element>
-              <CubeIcon tier={tier} />
-            </RankingTable.Element>
-            <RankingTable.Element>
-              <GrayText>{score?.toLocaleString()}</GrayText>
-            </RankingTable.Element>
-            <RankingTable.Element>
-              <TechStackList>
-                {primaryLanguages.map((lang) => (
-                  <li key={lang}>
-                    <LanguageIcon language={lang} width={35} height={35} />
-                  </li>
-                ))}
-              </TechStackList>
-            </RankingTable.Element>
-          </RankingTable.Row>
-        ))}
-      </RankingTable>
-      {isLoading && Array.from({ length: COUNT_PER_PAGE }).map((_, index) => <RankingSkeleton key={index} />)}
-      {isError && <NotFound />}
-      {data?.metadata && (
-        <PaginationContainer>
-          <Pagination
-            currentPage={page}
-            range={data.metadata.range}
-            firstPage={data.metadata.firstPage}
-            lastPage={data.metadata.lastPage}
-            canMoveLeft={data.metadata.left}
-            canMoveRight={data.metadata.right}
-            setCurrentPage={setPage}
-          />
-        </PaginationContainer>
-      )}
-    </Container>
+    <>
+      <HeadMeta title={t('meta:ranking-title')} description={t('meta:ranking-description')} />
+      <Container>
+        <Filterbar active={tier} setActive={setFilter} />
+        <SearchbarContainer>
+          {username !== '' && <SearchInfo>&apos;{username}&apos;에 대한 검색 결과 입니다.</SearchInfo>}
+          <RankingSearchbar placeholder={t('ranking:search-placeholder')} width={200} onSearch={onSearch} />
+        </SearchbarContainer>
+        <RankingTable
+          width={'100%'}
+          columnWidthList={['8%', '52%', '10%', '10%', '20%']}
+          columnAlignList={['center', 'left', 'left', 'left', 'center']}
+        >
+          <RankingTable.Head>
+            <RankingTable.Element>#</RankingTable.Element>
+            <RankingTable.Element>{t('common:table-user')}</RankingTable.Element>
+            <RankingTable.Element>{t('common:table-tier')}</RankingTable.Element>
+            <RankingTable.Element>{t('common:table-score')}</RankingTable.Element>
+            <RankingTable.Element>{t('common:table-tech-stack')}</RankingTable.Element>
+          </RankingTable.Head>
+          {data?.users.map(({ id, username, avatarUrl, tier, score, primaryLanguages }, index) => (
+            <RankingTable.Row key={id} onClick={() => searchUser(username)}>
+              <RankingTable.Element>
+                <GrayText>{(page - 1) * COUNT_PER_PAGE + index + 1}</GrayText>
+              </RankingTable.Element>
+              <RankingTable.Element>
+                <Avatar src={avatarUrl} name={username} />
+              </RankingTable.Element>
+              <RankingTable.Element>
+                <CubeIcon tier={tier} />
+              </RankingTable.Element>
+              <RankingTable.Element>
+                <GrayText>{score?.toLocaleString()}</GrayText>
+              </RankingTable.Element>
+              <RankingTable.Element>
+                <TechStackList>
+                  {primaryLanguages.map((lang) => (
+                    <li key={lang}>
+                      <LanguageIcon language={lang} width={35} height={35} />
+                    </li>
+                  ))}
+                </TechStackList>
+              </RankingTable.Element>
+            </RankingTable.Row>
+          ))}
+        </RankingTable>
+        {isLoading && Array.from({ length: COUNT_PER_PAGE }).map((_, index) => <RankingSkeleton key={index} />)}
+        {isError && <NotFound />}
+        {data?.metadata && (
+          <PaginationContainer>
+            <Pagination
+              currentPage={page}
+              range={data.metadata.range}
+              firstPage={data.metadata.firstPage}
+              lastPage={data.metadata.lastPage}
+              canMoveLeft={data.metadata.left}
+              canMoveRight={data.metadata.right}
+              setCurrentPage={setPage}
+            />
+          </PaginationContainer>
+        )}
+      </Container>
+    </>
   );
 }
 
@@ -119,7 +123,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   return {
     props: {
       dehydratedState: dehydrate(queryClient),
-      ...(await serverSideTranslations(context.locale as string, ['common', 'header', 'footer', 'tier', 'ranking'])),
+      ...(await serverSideTranslations(context.locale as string, [
+        'common',
+        'header',
+        'footer',
+        'tier',
+        'ranking',
+        'meta',
+      ])),
     },
   };
 };
