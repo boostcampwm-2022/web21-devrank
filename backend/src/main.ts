@@ -1,3 +1,4 @@
+import { logger } from '@libs/utils';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -6,7 +7,9 @@ import { HttpExceptionFilter } from 'libs/common/filters/http-exception.filter';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: logger,
+  });
   const configService = app.get(ConfigService);
   const port = configService.get('PORT');
   app.use(cookieParser());
