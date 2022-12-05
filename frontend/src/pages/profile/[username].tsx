@@ -4,10 +4,12 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import styled from 'styled-components';
 import { QueryClient, dehydrate, useQuery } from '@tanstack/react-query';
 import { ProfileUserResponse } from '@type/response';
+import HeadMeta from '@components/HeadMeta';
 import { CommitHistory, EXPbar, PinnedRepository, ProfileCard } from '@components/Profile';
 import { Paper } from '@components/common';
 import { requestTokenRefresh } from '@apis/auth';
 import { requestUserInfoByUsername } from '@apis/users';
+import { getProfileDescription } from '@utils/utils';
 
 interface ProfileProps {
   username: string;
@@ -17,45 +19,51 @@ function Profile({ username }: ProfileProps) {
   const { data, isFetching } = useQuery<ProfileUserResponse>(['profile', username], () =>
     requestUserInfoByUsername({ username }),
   );
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation(['profile', 'meta']);
 
   if (isFetching || !data) return;
+
   return (
-    <Container>
-      <ProfileCard
-        profileData={{
-          username,
-          name: data.name,
-          location: data.location,
-          followers: data.followers,
-          following: data.following,
-          company: data.company,
-          email: data.email,
-          organizations: data.organizations,
-          avatarUrl: data.avatarUrl,
-          tier: data.tier,
-          tierRank: data.tierRank,
-          totalRank: data.totalRank,
-        }}
-      />
-      <Title>EXP</Title>
-      <EXPbar exp={data?.score} />
-      <ContributionHeader>
-        <Title>Contributions</Title>
-        <p>{`${t('maximum-continuous-commit-history')} : ${data.history.maxContinuosCount}${t('day')}`}</p>
-      </ContributionHeader>
-      <Paper>
-        <CommitHistory history={data.history} tier={data.tier} />
-      </Paper>
-      <Title>WakaTime</Title>
-      <Paper></Paper>
-      <Title>Github stats</Title>
-      <Paper></Paper>
-      <Title>Pinned Repositories</Title>
-      <Paper>
-        <PinnedRepository repositories={data.pinnedRepositories} />
-      </Paper>
-    </Container>
+    <>
+      <HeadMeta title={`${username}${t('meta:profile-title')}`} description={getProfileDescription(data)} />
+      <Container>
+        <ProfileCard
+          profileData={{
+            username,
+            name: data.name,
+            location: data.location,
+            followers: data.followers,
+            following: data.following,
+            company: data.company,
+            email: data.email,
+            organizations: data.organizations,
+            avatarUrl: data.avatarUrl,
+            tier: data.tier,
+            tierRank: data.tierRank,
+            totalRank: data.totalRank,
+          }}
+        />
+        <Title>EXP</Title>
+        <EXPbar exp={data?.score} />
+        <ContributionHeader>
+          <Title>Contributions</Title>
+          <p>{`${t('profile:maximum-continuous-commit-history')} : ${data.history.maxContinuosCount}${t(
+            'profile:day',
+          )}`}</p>
+        </ContributionHeader>
+        <Paper>
+          <CommitHistory history={data.history} tier={data.tier} />
+        </Paper>
+        <Title>WakaTime</Title>
+        <Paper></Paper>
+        <Title>Github stats</Title>
+        <Paper></Paper>
+        <Title>Pinned Repositories</Title>
+        <Paper>
+          <PinnedRepository repositories={data.pinnedRepositories} />
+        </Paper>
+      </Container>
+    </>
   );
 }
 
@@ -82,6 +90,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           'tier',
           'ranking',
           'profile',
+          'meta',
         ])),
       },
     };
