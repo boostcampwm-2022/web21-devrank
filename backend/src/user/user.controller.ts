@@ -65,15 +65,20 @@ export class UserController {
   @ApiBearerAuth('accessToken')
   @ApiOperation({ summary: '특정 유저의 점수 업데이트 (유저마다 딜레이 시간 120초)' })
   @ApiResponse({ status: 200, description: '업데이트된 유저 정보', type: UserDto })
-  async updateScore(@UserGithubToken() githubToken: string, @Param('username') username: string): Promise<UserDto> {
+  async updateScore(
+    @UserGithubToken() githubToken: string,
+    @Param('username') username: string,
+  ): Promise<UserProfileDto> {
     if ((await this.userService.findUpdateScoreTimeToLive(username)) > 0) {
       throw new BadRequestException('user score has been updated recently.');
     }
-    await this.userService.setUpdateScoreDelayTime(username, UPDATE_DELAY_TIME);
-    return await this.userService.updateUser(
+    const user = await this.userService.updateUser(
       username,
       githubToken || this.configService.get('GITHUB_PERSONAL_ACCESS_TOKEN'),
     );
+    await this.userService.setUpdateScoreDelayTime(username, UPDATE_DELAY_TIME);
+    user.updateDelayTime = UPDATE_DELAY_TIME + 3;
+    return user;
   }
 
   @Patch('')

@@ -1,4 +1,4 @@
-import { getTier } from '@libs/utils';
+import { getTier, tierCutOffs } from '@libs/utils';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Octokit } from '@octokit/core';
 import { AutoCompleteDto } from './dto/auto-complete.dto';
@@ -37,11 +37,10 @@ export class UserService {
     } else {
       user = await this.userRepository.findOneByUsernameAndUpdateViews(username);
     }
-    if (!user) {
-      user = await this.getAnonymousUserInfo(githubToken, username);
-      await this.userRepository.createOrUpdate(user);
-      await this.updateUser(user.username, githubToken);
-    }
+    user = await this.updateUser(username, githubToken);
+    if (!user.scoreHistory) user.scoreHistory = [];
+    user.scoreHistory.push({ date: new Date(), score: user.score });
+    await this.userRepository.createOrUpdate(user);
     const { totalRank, tierRank } = await this.getUserRelativeRanking(user);
     this.userRepository.setDuplicatedRequestIp(ip, username);
     user.updateDelayTime = updateDelayTime;
@@ -55,11 +54,9 @@ export class UserService {
     return users.map((user) => new AutoCompleteDto().of(user));
   }
 
-  async updateUser(username: string, githubToken: string): Promise<UserDto> {
-    const user = await this.userRepository.findOneByUsername(username);
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
+  async updateUser(username: string, githubToken: string): Promise<UserProfileDto> {
+    let user = await this.getUserInfo(githubToken, username);
+    user = await this.userRepository.createOrUpdate(user);
     const octokit = new Octokit({
       auth: githubToken,
     });
@@ -75,13 +72,38 @@ export class UserService {
       organizations,
       pinnedRepositories,
     };
-    return this.userRepository.createOrUpdate(updatedUser);
+    user = await this.userRepository.createOrUpdate(updatedUser);
+    const { totalRank, tierRank } = await this.getUserRelativeRanking(user);
+    const userWithRank: UserProfileDto = {
+      ...user,
+      totalRank,
+      tierRank,
+      needExp: tierCutOffs[user.tier] - user.score,
+    };
+    return userWithRank;
   }
 
   async updateAllUsers(githubToken: string): Promise<UserDto[]> {
     const users = await this.userRepository.findAll({}, false, ['username']);
     const promises = users.map((user) => {
       return this.updateUser(user.username, githubToken);
+    });
+    return Promise.all(promises);
+  }
+
+  async dailyUpdateAllUsers(githubToken: string): Promise<UserDto[]> {
+    const users = await this.userRepository.findAll({}, false, ['username']);
+    const promises = users.map(async (user) => {
+      user.dailyViews = 0;
+      this.userRepository.createOrUpdate(user);
+      if (!user.scoreHistory) user.scoreHistory = [];
+      user.scoreHistory.push({
+        date: new Date(),
+        score: user.score,
+      });
+      user = await this.updateUser(user.username, githubToken);
+      user.scoreDifference = user.score - user.scoreHistory[user.scoreHistory.length - 2].score;
+      return user;
     });
     return Promise.all(promises);
   }
@@ -101,7 +123,7 @@ export class UserService {
     return this.userRepository.createOrUpdate(user);
   }
 
-  async getAnonymousUserInfo(githubToken: string, username: string): Promise<UserDto> {
+  async getUserInfo(githubToken: string, username: string): Promise<UserDto> {
     const octokit = new Octokit({
       auth: githubToken,
     });
