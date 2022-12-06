@@ -47,6 +47,8 @@ export class UserService {
     user.updateDelayTime = updateDelayTime;
     user.totalRank = totalRank;
     user.tierRank = tierRank;
+    user.startExp = tierCutOffs[user.tier];
+    user.needExp = tierCutOffs[user.tier] - user.score;
     return user;
   }
 
@@ -79,6 +81,7 @@ export class UserService {
       ...user,
       totalRank,
       tierRank,
+      startExp: tierCutOffs[user.tier],
       needExp: tierCutOffs[user.tier] - user.score,
     };
     return userWithRank;
