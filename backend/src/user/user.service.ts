@@ -90,6 +90,19 @@ export class UserService {
     return Promise.all(promises);
   }
 
+  async dailyUpdateAllUsers(githubToken: string): Promise<UserDto[]> {
+    const users = await this.userRepository.findAll({}, false, ['username']);
+    const promises = users.map(async (user) => {
+      user.dailyViews = 0;
+      this.userRepository.createOrUpdate(user);
+      const prevScore = user.score;
+      user = await this.updateUser(user.username, githubToken);
+      user.scoreDifference = user.score - prevScore;
+      return user;
+    });
+    return Promise.all(promises);
+  }
+
   async isDuplicatedRequestIp(ip: string, username: string): Promise<boolean> {
     return this.userRepository.isDuplicatedRequestIp(ip, username);
   }
