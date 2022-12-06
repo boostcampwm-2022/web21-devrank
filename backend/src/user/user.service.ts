@@ -1,3 +1,4 @@
+import { GITHUB_API_DELAY } from '@libs/consts';
 import { getTier, tierCutOffs } from '@libs/utils';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Octokit } from '@octokit/core';
@@ -36,6 +37,9 @@ export class UserService {
       user = await this.userRepository.findOneByUsername(username);
     } else {
       user = await this.userRepository.findOneByUsernameAndUpdateViews(username);
+    }
+    if (user) {
+      return user;
     }
     user = await this.updateUser(username, githubToken);
     if (!user.scoreHistory) user.scoreHistory = [];
@@ -83,29 +87,31 @@ export class UserService {
     return userWithRank;
   }
 
-  async updateAllUsers(githubToken: string): Promise<UserDto[]> {
+  async updateAllUsers(githubToken: string): Promise<void> {
+    const sleep = (m) => new Promise((r) => setTimeout(r, m));
     const users = await this.userRepository.findAll({}, false, ['username']);
-    const promises = users.map((user) => {
-      return this.updateUser(user.username, githubToken);
-    });
-    return Promise.all(promises);
+    for (const user of users) {
+      await sleep(GITHUB_API_DELAY);
+      await this.updateUser(user.username, githubToken);
+    }
   }
 
-  async dailyUpdateAllUsers(githubToken: string): Promise<UserDto[]> {
+  async dailyUpdateAllUsers(githubToken: string): Promise<void> {
+    const sleep = (m) => new Promise((r) => setTimeout(r, m));
     const users = await this.userRepository.findAll({}, false, ['username']);
-    const promises = users.map(async (user) => {
-      user.dailyViews = 0;
-      this.userRepository.createOrUpdate(user);
-      if (!user.scoreHistory) user.scoreHistory = [];
-      user.scoreHistory.push({
+    for (const user of users) {
+      await sleep(GITHUB_API_DELAY);
+      const updatedUser = await this.updateUser(user.username, githubToken);
+      if (!updatedUser.scoreHistory) updatedUser.scoreHistory = [];
+      updatedUser.scoreHistory.push({
         date: new Date(),
         score: user.score,
       });
-      user = await this.updateUser(user.username, githubToken);
-      user.scoreDifference = user.score - user.scoreHistory[user.scoreHistory.length - 2].score;
-      return user;
-    });
-    return Promise.all(promises);
+      updatedUser.scoreDifference =
+        updatedUser.score - updatedUser.scoreHistory[updatedUser.scoreHistory.length - 2].score;
+      updatedUser.dailyViews = 0;
+      this.userRepository.createOrUpdate(updatedUser);
+    }
   }
 
   async isDuplicatedRequestIp(ip: string, username: string): Promise<boolean> {
@@ -131,6 +137,9 @@ export class UserService {
       const response = await octokit.request('GET /users/{username}', {
         username: username,
       });
+      if (response.data.type !== 'User') {
+        throw new NotFoundException('User not found.');
+      }
       const user: UserDto = {
         id: response.data.node_id,
         username: response.data.login,
@@ -160,13 +169,16 @@ export class UserService {
       username,
       id,
     });
+
     const personalResponse: any = await octokit.graphql(nonForkRepositoryQuery, {
       username,
       id,
     });
+
     const followersResponse: any = await octokit.graphql(followersQuery, {
       username,
     });
+
     const issuesResponse: any = await octokit.graphql(issueQuery, {
       username,
     });
