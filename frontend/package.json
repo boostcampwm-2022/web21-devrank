@@ -9,7 +9,8 @@
     "lint": "next lint",
     "lint:fix": "eslint --fix ./src/**/*.{ts,tsx,js,jsx}",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "deploy:prod": "docker build -t devrank/frontend:latest -f Dockerfile . --platform linux/x86_64 && docker push devrank/frontend:latest"
   },
   "dependencies": {
     "@next/font": "^13.0.3",

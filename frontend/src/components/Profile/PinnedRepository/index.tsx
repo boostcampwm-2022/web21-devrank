@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import styled from 'styled-components';
 import { PinnedRepositoryType } from '@type/common';
 import { LanguageIcon } from '@components/common';
@@ -11,30 +12,32 @@ interface PinnedRepositoryProps {
 function PinnedRepository({ repositories }: PinnedRepositoryProps) {
   return (
     <Container>
-      {repositories.map(({ name, description, languages, forkCount, stargazerCount }) => (
-        <Repository key={`${name}-${description}`}>
-          <Name>{name}</Name>
-          <Description>{description}</Description>
-          <Meta>
-            <Languages>
-              {languages.map((language) => (
-                <li key={language}>
-                  <LanguageIcon language={language} width={37} height={37} />
+      {repositories.map(({ name, description, languages, forkCount, stargazerCount, url }) => (
+        <Link href={url} key={`${name}-${description}`}>
+          <Repository>
+            <Name>{name}</Name>
+            <Description>{description}</Description>
+            <Meta>
+              <Languages>
+                {languages.map((language) => (
+                  <li key={language}>
+                    <LanguageIcon language={language} width={37} height={37} />
+                  </li>
+                ))}
+              </Languages>
+              <Info>
+                <li>
+                  <Image src={'/icons/star.svg'} alt='star' width={24} height={24} />
+                  {numberCompactFormatter(stargazerCount)}
                 </li>
-              ))}
-            </Languages>
-            <Info>
-              <li>
-                <Image src={'/icons/star.svg'} alt='star' width={24} height={24} />
-                {numberCompactFormatter(stargazerCount)}
-              </li>
-              <li>
-                <Image src={'/icons/fork.svg'} alt='star' width={24} height={24} />
-                {numberCompactFormatter(forkCount)}
-              </li>
-            </Info>
-          </Meta>
-        </Repository>
+                <li>
+                  <Image src={'/icons/fork.svg'} alt='star' width={24} height={24} />
+                  {numberCompactFormatter(forkCount)}
+                </li>
+              </Info>
+            </Meta>
+          </Repository>
+        </Link>
       ))}
     </Container>
   );

@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { QueryClient, dehydrate, useQuery } from '@tanstack/react-query';
 import { ProgrammingLanguageRankingResponse, RankingPaiginationResponse, RankingResponse } from '@type/response';
+import HeadMeta from '@components/HeadMeta';
 import Ranking from '@components/Ranking';
 import { Avatar, LanguageIcon } from '@components/common';
 import CubeIcon from '@components/common/CubeIcon';
@@ -20,7 +21,7 @@ import {
 import { MAIN_PAGE_RANK_COUNT } from '@utils/constants';
 
 function Home() {
-  const { t } = useTranslation(['index', 'common']);
+  const { t } = useTranslation(['index', 'common', 'meta']);
   const router = useRouter();
 
   const { data: rankingByScore } = useQuery<RankingPaiginationResponse>(['top-ranking-by-score'], () =>
@@ -44,128 +45,140 @@ function Home() {
   };
 
   return (
-    <Container>
-      <h2>
-        <Image src='/icons/logo-main.svg' alt='Devrank 로고' width={550} height={230} quality={100} priority />
-      </h2>
-      <AutoCompleteSearchbar type='text' width={600} placeholder={t('index:search-placeholder')} submitAlign='right' />
-      <Content>
-        <OverallRanking>
-          <Title>{t('index:overall-ranking')}</Title>
-          <Ranking
-            width={'512px'}
-            columnWidthList={['12%', '8%', '58%', '20%']}
-            columnAlignList={['left', 'left', 'left', 'right']}
-          >
-            <Ranking.Head>
-              <Ranking.Element>{t('common:table-tier')}</Ranking.Element>
-              <Ranking.Element>#</Ranking.Element>
-              <Ranking.Element>{t('common:table-user')}</Ranking.Element>
-              <Ranking.Element>{t('common:table-score')}</Ranking.Element>
-            </Ranking.Head>
-            {rankingByScore?.users.map(({ id, tier, avatarUrl, username, score }, index) => (
-              <Ranking.Row key={id} onClick={() => searchUser(username)}>
-                <Ranking.Element>
-                  <CubeIcon tier={tier} />
-                </Ranking.Element>
-                <Ranking.Element>
-                  <GrayText>{index + 1}</GrayText>
-                </Ranking.Element>
-                <Ranking.Element>
-                  <Avatar src={avatarUrl} name={username} />
-                </Ranking.Element>
-                <Ranking.Element>
-                  <GrayText>{score.toLocaleString()}</GrayText>
-                </Ranking.Element>
-              </Ranking.Row>
-            ))}
-          </Ranking>
-        </OverallRanking>
-        <RisingRanking>
-          <Title>{t('index:rising-user-top-3')}</Title>
-          <Ranking
-            width={'512px'}
-            columnWidthList={['12%', '8%', '58%', '20%']}
-            columnAlignList={['left', 'left', 'left', 'right']}
-          >
-            <Ranking.Head>
-              <Ranking.Element>{t('common:table-tier')}</Ranking.Element>
-              <Ranking.Element>#</Ranking.Element>
-              <Ranking.Element>{t('common:table-user')}</Ranking.Element>
-              <Ranking.Element>{t('common:table-score')}</Ranking.Element>
-            </Ranking.Head>
-            {rankingByRising?.map(({ id, tier, username, avatarUrl, score }, index) => (
-              <Ranking.Row key={id} onClick={() => searchUser(username)}>
-                <Ranking.Element>
-                  <CubeIcon tier={tier} />
-                </Ranking.Element>
-                <Ranking.Element>
-                  <GrayText>{index + 1}</GrayText>
-                </Ranking.Element>
-                <Ranking.Element>
-                  <Avatar src={avatarUrl} name={username} />
-                </Ranking.Element>
-                <Ranking.Element>
-                  <GrayText>{score.toLocaleString()}</GrayText>
-                </Ranking.Element>
-              </Ranking.Row>
-            ))}
-          </Ranking>
-        </RisingRanking>
-        <DailyRanking>
-          <Title>{t('index:daily-views-top-3')}</Title>
-          <Ranking
-            width={'512px'}
-            columnWidthList={['12%', '8%', '58%', '20%']}
-            columnAlignList={['left', 'left', 'left', 'right']}
-          >
-            <Ranking.Head>
-              <Ranking.Element>{t('common:table-tier')}</Ranking.Element>
-              <Ranking.Element>#</Ranking.Element>
-              <Ranking.Element>{t('common:table-user')}</Ranking.Element>
-              <Ranking.Element>{t('common:table-views')}</Ranking.Element>
-            </Ranking.Head>
-            {rankingByViews?.map(({ id, tier, username, avatarUrl, dailyViews }, index) => (
-              <Ranking.Row key={id} onClick={() => searchUser(username)}>
-                <Ranking.Element>
-                  <CubeIcon tier={tier} />
-                </Ranking.Element>
-                <Ranking.Element>
-                  <GrayText>{index + 1}</GrayText>
-                </Ranking.Element>
-                <Ranking.Element>
-                  <Avatar src={avatarUrl} name={username} />
-                </Ranking.Element>
-                <Ranking.Element>
-                  <GrayText>{dailyViews.toLocaleString()}</GrayText>
-                </Ranking.Element>
-              </Ranking.Row>
-            ))}
-          </Ranking>
-        </DailyRanking>
-        <LanguageRanking>
-          <Title>{t('index:most-programming-lang-top-3')}</Title>
-          <Ranking width={'512px'} columnWidthList={['13%', '56%', '31%']} columnAlignList={['left', 'left', 'right']}>
-            <Ranking.Head>
-              <Ranking.Element>{t('common:table-programming-lang')}</Ranking.Element>
-              <Ranking.Element />
-              <Ranking.Element>{t('common:table-user-num')}</Ranking.Element>
-            </Ranking.Head>
-            {rankingByProgrammingLang?.map(({ language, count }) => (
-              <Ranking.Row key={language}>
-                <Ranking.Element>
-                  <LanguageIcon language={language} width={30} height={30} />
-                </Ranking.Element>
-                <Ranking.Element>{language}</Ranking.Element>
-                <Ranking.Element>
-                  <GrayText>{count}</GrayText>
-                </Ranking.Element>
-              </Ranking.Row>
-            ))}
-          </Ranking>
-        </LanguageRanking>
-      </Content>
-    </Container>
+    <>
+      <HeadMeta title={t('meta:main-title')} description={t('meta:main-description')} />
+      <Container>
+        <h2>
+          <Image src='/icons/logo-main.svg' alt='Devrank 로고' width={550} height={230} quality={100} priority />
+        </h2>
+        <AutoCompleteSearchbar
+          type='text'
+          width={600}
+          placeholder={t('index:search-placeholder')}
+          submitAlign='right'
+        />
+        <Content>
+          <OverallRanking>
+            <Title>{t('index:overall-ranking')}</Title>
+            <Ranking
+              width={'512px'}
+              columnWidthList={['12%', '8%', '58%', '20%']}
+              columnAlignList={['left', 'left', 'left', 'right']}
+            >
+              <Ranking.Head>
+                <Ranking.Element>{t('common:table-tier')}</Ranking.Element>
+                <Ranking.Element>#</Ranking.Element>
+                <Ranking.Element>{t('common:table-user')}</Ranking.Element>
+                <Ranking.Element>{t('common:table-score')}</Ranking.Element>
+              </Ranking.Head>
+              {rankingByScore?.users.map(({ id, tier, avatarUrl, username, score }, index) => (
+                <Ranking.Row key={id} onClick={() => searchUser(username)}>
+                  <Ranking.Element>
+                    <CubeIcon tier={tier} />
+                  </Ranking.Element>
+                  <Ranking.Element>
+                    <GrayText>{index + 1}</GrayText>
+                  </Ranking.Element>
+                  <Ranking.Element>
+                    <Avatar src={avatarUrl} name={username} />
+                  </Ranking.Element>
+                  <Ranking.Element>
+                    <GrayText>{score.toLocaleString()}</GrayText>
+                  </Ranking.Element>
+                </Ranking.Row>
+              ))}
+            </Ranking>
+          </OverallRanking>
+          <RisingRanking>
+            <Title>{t('index:rising-user-top-3')}</Title>
+            <Ranking
+              width={'512px'}
+              columnWidthList={['12%', '8%', '58%', '20%']}
+              columnAlignList={['left', 'left', 'left', 'right']}
+            >
+              <Ranking.Head>
+                <Ranking.Element>{t('common:table-tier')}</Ranking.Element>
+                <Ranking.Element>#</Ranking.Element>
+                <Ranking.Element>{t('common:table-user')}</Ranking.Element>
+                <Ranking.Element>{t('common:table-score')}</Ranking.Element>
+              </Ranking.Head>
+              {rankingByRising?.map(({ id, tier, username, avatarUrl, score }, index) => (
+                <Ranking.Row key={id} onClick={() => searchUser(username)}>
+                  <Ranking.Element>
+                    <CubeIcon tier={tier} />
+                  </Ranking.Element>
+                  <Ranking.Element>
+                    <GrayText>{index + 1}</GrayText>
+                  </Ranking.Element>
+                  <Ranking.Element>
+                    <Avatar src={avatarUrl} name={username} />
+                  </Ranking.Element>
+                  <Ranking.Element>
+                    <GrayText>{score.toLocaleString()}</GrayText>
+                  </Ranking.Element>
+                </Ranking.Row>
+              ))}
+            </Ranking>
+          </RisingRanking>
+          <DailyRanking>
+            <Title>{t('index:daily-views-top-3')}</Title>
+            <Ranking
+              width={'512px'}
+              columnWidthList={['12%', '8%', '58%', '20%']}
+              columnAlignList={['left', 'left', 'left', 'right']}
+            >
+              <Ranking.Head>
+                <Ranking.Element>{t('common:table-tier')}</Ranking.Element>
+                <Ranking.Element>#</Ranking.Element>
+                <Ranking.Element>{t('common:table-user')}</Ranking.Element>
+                <Ranking.Element>{t('common:table-views')}</Ranking.Element>
+              </Ranking.Head>
+              {rankingByViews?.map(({ id, tier, username, avatarUrl, dailyViews }, index) => (
+                <Ranking.Row key={id} onClick={() => searchUser(username)}>
+                  <Ranking.Element>
+                    <CubeIcon tier={tier} />
+                  </Ranking.Element>
+                  <Ranking.Element>
+                    <GrayText>{index + 1}</GrayText>
+                  </Ranking.Element>
+                  <Ranking.Element>
+                    <Avatar src={avatarUrl} name={username} />
+                  </Ranking.Element>
+                  <Ranking.Element>
+                    <GrayText>{dailyViews.toLocaleString()}</GrayText>
+                  </Ranking.Element>
+                </Ranking.Row>
+              ))}
+            </Ranking>
+          </DailyRanking>
+          <LanguageRanking>
+            <Title>{t('index:most-programming-lang-top-3')}</Title>
+            <Ranking
+              width={'512px'}
+              columnWidthList={['13%', '56%', '31%']}
+              columnAlignList={['left', 'left', 'right']}
+            >
+              <Ranking.Head>
+                <Ranking.Element>{t('common:table-programming-lang')}</Ranking.Element>
+                <Ranking.Element />
+                <Ranking.Element>{t('common:table-user-num')}</Ranking.Element>
+              </Ranking.Head>
+              {rankingByProgrammingLang?.map(({ language, count }) => (
+                <Ranking.Row key={language}>
+                  <Ranking.Element>
+                    <LanguageIcon language={language} width={30} height={30} />
+                  </Ranking.Element>
+                  <Ranking.Element>{language}</Ranking.Element>
+                  <Ranking.Element>
+                    <GrayText>{count}</GrayText>
+                  </Ranking.Element>
+                </Ranking.Row>
+              ))}
+            </Ranking>
+          </LanguageRanking>
+        </Content>
+      </Container>
+    </>
   );
 }
 
@@ -195,7 +208,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   return {
     props: {
       dehydratedState: dehydrate(queryClient),
-      ...(await serverSideTranslations(context.locale as string, ['index', 'common', 'header', 'footer'])),
+      ...(await serverSideTranslations(context.locale as string, ['index', 'common', 'header', 'footer', 'meta'])),
     },
   };
 };
