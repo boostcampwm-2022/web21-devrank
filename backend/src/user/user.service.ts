@@ -309,10 +309,7 @@ export class UserService {
 
   async getUserRelativeRanking(user: UserDto): Promise<Rank> {
     const cachedRanks = await this.userRepository.findCachedUserRank(user.id + '&');
-    console.log(cachedRanks);
     if (Object.keys(cachedRanks).length) {
-      console.log('cached');
-
       return cachedRanks;
     }
     const users = await this.userRepository.findAll({}, true, ['username', 'tier', 'score']);
