@@ -11,7 +11,7 @@ export class BatchService {
   @Cron('0 0 * * * *', { name: 'cronTask' })
   handleCron() {
     this.logger.log('Task Called');
-    this.userService.updateAllUsers(this.configService.get('GITHUB_PERSONAL_ACCESS_TOKEN'));
+    this.userService.dailyUpdateAllUsers(this.configService.get('GITHUB_PERSONAL_ACCESS_TOKEN'));
     this.logger.log('Task Finished');
   }
 }
