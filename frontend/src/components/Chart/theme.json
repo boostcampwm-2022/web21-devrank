@@ -17,5 +17,34 @@
       "color": "#FBFBFB",
       "fontSize": 12
     }
+  },
+  "axis": {
+    "domain": {
+      "line": {
+        "stroke": "#FBFBFB",
+        "strokeWidth": 1
+      }
+    },
+    "legend": {
+      "text": {
+        "fontSize": 12,
+        "fill": "#FBFBFB"
+      }
+    },
+    "ticks": {
+      "line": {
+        "stroke": "#FBFBFB",
+        "strokeWidth": 1
+      },
+      "text": {
+        "fontSize": 14,
+        "fill": "#FBFBFB"
+      }
+    }
+  },
+  "grid": {
+    "line": {
+      "stroke": "#5d5f65"
+    }
   }
 }
