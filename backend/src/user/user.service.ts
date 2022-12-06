@@ -37,18 +37,10 @@ export class UserService {
     } else {
       user = await this.userRepository.findOneByUsernameAndUpdateViews(username);
     }
-    if (!user) {
-      try {
-        user = await this.getAnonymousUserInfo(githubToken, username);
-      } catch {
-        throw new NotFoundException('User not found.');
-      }
-      // TODO: authContorller에 있는 코드와 중복되는 부분이 있음. 추후 리팩토링 필요
-      await this.userRepository.createOrUpdate(user);
-      user = await this.updateUser(user.username, githubToken);
-      user.scoreHistory.push({ date: new Date(), score: user.score });
-      await this.userRepository.createOrUpdate(user);
-    }
+    user = await this.updateUser(username, githubToken);
+    if (!user.scoreHistory) user.scoreHistory = [];
+    user.scoreHistory.push({ date: new Date(), score: user.score });
+    await this.userRepository.createOrUpdate(user);
     const { totalRank, tierRank } = await this.getUserRelativeRanking(user);
     this.userRepository.setDuplicatedRequestIp(ip, username);
     user.updateDelayTime = updateDelayTime;
@@ -63,10 +55,8 @@ export class UserService {
   }
 
   async updateUser(username: string, githubToken: string): Promise<UserProfileDto> {
-    let user = await this.userRepository.findOneByUsername(username);
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
+    let user = await this.getUserInfo(githubToken, username);
+    user = await this.userRepository.createOrUpdate(user);
     const octokit = new Octokit({
       auth: githubToken,
     });
@@ -106,6 +96,7 @@ export class UserService {
     const promises = users.map(async (user) => {
       user.dailyViews = 0;
       this.userRepository.createOrUpdate(user);
+      if (!user.scoreHistory) user.scoreHistory = [];
       user.scoreHistory.push({
         date: new Date(),
         score: user.score,
@@ -132,7 +123,7 @@ export class UserService {
     return this.userRepository.createOrUpdate(user);
   }
 
-  async getAnonymousUserInfo(githubToken: string, username: string): Promise<UserDto> {
+  async getUserInfo(githubToken: string, username: string): Promise<UserDto> {
     const octokit = new Octokit({
       auth: githubToken,
     });
