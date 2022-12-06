@@ -95,9 +95,12 @@ export class UserService {
     const promises = users.map(async (user) => {
       user.dailyViews = 0;
       this.userRepository.createOrUpdate(user);
-      const prevScore = user.score;
+      user.scoreHistory.push({
+        date: new Date(),
+        score: user.score,
+      });
       user = await this.updateUser(user.username, githubToken);
-      user.scoreDifference = user.score - prevScore;
+      user.scoreDifference = user.score - user.scoreHistory[user.scoreHistory.length - 2].score;
       return user;
     });
     return Promise.all(promises);
