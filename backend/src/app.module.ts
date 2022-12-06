@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
 import { AuthModule } from './auth/auth.module';
+import { BatchModule } from './batch/batch.module';
 import { RankingModule } from './ranking/ranking.module';
 import { UserModule } from './user/user.module';
 import { AppController } from './app.controller';
@@ -33,6 +34,7 @@ import { AppService } from './app.service';
     AuthModule,
     UserModule,
     RankingModule,
+    BatchModule,
   ],
   controllers: [AppController],
   providers: [AppService, Logger],
