@@ -1,5 +1,6 @@
+import { CubeRankType } from '@type/common';
 import { ProfileUserResponse } from '@type/response';
-import { CUBE_RANK_RANGE, DEVICON_URL, EXCEPTIONAL_LANGUAGE } from '@utils/constants';
+import { CUBE_RANK, CUBE_RANK_RANGE, DEVICON_URL, EXCEPTIONAL_LANGUAGE } from '@utils/constants';
 
 export const languageToURL = (language: string): string => {
   if (EXCEPTIONAL_LANGUAGE.includes(language)) {
@@ -53,4 +54,16 @@ export const getProfileDescription = (data: ProfileUserResponse) => {
     `${tier} 등수: ${tierRank} / ` +
     languageStr
   );
+};
+
+interface QueryValidatorType {
+  tier?: string | string[];
+  username?: string | string[];
+  page?: string | string[];
+}
+
+export const queryValidator = ({ tier, username, page }: QueryValidatorType) => {
+  if (!tier || !Object.values(CUBE_RANK).includes(tier as CubeRankType)) return false;
+  if (!page || page.toString().match(/\D/)) return false;
+  return { tier, username: username || '', page: Number(page) };
 };
