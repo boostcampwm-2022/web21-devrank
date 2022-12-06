@@ -33,6 +33,8 @@
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/swagger": "^6.1.3",
     "@octokit/core": "^4.1.0",
+    "@sentry/node": "^7.23.0",
+    "@sentry/tracing": "^7.23.0",
     "axios": "0.27.2",
     "class-validator": "^0.13.2",
     "cookie-parser": "^1.4.6",
