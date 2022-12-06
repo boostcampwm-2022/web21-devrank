@@ -37,22 +37,10 @@ export class UserService {
     } else {
       user = await this.userRepository.findOneByUsernameAndUpdateViews(username);
     }
-    let userInfo: UserDto;
-    try {
-      userInfo = await this.getUserInfo(githubToken, username);
-    } catch {
-      throw new NotFoundException('User not found.');
-    }
-    if (user) {
-      user = { ...user, ...userInfo };
-    }
-    if (!user) {
-      // TODO: authContorller에 있는 코드와 중복되는 부분이 있음. 추후 리팩토링 필요
-      await this.userRepository.createOrUpdate(userInfo);
-      user = await this.updateUser(user.username, githubToken);
-      user.scoreHistory.push({ date: new Date(), score: user.score });
-      await this.userRepository.createOrUpdate(user);
-    }
+    user = await this.updateUser(username, githubToken);
+    if (!user.scoreHistory) user.scoreHistory = [];
+    user.scoreHistory.push({ date: new Date(), score: user.score });
+    await this.userRepository.createOrUpdate(user);
     const { totalRank, tierRank } = await this.getUserRelativeRanking(user);
     this.userRepository.setDuplicatedRequestIp(ip, username);
     user.updateDelayTime = updateDelayTime;
@@ -67,10 +55,8 @@ export class UserService {
   }
 
   async updateUser(username: string, githubToken: string): Promise<UserDto> {
-    const user = await this.userRepository.findOneByUsername(username);
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
+    let user = await this.getUserInfo(githubToken, username);
+    user = await this.userRepository.createOrUpdate(user);
     const octokit = new Octokit({
       auth: githubToken,
     });
