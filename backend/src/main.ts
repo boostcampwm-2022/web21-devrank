@@ -43,7 +43,7 @@ async function bootstrap() {
   // for sentry
   if (configService.get('NODE_ENV') === 'production') {
     Sentry.init({
-      dsn: 'https://1202091baa724d928dc3e47d33941aba@o4504279677206528.ingest.sentry.io/4504279687299072',
+      dsn: configService.get('SENTRY_DSN'),
 
       // Set tracesSampleRate to 1.0 to capture 100%
       // of transactions for performance monitoring.
