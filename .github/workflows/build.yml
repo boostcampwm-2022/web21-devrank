@@ -24,3 +24,4 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
     - run: cd backend && yarn deploy:prod
+    - run: cd frontend && yarn deploy:prod
