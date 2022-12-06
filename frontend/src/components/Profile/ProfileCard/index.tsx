@@ -1,6 +1,7 @@
 import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
 import styled from 'styled-components';
+import ProfileRefreshButton from '../ProfileRefreshButton';
 import { CubeRankType, OrganizationType } from '@type/common';
 import { ProfileLabel } from '@components/Profile';
 import { Avatar, CubeIcon, Paper } from '@components/common';
@@ -19,6 +20,9 @@ interface ProfileCardProps {
     tier: CubeRankType;
     tierRank: number;
     totalRank: number;
+    updateDelayTime: number;
+    updateData: () => void;
+    isLoading: boolean;
   };
 }
 
@@ -36,17 +40,23 @@ function ProfileCard({ profileData }: ProfileCardProps) {
     tier,
     tierRank,
     totalRank,
+    updateDelayTime,
+    updateData,
+    isLoading,
   } = profileData;
 
   const { t } = useTranslation('profile');
+
+  const gotoGithub = (username: string) => {
+    window.location.href = `https://github.com/${username}`;
+  };
   return (
     <Paper>
-      <Avatar src={avatarUrl} size='lg' />
+      <Avatar src={avatarUrl} size='lg' onClick={() => gotoGithub(username)} />
       <ProfileInfos>
         <li>
-          <a href={`https://github.com/${username}`}>
-            <h3>{username}</h3>
-          </a>
+          <h3 onClick={() => gotoGithub(username)}>{username}</h3>
+          <ProfileRefreshButton updateData={updateData} updateDelayTime={updateDelayTime} isLoading={isLoading} />
         </li>
         {name && (
           <ProfileLabel>
@@ -112,13 +122,24 @@ const ProfileInfos = styled.ul`
   margin-left: 30px;
 
   h3 {
+    width: max-content;
+    cursor: pointer;
     font-size: ${({ theme }) => theme.fontSize.xxl};
     font-weight: ${({ theme }) => theme.fontWeight.bold};
-    margin-bottom: 10px;
   }
 
-  > li + li {
-    margin-top: 4px;
+  > li {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+
+    &:first-child {
+      margin-bottom: 10px;
+    }
+
+    + li {
+      margin-top: 4px;
+    }
   }
 `;
 
