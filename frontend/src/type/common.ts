@@ -12,6 +12,8 @@ export type InputChangeEvent = React.ChangeEvent<HTMLInputElement>;
 
 export type FormEvent = React.FormEvent<HTMLFormElement>;
 
+export type MethodType = 'GET' | 'POST' | 'PATCH' | 'DELETE';
+
 export type CommitLevelType = 0 | 1 | 2 | 3 | 4;
 export interface PinnedRepositoryType {
   name: string;

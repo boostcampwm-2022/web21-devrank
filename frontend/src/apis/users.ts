@@ -1,7 +1,9 @@
+import { MethodType } from '@type/common';
+import { ProfileUserResponse, UserByPrefixResponse } from '@type/response';
 import axiosInstance from '@utils/axiosInstance';
-import { UserByPrefixResponse, ProfileUserResponse } from '@type/response';
 
 interface RequestProfilUserParams {
+  method: MethodType;
   username: string;
 }
 
@@ -12,11 +14,12 @@ interface requestUserListByPrefixParams {
 
 export const requestUserInfoByUsername = async ({
   username,
+  method,
 }: RequestProfilUserParams): Promise<ProfileUserResponse> => {
-  const { data } = await axiosInstance.get(`/users/${username}`);
-  
+  const { data } = await axiosInstance.request({ method, url: `/users/${username}` });
+
   return data;
-}
+};
 
 export const requestUserListByPrefix = async ({
   limit,

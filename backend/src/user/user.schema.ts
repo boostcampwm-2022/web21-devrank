@@ -74,6 +74,9 @@ export class User extends Document {
 
   @Prop()
   primaryLanguages: string[];
+
+  @Prop({ default: [] })
+  scoreHistory: { date: Date; score: number }[];
 }
 
 export const UserScheme = SchemaFactory.createForClass(User);
