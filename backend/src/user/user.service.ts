@@ -106,6 +106,7 @@ export class UserService {
     const promises = users.map(async (user) => {
       user.dailyViews = 0;
       this.userRepository.createOrUpdate(user);
+      if (!user.scoreHistory) user.scoreHistory = [];
       user.scoreHistory.push({
         date: new Date(),
         score: user.score,
