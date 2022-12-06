@@ -6,3 +6,5 @@ export const EXPIRATION = {
 export const UPDATE_DELAY_TIME = 120;
 
 export const PAGE_UNIT_COUNT = 10;
+
+export const GITHUB_API_DELAY = 1500;
