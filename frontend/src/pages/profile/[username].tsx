@@ -16,11 +16,11 @@ interface ProfileProps {
 function Profile({ username }: ProfileProps) {
   const MAX_COMMIT_STREAK = 368;
   const { data, refetch } = useQuery<ProfileUserResponse>(['profile', username], () =>
-    requestUserInfoByUsername({ username, method: 'get' }),
+    requestUserInfoByUsername({ username, method: 'GET' }),
   );
 
   const { mutate, isLoading } = useMutation<ProfileUserResponse>({
-    mutationFn: () => requestUserInfoByUsername({ username, method: 'patch' }),
+    mutationFn: () => requestUserInfoByUsername({ username, method: 'PATCH' }),
     onError: () => alert('최근에 업데이트 했습니다.'),
     onSettled: () => refetch(),
   });
@@ -81,7 +81,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const queryClient = new QueryClient();
   await Promise.all([
     queryClient.prefetchQuery(['user'], () => requestTokenRefresh(context)),
-    queryClient.prefetchQuery(['profile', username], () => requestUserInfoByUsername({ username, method: 'get' })),
+    queryClient.prefetchQuery(['profile', username], () => requestUserInfoByUsername({ username, method: 'GET' })),
   ]);
 
   if (queryClient.getQueryData(['profile', username])) {

@@ -1,8 +1,9 @@
+import { MethodType } from '@type/common';
 import { ProfileUserResponse, UserByPrefixResponse } from '@type/response';
 import axiosInstance from '@utils/axiosInstance';
 
 interface RequestProfilUserParams {
-  method: 'get' | 'patch';
+  method: MethodType;
   username: string;
 }
 
