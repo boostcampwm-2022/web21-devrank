@@ -1,4 +1,4 @@
-import { getTier } from '@libs/utils';
+import { getTier, tierCutOffs } from '@libs/utils';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Octokit } from '@octokit/core';
 import { AutoCompleteDto } from './dto/auto-complete.dto';
@@ -54,7 +54,7 @@ export class UserService {
     return users.map((user) => new AutoCompleteDto().of(user));
   }
 
-  async updateUser(username: string, githubToken: string): Promise<UserDto> {
+  async updateUser(username: string, githubToken: string): Promise<UserProfileDto> {
     let user = await this.getUserInfo(githubToken, username);
     user = await this.userRepository.createOrUpdate(user);
     const octokit = new Octokit({
@@ -72,7 +72,15 @@ export class UserService {
       organizations,
       pinnedRepositories,
     };
-    return this.userRepository.createOrUpdate(updatedUser);
+    user = await this.userRepository.createOrUpdate(updatedUser);
+    const { totalRank, tierRank } = await this.getUserRelativeRanking(user);
+    const userWithRank: UserProfileDto = {
+      ...user,
+      totalRank,
+      tierRank,
+      needExp: tierCutOffs[user.tier] - user.score,
+    };
+    return userWithRank;
   }
 
   async updateAllUsers(githubToken: string): Promise<UserDto[]> {
