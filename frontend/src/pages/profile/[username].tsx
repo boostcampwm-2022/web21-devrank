@@ -1,6 +1,7 @@
 import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { QueryClient, dehydrate, useMutation, useQuery } from '@tanstack/react-query';
 import { ProfileUserResponse } from '@type/response';
@@ -17,22 +18,25 @@ interface ProfileProps {
 
 function Profile({ username }: ProfileProps) {
   const MAX_COMMIT_STREAK = 368;
+  const router = useRouter();
+  const locale = router.locale as string;
   const { data, refetch } = useQuery<ProfileUserResponse>(['profile', username], () =>
     requestUserInfoByUsername({ username, method: 'GET' }),
   );
-  
+
   const { mutate, isLoading } = useMutation<ProfileUserResponse>({
     mutationFn: () => requestUserInfoByUsername({ username, method: 'PATCH' }),
     onError: () => alert('최근에 업데이트 했습니다.'),
     onSettled: () => refetch(),
   });
 
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation(['profile', 'meta']);
 
   return (
     <Container>
       {data && (
         <>
+          <HeadMeta title={`${username}${t('meta:profile-title')}`} description={getProfileDescription(locale, data)} />
           <ProfileCard
             profileData={{
               username,

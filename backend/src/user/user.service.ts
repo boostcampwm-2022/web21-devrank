@@ -6,6 +6,7 @@ import { AutoCompleteDto } from './dto/auto-complete.dto';
 import { History } from './dto/history.dto';
 import { OrganizationDto } from './dto/organization.dto';
 import { PinnedRepositoryDto } from './dto/pinned-repository.dto';
+import { Rank } from './dto/rank.dto';
 import { UserDto } from './dto/user.dto';
 import { UserProfileDto } from './dto/user.profile.dto';
 import {
@@ -49,6 +50,8 @@ export class UserService {
     user.updateDelayTime = await this.userRepository.findUpdateScoreTimeToLive(username);
     user.totalRank = totalRank;
     user.tierRank = tierRank;
+    user.startExp = tierCutOffs[user.tier];
+    user.needExp = tierCutOffs[user.tier] - user.score;
     return user;
   }
 
@@ -81,6 +84,7 @@ export class UserService {
       ...user,
       totalRank,
       tierRank,
+      startExp: tierCutOffs[user.tier],
       needExp: tierCutOffs[user.tier] - user.score,
     };
     return userWithRank;
@@ -321,16 +325,21 @@ export class UserService {
     };
   }
 
-  async getUserRelativeRanking(user: UserDto): Promise<{ totalRank: number; tierRank: number }> {
-    // if not cached
+  async getUserRelativeRanking(user: UserDto): Promise<Rank> {
+    const cachedRanks = await this.userRepository.findCachedUserRank(user.id + '&');
+    if (Object.keys(cachedRanks).length) {
+      return cachedRanks;
+    }
     const users = await this.userRepository.findAll({}, true, ['username', 'tier', 'score']);
     let tierRank = 0;
     for (let rank = 0; rank < users.length; rank++) {
       if (users[rank].username === user.username) {
-        return {
+        const rankInfo = {
           totalRank: rank + 1,
           tierRank: tierRank + 1,
         };
+        this.userRepository.setCachedUserRank(user.id + '&', rankInfo);
+        return rankInfo;
       }
       if (users[rank].tier === user.tier) {
         tierRank += 1;
