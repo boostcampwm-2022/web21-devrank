@@ -1,3 +1,5 @@
+import { useTheme } from 'styled-components';
+import { HistoryType } from '@type/common';
 import { ProfileUserResponse } from '@type/response';
 import { CUBE_RANK_RANGE, DEVICON_URL, EXCEPTIONAL_LANGUAGE } from '@utils/constants';
 
@@ -53,4 +55,41 @@ export const getProfileDescription = (data: ProfileUserResponse) => {
     `${tier} 등수: ${tierRank} / ` +
     languageStr
   );
+};
+
+export const transToPieChartData = (data: HistoryType) => {
+  const theme = useTheme();
+
+  return [
+    {
+      id: 'Commit',
+      label: 'Commit',
+      value: data.totalCommitContributions,
+      color: theme.colors.yellow2,
+    },
+    {
+      id: 'Issue',
+      label: 'Issue',
+      value: data.totalIssueContributions,
+      color: theme.colors.red2,
+    },
+    {
+      id: 'Pull Request',
+      label: 'Pull Request',
+      value: data.totalPullRequestContributions,
+      color: theme.colors.blue2,
+    },
+    {
+      id: 'Review',
+      label: 'Review',
+      value: data.totalPullRequestReviewContributions,
+      color: theme.colors.purple2,
+    },
+    {
+      id: 'Repository',
+      label: 'Repository',
+      value: data.totalRepositoryContributions,
+      color: theme.colors.green1,
+    },
+  ];
 };
