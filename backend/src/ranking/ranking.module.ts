@@ -1,4 +1,3 @@
-import { Repository, RepositoryScheme } from '@apps/user/repository.schema';
 import { UserModule } from '@apps/user/user.module';
 import { UserRepository } from '@apps/user/user.repository';
 import { Module } from '@nestjs/common';
@@ -8,13 +7,7 @@ import { RankingController } from './ranking.controller';
 import { RankingService } from './ranking.service';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([
-      { name: User.name, schema: UserScheme },
-      { name: Repository.name, schema: RepositoryScheme },
-    ]),
-    UserModule,
-  ],
+  imports: [MongooseModule.forFeature([{ name: User.name, schema: UserScheme }]), UserModule],
   controllers: [RankingController],
   providers: [RankingService, UserRepository],
   exports: [RankingService],

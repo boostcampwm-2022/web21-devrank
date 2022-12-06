@@ -1,6 +1,5 @@
 import { appWithTranslation } from 'next-i18next';
 import type { AppProps } from 'next/app';
-import Head from 'next/head';
 import { useState } from 'react';
 import { ThemeProvider } from 'styled-components';
 import { Hydrate, QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -38,24 +37,19 @@ function App({ Component, pageProps }: AppProps) {
   );
 
   return (
-    <>
-      <Head>
-        <title>Devrank</title>
-      </Head>
-      <QueryClientProvider client={queryClient}>
-        <Hydrate state={pageProps.dehydratedState}>
-          <ThemeProvider theme={theme}>
-            <GlobalStyles />
-            <div className={lineSeedKR.className}>
-              <Layout>
-                <Component {...pageProps} />
-              </Layout>
-            </div>
-          </ThemeProvider>
-          <ReactQueryDevtools initialIsOpen={false} />
-        </Hydrate>
-      </QueryClientProvider>
-    </>
+    <QueryClientProvider client={queryClient}>
+      <Hydrate state={pageProps.dehydratedState}>
+        <ThemeProvider theme={theme}>
+          <GlobalStyles />
+          <div className={lineSeedKR.className}>
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
+          </div>
+        </ThemeProvider>
+        <ReactQueryDevtools initialIsOpen={false} />
+      </Hydrate>
+    </QueryClientProvider>
   );
 }
 

@@ -69,11 +69,13 @@ export class UserController {
     if ((await this.userService.findUpdateScoreTimeToLive(username)) > 0) {
       throw new BadRequestException('user score has been updated recently.');
     }
-    await this.userService.setUpdateScoreDelayTime(username, UPDATE_DELAY_TIME);
-    return await this.userService.updateUser(
+    const user = await this.userService.updateUser(
       username,
       githubToken || this.configService.get('GITHUB_PERSONAL_ACCESS_TOKEN'),
     );
+    await this.userService.setUpdateScoreDelayTime(username, UPDATE_DELAY_TIME);
+    user.updateDelayTime = UPDATE_DELAY_TIME + 3;
+    return user;
   }
 
   @Patch('')

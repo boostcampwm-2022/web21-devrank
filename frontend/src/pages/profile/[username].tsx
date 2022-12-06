@@ -4,10 +4,12 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import styled from 'styled-components';
 import { QueryClient, dehydrate, useMutation, useQuery } from '@tanstack/react-query';
 import { ProfileUserResponse } from '@type/response';
+import HeadMeta from '@components/HeadMeta';
 import { CommitHistory, EXPbar, PinnedRepository, ProfileCard } from '@components/Profile';
 import { Paper } from '@components/common';
 import { requestTokenRefresh } from '@apis/auth';
 import { requestUserInfoByUsername } from '@apis/users';
+import { getProfileDescription } from '@utils/utils';
 
 interface ProfileProps {
   username: string;
@@ -18,7 +20,7 @@ function Profile({ username }: ProfileProps) {
   const { data, refetch } = useQuery<ProfileUserResponse>(['profile', username], () =>
     requestUserInfoByUsername({ username, method: 'get' }),
   );
-
+  
   const { mutate, isLoading } = useMutation<ProfileUserResponse>({
     mutationFn: () => requestUserInfoByUsername({ username, method: 'patch' }),
     onSuccess: () => {
@@ -101,6 +103,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           'tier',
           'ranking',
           'profile',
+          'meta',
         ])),
       },
     };

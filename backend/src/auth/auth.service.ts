@@ -5,6 +5,7 @@ import axios from 'axios';
 import { CookieOptions } from 'express';
 import { Request } from 'express';
 import * as jwt from 'jsonwebtoken';
+import * as URL from 'url';
 import { AuthRepository } from './auth.repository';
 import { GithubProfile } from './types';
 
@@ -86,10 +87,12 @@ export class AuthService {
   getCookieOption = (): CookieOptions => {
     const maxAge = EXPIRATION.REFRESH_TOKEN * 1000;
 
-    if (this.configService.get('NODE_ENV') === 'prod') {
-      return { httpOnly: true, secure: true, sameSite: 'lax', maxAge };
+    const domain = URL.parse(this.configService.get('CLIENT_URL')).host;
+
+    if (this.configService.get('NODE_ENV') === 'production') {
+      return { httpOnly: true, secure: true, sameSite: 'lax', maxAge, domain };
     } else if (this.configService.get('NODE_ENV') === 'alpha') {
-      return { httpOnly: true, secure: true, sameSite: 'none', maxAge };
+      return { httpOnly: true, secure: true, sameSite: 'none', maxAge, domain };
     }
 
     return { httpOnly: true, maxAge };
