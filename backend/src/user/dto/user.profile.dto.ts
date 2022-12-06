@@ -9,5 +9,8 @@ export class UserProfileDto extends UserDto {
   tierRank: number;
 
   @ApiProperty()
+  startExp: number;
+
+  @ApiProperty()
   needExp: number;
 }
