@@ -72,4 +72,7 @@ export class UserDto {
 
   @ApiProperty({ isArray: true, type: OrganizationDto })
   organizations?: OrganizationDto[];
+
+  @ApiProperty()
+  scoreHistory?: { date: Date; score: number }[];
 }
