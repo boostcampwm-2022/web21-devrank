@@ -21,13 +21,8 @@ function Profile({ username }: ProfileProps) {
 
   const { mutate, isLoading } = useMutation<ProfileUserResponse>({
     mutationFn: () => requestUserInfoByUsername({ username, method: 'patch' }),
-    onSuccess: () => {
-      refetch();
-    },
-    onError: () => {
-      alert('최근에 업데이트 했습니다.');
-      refetch();
-    },
+    onError: () => alert('최근에 업데이트 했습니다.'),
+    onSettled: () => refetch(),
   });
 
   const { t } = useTranslation('profile');
