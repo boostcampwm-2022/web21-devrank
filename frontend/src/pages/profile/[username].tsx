@@ -1,15 +1,19 @@
 import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import dynamic from 'next/dynamic';
 import styled from 'styled-components';
 import { QueryClient, dehydrate, useMutation, useQuery } from '@tanstack/react-query';
 import { ProfileUserResponse } from '@type/response';
+// import PieChart from '@components/Chart/PieChart';
 import HeadMeta from '@components/HeadMeta';
 import { CommitHistory, EXPbar, PinnedRepository, ProfileCard } from '@components/Profile';
 import { Paper } from '@components/common';
 import { requestTokenRefresh } from '@apis/auth';
 import { requestUserInfoByUsername } from '@apis/users';
-import { getProfileDescription } from '@utils/utils';
+import { getProfileDescription, transToPieChartData } from '@utils/utils';
+
+const PieChart = dynamic(() => import('@components/Chart/PieChart'), { ssr: false });
 
 interface ProfileProps {
   username: string;
@@ -20,7 +24,7 @@ function Profile({ username }: ProfileProps) {
   const { data, refetch } = useQuery<ProfileUserResponse>(['profile', username], () =>
     requestUserInfoByUsername({ username, method: 'GET' }),
   );
-  
+
   const { mutate, isLoading } = useMutation<ProfileUserResponse>({
     mutationFn: () => requestUserInfoByUsername({ username, method: 'PATCH' }),
     onError: () => alert('최근에 업데이트 했습니다.'),
@@ -64,7 +68,11 @@ function Profile({ username }: ProfileProps) {
             <CommitHistory history={data.history} tier={data.tier} />
           </Paper>
           <Title>Github stats</Title>
-          <Paper></Paper>
+          <Paper>
+            <PieChartContainer>
+              <PieChart data={transToPieChartData(data.history)} />
+            </PieChartContainer>
+          </Paper>
           <Title>Pinned Repositories</Title>
           <Paper>
             <PinnedRepository repositories={data.pinnedRepositories} />
@@ -134,4 +142,9 @@ const ContributionHeader = styled.div`
     font-weight: ${({ theme }) => theme.fontWeight.bold};
     margin: 80px 20px 10px;
   }
+`;
+
+const PieChartContainer = styled.div`
+  width: 100%;
+  height: 400px;
 `;
