@@ -1,3 +1,4 @@
+import { useTranslation } from 'next-i18next';
 import { ProfileUserResponse } from '@type/response';
 import { CUBE_RANK_RANGE, DEVICON_URL, EXCEPTIONAL_LANGUAGE } from '@utils/constants';
 
@@ -41,16 +42,41 @@ export const getDate = (dateString: string) => {
   return { year, month, date, day };
 };
 
-export const getProfileDescription = (data: ProfileUserResponse) => {
+export const getProfileDescription = (locale: string, data: ProfileUserResponse) => {
+  const { t } = useTranslation();
   const { username, tier, score, totalRank, tierRank, primaryLanguages } = data;
   const languageStr = primaryLanguages.join(', ');
 
   return (
     `${username} / ` +
-    `등급: ${tier} / ` +
-    `점수: ${score} / ` +
-    `전체 등수: ${totalRank} / ` +
-    `${tier} 등수: ${tierRank} / ` +
+    `${t('profile:rank')}: ${tier} / ` +
+    `${t('profile:current-score')}: ${score} / ` +
+    `${t('profile:total')}: ${totalRank}${getRankingUnit(locale, totalRank)} / ` +
+    `${t(`tier:${tier}`)}: ${tierRank}${getRankingUnit(locale, tierRank)} / ` +
     languageStr
   );
+};
+
+export const getRankingUnit = (locale: string, rank: number) => {
+  if (locale === 'ko') return '등';
+
+  const rankFirstUint = rank % 10;
+  const rankSecondUint = rank % 100;
+  switch (rankSecondUint) {
+    case 11:
+    case 12:
+    case 13:
+      return 'th';
+    default:
+      switch (rankFirstUint) {
+        case 1:
+          return 'st';
+        case 2:
+          return 'nd';
+        case 3:
+          return 'rd';
+        default:
+          return 'th';
+      }
+  }
 };
