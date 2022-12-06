@@ -1,6 +1,6 @@
 import { GITHUB_API_DELAY } from '@libs/consts';
-import { getTier, tierCutOffs } from '@libs/utils';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { getTier, logger, tierCutOffs } from '@libs/utils';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { Octokit } from '@octokit/core';
 import { AutoCompleteDto } from './dto/auto-complete.dto';
 import { History } from './dto/history.dto';
@@ -31,7 +31,6 @@ export class UserService {
   }
 
   async findOneByUsername(githubToken: string, ip: string, username: string): Promise<UserProfileDto> {
-    const updateDelayTime = await this.userRepository.findUpdateScoreTimeToLive(username);
     let user = null;
     if (await this.userRepository.isDuplicatedRequestIp(ip, username)) {
       user = await this.userRepository.findOneByUsername(username);
@@ -47,7 +46,7 @@ export class UserService {
     await this.userRepository.createOrUpdate(user);
     const { totalRank, tierRank } = await this.getUserRelativeRanking(user);
     this.userRepository.setDuplicatedRequestIp(ip, username);
-    user.updateDelayTime = updateDelayTime;
+    user.updateDelayTime = await this.userRepository.findUpdateScoreTimeToLive(username);
     user.totalRank = totalRank;
     user.tierRank = tierRank;
     return user;
@@ -92,7 +91,11 @@ export class UserService {
     const users = await this.userRepository.findAll({}, false, ['username']);
     for (const user of users) {
       await sleep(GITHUB_API_DELAY);
-      await this.updateUser(user.username, githubToken);
+      try {
+        await this.updateUser(user.username, githubToken);
+      } catch {
+        logger.error(`can't update user ${user.username}`);
+      }
     }
   }
 
@@ -101,16 +104,21 @@ export class UserService {
     const users = await this.userRepository.findAll({}, false, ['username']);
     for (const user of users) {
       await sleep(GITHUB_API_DELAY);
-      const updatedUser = await this.updateUser(user.username, githubToken);
-      if (!updatedUser.scoreHistory) updatedUser.scoreHistory = [];
-      updatedUser.scoreHistory.push({
-        date: new Date(),
-        score: user.score,
-      });
-      updatedUser.scoreDifference =
-        updatedUser.score - updatedUser.scoreHistory[updatedUser.scoreHistory.length - 2].score;
-      updatedUser.dailyViews = 0;
-      this.userRepository.createOrUpdate(updatedUser);
+      try {
+        await this.updateUser(user.username, githubToken);
+        const updatedUser = await this.updateUser(user.username, githubToken);
+        if (!updatedUser.scoreHistory) updatedUser.scoreHistory = [];
+        updatedUser.scoreHistory.push({
+          date: new Date(),
+          score: user.score,
+        });
+        updatedUser.scoreDifference =
+          updatedUser.score - updatedUser.scoreHistory[updatedUser.scoreHistory.length - 2].score;
+        updatedUser.dailyViews = 0;
+        this.userRepository.createOrUpdate(updatedUser);
+      } catch {
+        logger.error(`can't update user ${user.username}`);
+      }
     }
   }
 
@@ -164,86 +172,90 @@ export class UserService {
       username,
     });
     const id = res.data.node_id;
-    //TODO: parent orderBy 적용되어야함
-    const forkResponse: any = await octokit.graphql(forkRepositoryQuery, {
-      username,
-      id,
-    });
 
-    const personalResponse: any = await octokit.graphql(nonForkRepositoryQuery, {
-      username,
-      id,
-    });
-
-    const followersResponse: any = await octokit.graphql(followersQuery, {
-      username,
-    });
-
-    const issuesResponse: any = await octokit.graphql(issueQuery, {
-      username,
-    });
-
-    let languagesScore = new Map();
-    function getCommitScore(acc: number, repository) {
-      if (!repository.defaultBranchRef) {
-        return acc + 0;
-      }
-      if (repository.diskUsage > repository.languages.totalSize) {
-        return acc + 0;
-      }
-      let repositoryScore = 0;
-      const repositoryWeight = repository.stargazerCount;
-      repository.defaultBranchRef.target.history.nodes.forEach((commit) => {
-        const time = +new Date() - +new Date(commit.committedDate);
-        //TODO: 매직넘버 제거
-        const timeWeight = (1 / 1.0019) ** (time / 1000 / 60 / 60 / 24);
-        repositoryScore += repositoryWeight * timeWeight;
+    try {
+      const forkResponse: any = await octokit.graphql(forkRepositoryQuery, {
+        username,
+        id,
       });
-      repositoryScore /= 100;
-      if (repositoryScore == 0) {
-        return acc + 0;
-      }
-      console.log(repository.name, repositoryScore);
-      if (repository.primaryLanguage) {
-        if (languagesScore.has(repository.primaryLanguage.name)) {
-          languagesScore.set(
-            repository.primaryLanguage.name,
-            languagesScore.get(repository.primaryLanguage.name) + repositoryScore,
-          );
-        } else {
-          languagesScore.set(repository.primaryLanguage.name, repositoryScore);
-        }
-      }
-      return acc + repositoryScore;
-    }
-    const forkRepositories = forkResponse.user.repositories.nodes.map((repository) => {
-      return repository.parent;
-    });
 
-    const forkScore = forkRepositories.reduce(getCommitScore, 0);
-    const followersScore = Math.floor(followersResponse.user.followers.totalCount / 10);
-    const personalRepositories = personalResponse.user.repositories.nodes;
-    const personalScore = personalRepositories.reduce(getCommitScore, 0);
-    const commitsScore = parseInt(forkScore + personalScore);
-    const issuesScore = Math.floor(
-      issuesResponse.user.issues.edges.reduce((acc, issue) => {
-        const time = +new Date() - +new Date(issue.node.createdAt);
-        const timeWeight = (1 / 1.0019) ** (time / 1000 / 60 / 60 / 24);
-        const repositoryWeight = issue.node.repository.stargazerCount;
-        const issueScore = repositoryWeight * timeWeight;
-        return acc + issueScore;
-      }, 0) / 1000,
-    );
-    const score = commitsScore + followersScore + issuesScore;
-    languagesScore = new Map([...languagesScore].sort((a, b) => b[1] - a[1]));
-    return {
-      commitsScore,
-      issuesScore,
-      followersScore,
-      score,
-      tier: getTier(score),
-      primaryLanguages: Array.from(languagesScore.keys()).slice(0, 3),
-    };
+      const personalResponse: any = await octokit.graphql(nonForkRepositoryQuery, {
+        username,
+        id,
+      });
+
+      const followersResponse: any = await octokit.graphql(followersQuery, {
+        username,
+      });
+
+      const issuesResponse: any = await octokit.graphql(issueQuery, {
+        username,
+      });
+
+      let languagesScore = new Map();
+      function getCommitScore(acc: number, repository) {
+        if (!repository.defaultBranchRef) {
+          return acc + 0;
+        }
+        if (repository.diskUsage > repository.languages.totalSize) {
+          return acc + 0;
+        }
+        let repositoryScore = 0;
+        const repositoryWeight = repository.stargazerCount;
+        repository.defaultBranchRef.target.history.nodes.forEach((commit) => {
+          const time = +new Date() - +new Date(commit.committedDate);
+          //TODO: 매직넘버 제거
+          const timeWeight = (1 / 1.0019) ** (time / 1000 / 60 / 60 / 24);
+          repositoryScore += repositoryWeight * timeWeight;
+        });
+        repositoryScore /= 100;
+        if (repositoryScore == 0) {
+          return acc + 0;
+        }
+        console.log(repository.name, repositoryScore);
+        if (repository.primaryLanguage) {
+          if (languagesScore.has(repository.primaryLanguage.name)) {
+            languagesScore.set(
+              repository.primaryLanguage.name,
+              languagesScore.get(repository.primaryLanguage.name) + repositoryScore,
+            );
+          } else {
+            languagesScore.set(repository.primaryLanguage.name, repositoryScore);
+          }
+        }
+        return acc + repositoryScore;
+      }
+      const forkRepositories = forkResponse.user.repositories.nodes.map((repository) => {
+        return repository.parent;
+      });
+
+      const forkScore = forkRepositories.reduce(getCommitScore, 0);
+      const followersScore = Math.floor(followersResponse.user.followers.totalCount / 10);
+      const personalRepositories = personalResponse.user.repositories.nodes;
+      const personalScore = personalRepositories.reduce(getCommitScore, 0);
+      const commitsScore = parseInt(forkScore + personalScore);
+      const issuesScore = Math.floor(
+        issuesResponse.user.issues.edges.reduce((acc, issue) => {
+          const time = +new Date() - +new Date(issue.node.createdAt);
+          const timeWeight = (1 / 1.0019) ** (time / 1000 / 60 / 60 / 24);
+          const repositoryWeight = issue.node.repository.stargazerCount;
+          const issueScore = repositoryWeight * timeWeight;
+          return acc + issueScore;
+        }, 0) / 1000,
+      );
+      const score = commitsScore + followersScore + issuesScore;
+      languagesScore = new Map([...languagesScore].sort((a, b) => b[1] - a[1]));
+      return {
+        commitsScore,
+        issuesScore,
+        followersScore,
+        score,
+        tier: getTier(score),
+        primaryLanguages: Array.from(languagesScore.keys()).slice(0, 3),
+      };
+    } catch {
+      throw new HttpException(`can't update this user.`, HttpStatus.NO_CONTENT);
+    }
   }
 
   async getUserHistory(username: string, octokit: Octokit): Promise<History> {
