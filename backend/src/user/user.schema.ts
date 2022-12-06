@@ -75,7 +75,7 @@ export class User extends Document {
   @Prop()
   primaryLanguages: string[];
 
-  @Prop()
+  @Prop({ default: [] })
   scoreHistory: { date: Date; score: number }[];
 }
 

@@ -53,7 +53,7 @@ export class AuthController {
     }
     const githubToken = await this.authService.getGithubToken(code);
     const userInfo: GithubProfile = await this.authService.getGithubProfile(githubToken);
-    const user: UserDto = {
+    let user: UserDto = {
       id: userInfo.node_id,
       username: userInfo.login,
       following: userInfo.following,
@@ -71,7 +71,9 @@ export class AuthController {
       await this.userService.findOneByFilter({ username: user.username });
     } catch {
       await this.userService.createOrUpdate(user);
-      await this.userService.updateUser(user.username, githubToken);
+      user = await this.userService.updateUser(user.username, githubToken);
+      user.scoreHistory.push({ score: user.score, date: new Date() });
+      await this.userService.createOrUpdate(user);
     }
 
     const accessToken = this.authService.issueAccessToken(user.id, githubToken);
