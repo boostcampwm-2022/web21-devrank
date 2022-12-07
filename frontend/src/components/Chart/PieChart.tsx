@@ -22,8 +22,7 @@ function PieChart({ data }: PieChartProps) {
       }}
       theme={theme}
       enableArcLabels={false}
-      arcLinkLabelsThickness={2}
-      arcLinkLabelsColor={{ from: 'color' }}
+      enableArcLinkLabels={false}
       legends={[
         {
           anchor: 'bottom',
