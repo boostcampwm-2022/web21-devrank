@@ -1,0 +1,52 @@
+{
+  "color": "#FBFBFB",
+  "fontSize": 14,
+  "fontFamily": "Noto Sans KR, sans-serif",
+  "labels": {
+    "text": {
+      "fill": "#FBFBFB"
+    }
+  },
+  "legends": {
+    "text": {
+      "fill": "#FBFBFB"
+    }
+  },
+  "tooltip": {
+    "container": {
+      "background": "#5d5f65",
+      "color": "#FBFBFB",
+      "fontSize": 12
+    }
+  },
+  "axis": {
+    "domain": {
+      "line": {
+        "stroke": "#FBFBFB",
+        "strokeWidth": 1
+      }
+    },
+    "legend": {
+      "text": {
+        "fontSize": 14,
+        "fontWeight": 700,
+        "fill": "#FBFBFB"
+      }
+    },
+    "ticks": {
+      "line": {
+        "stroke": "#FBFBFB",
+        "strokeWidth": 1
+      },
+      "text": {
+        "fontSize": 14,
+        "fill": "#FBFBFB"
+      }
+    }
+  },
+  "grid": {
+    "line": {
+      "stroke": "#5d5f65"
+    }
+  }
+}

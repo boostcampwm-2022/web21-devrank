@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { QueryClient, dehydrate, useMutation, useQuery } from '@tanstack/react-query';
 import { ProfileUserResponse } from '@type/response';
 import HeadMeta from '@components/HeadMeta';
-import { CommitHistory, EXPbar, PinnedRepository, ProfileCard } from '@components/Profile';
+import { CommitHistory, ContributionStatistic, EXPbar, PinnedRepository, ProfileCard } from '@components/Profile';
 import { Paper } from '@components/common';
 import { requestTokenRefresh } from '@apis/auth';
 import { requestUserInfoByUsername } from '@apis/users';
@@ -67,8 +67,10 @@ function Profile({ username }: ProfileProps) {
           <Paper>
             <CommitHistory history={data.history} tier={data.tier} />
           </Paper>
-          <Title>Github stats</Title>
-          <Paper></Paper>
+          <Title>Stats</Title>
+          <Paper>
+            <ContributionStatistic data={data} />
+          </Paper>
           <Title>Pinned Repositories</Title>
           <Paper>
             <PinnedRepository repositories={data.pinnedRepositories} />
