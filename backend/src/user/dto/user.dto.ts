@@ -3,6 +3,14 @@ import { History } from './history.dto';
 import { OrganizationDto } from './organization.dto';
 import { PinnedRepositoryDto } from './pinned-repository.dto';
 
+class ScoreHistory {
+  @ApiProperty()
+  date: Date;
+
+  @ApiProperty()
+  score: number;
+}
+
 export class UserDto {
   @ApiProperty()
   id: string;
@@ -73,6 +81,6 @@ export class UserDto {
   @ApiProperty({ isArray: true, type: OrganizationDto })
   organizations?: OrganizationDto[];
 
-  @ApiProperty()
-  scoreHistory?: { date: Date; score: number }[];
+  @ApiProperty({ isArray: true, type: ScoreHistory })
+  scoreHistory?: ScoreHistory[];
 }

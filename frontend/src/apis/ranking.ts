@@ -1,4 +1,3 @@
-import { CubeRankType } from '@type/common';
 import { ProgrammingLanguageRankingResponse, RankingPaiginationResponse, RankingResponse } from '@type/response';
 import axiosInstance from '@utils/axiosInstance';
 import { CUBE_RANK } from '@utils/constants';
@@ -6,7 +5,7 @@ import { CUBE_RANK } from '@utils/constants';
 interface RequestTopRankingByScoreParams {
   page?: number;
   limit?: number;
-  tier?: CubeRankType;
+  tier?: string;
   username?: string;
 }
 

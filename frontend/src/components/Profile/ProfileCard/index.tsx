@@ -1,10 +1,12 @@
 import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
+import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import ProfileRefreshButton from '../ProfileRefreshButton';
 import { CubeRankType, OrganizationType } from '@type/common';
 import { ProfileLabel } from '@components/Profile';
 import { Avatar, CubeIcon, Paper } from '@components/common';
+import { getRankingUnit } from '@utils/utils';
 
 interface ProfileCardProps {
   profileData: {
@@ -45,7 +47,9 @@ function ProfileCard({ profileData }: ProfileCardProps) {
     isLoading,
   } = profileData;
 
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation(['profile', 'tier']);
+  const router = useRouter();
+  const locale = router.locale as string;
 
   const gotoGithub = (username: string) => {
     window.location.href = `https://github.com/${username}`;
@@ -104,10 +108,12 @@ function ProfileCard({ profileData }: ProfileCardProps) {
       <ProfileRank>
         <CubeIcon tier={tier} size={160} />
         <p>
-          {t('total')}: {totalRank}등
+          {t('profile:total')}: {totalRank}
+          {getRankingUnit(locale, totalRank)}
         </p>
         <p>
-          {tier}: {tierRank}등
+          {t(`tier:${tier}`)}: {tierRank}
+          {getRankingUnit(locale, tierRank)}
         </p>
       </ProfileRank>
     </Paper>

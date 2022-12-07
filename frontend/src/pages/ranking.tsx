@@ -2,7 +2,6 @@ import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
 import styled from 'styled-components';
 import { QueryClient, dehydrate, useQuery } from '@tanstack/react-query';
 import { CubeRankType } from '@type/common';
@@ -17,41 +16,50 @@ import { Avatar, CubeIcon, LanguageIcon, RankingSkeleton } from '@components/com
 import { requestTokenRefresh } from '@apis/auth';
 import { requestTopRankingByScore } from '@apis/ranking';
 import { COUNT_PER_PAGE, CUBE_RANK } from '@utils/constants';
+import { queryValidator } from '@utils/utils';
 
-function Ranking() {
+interface RankingProps {
+  tier: string;
+  username: string;
+  page: number;
+}
+
+function Ranking({ tier, username, page }: RankingProps) {
   const router = useRouter();
   const { t } = useTranslation(['ranking', 'common', 'meta']);
-  const [tier, setTier] = useState<CubeRankType>(CUBE_RANK.ALL);
-  const [username, setUsername] = useState('');
-  const [page, setPage] = useState(1);
 
   const { isLoading, isError, data } = useQuery<RankingPaiginationResponse>(['ranking', tier, username, page], () =>
     requestTopRankingByScore({ limit: COUNT_PER_PAGE, tier, username, page }),
   );
 
-  const setFilter = (tier: CubeRankType) => {
-    setTier(tier);
-    setPage(1);
-    setUsername('');
-  };
-
-  const onSearch = (input: string) => {
-    setPage(1);
-    setUsername(input);
-  };
-
   const searchUser = (username: string) => {
     router.push(`/profile/${username}`);
+  };
+
+  const setFiltering = (tier?: string, page?: number, username?: string) => {
+    router.push(`/ranking?tier=${tier}&page=${page}${username ? `&username=${username}` : ''}`);
+  };
+
+  const setUsername = (username: string) => {
+    setFiltering(tier, 1, username);
+  };
+
+  const setTier = (tier: CubeRankType) => {
+    setFiltering(tier, 1);
+  };
+
+  const setPage = (page: number) => {
+    setFiltering(tier, page, username);
   };
 
   return (
     <>
       <HeadMeta title={t('meta:ranking-title')} description={t('meta:ranking-description')} />
       <Container>
-        <Filterbar active={tier} setActive={setFilter} />
+        <Filterbar active={tier} setActive={setTier} />
         <SearchbarContainer>
           {username !== '' && <SearchInfo>&apos;{username}&apos;에 대한 검색 결과 입니다.</SearchInfo>}
-          <RankingSearchbar placeholder={t('ranking:search-placeholder')} width={200} onSearch={onSearch} />
+          <RankingSearchbar placeholder={t('ranking:search-placeholder')} width={200} onSearch={setUsername} />
         </SearchbarContainer>
         <RankingTable
           width={'100%'}
@@ -120,19 +128,32 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     requestTopRankingByScore({ limit: COUNT_PER_PAGE }),
   );
 
-  return {
-    props: {
-      dehydratedState: dehydrate(queryClient),
-      ...(await serverSideTranslations(context.locale as string, [
-        'common',
-        'header',
-        'footer',
-        'tier',
-        'ranking',
-        'meta',
-      ])),
-    },
-  };
+  const { tier, username, page } = context.query;
+  const query = queryValidator({ tier, username, page });
+
+  if (!query) {
+    return {
+      redirect: {
+        destination: '/profile/404',
+        permanent: false,
+      },
+    };
+  } else {
+    return {
+      props: {
+        ...query,
+        dehydratedState: dehydrate(queryClient),
+        ...(await serverSideTranslations(context.locale as string, [
+          'common',
+          'header',
+          'footer',
+          'tier',
+          'ranking',
+          'meta',
+        ])),
+      },
+    };
+  }
 };
 
 const Container = styled.div`

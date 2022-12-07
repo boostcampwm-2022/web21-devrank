@@ -7,4 +7,10 @@ export class UserProfileDto extends UserDto {
 
   @ApiProperty()
   tierRank: number;
+
+  @ApiProperty()
+  startExp: number;
+
+  @ApiProperty()
+  needExp: number;
 }

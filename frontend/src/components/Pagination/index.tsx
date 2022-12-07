@@ -1,4 +1,3 @@
-import { Dispatch, SetStateAction } from 'react';
 import styled, { css } from 'styled-components';
 import Arrow from './Arrow';
 
@@ -14,7 +13,7 @@ interface PaginationProps {
   lastPage: number;
   canMoveLeft: boolean;
   canMoveRight: boolean;
-  setCurrentPage: Dispatch<SetStateAction<number>>;
+  setCurrentPage: (page: number) => void;
 }
 
 interface StyledPaginationItemProps {
