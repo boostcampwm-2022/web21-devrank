@@ -1,5 +1,6 @@
 import { useTheme } from 'styled-components';
-import { HistoryType } from '@type/common';
+import { Serie } from '@nivo/line';
+import { DailyInfo, HistoryType } from '@type/common';
 import { ProfileUserResponse } from '@type/response';
 import { CUBE_RANK_RANGE, DEVICON_URL, EXCEPTIONAL_LANGUAGE } from '@utils/constants';
 
@@ -92,4 +93,17 @@ export const transToPieChartData = (data: HistoryType) => {
       color: theme.colors.green1,
     },
   ];
+};
+
+export const transToLineChartData = (data: { [key: string]: DailyInfo }): Serie[] => {
+  const theme = useTheme();
+  const ret = [
+    {
+      id: 'contribution',
+      color: '#558EF8',
+      data: Object.entries(data).map(([key, value]) => ({ x: key, y: value.count })),
+    },
+  ];
+
+  return ret;
 };
