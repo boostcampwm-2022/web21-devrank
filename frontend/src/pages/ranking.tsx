@@ -123,13 +123,15 @@ export default Ranking;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const queryClient = new QueryClient();
-  await queryClient.prefetchQuery(['user'], () => requestTokenRefresh(context));
-  await queryClient.prefetchQuery(['ranking', CUBE_RANK.ALL, ''], () =>
-    requestTopRankingByScore({ limit: COUNT_PER_PAGE }),
-  );
-
   const { tier, username, page } = context.query;
   const query = queryValidator({ tier, username, page });
+
+  await Promise.allSettled([
+    queryClient.prefetchQuery(['user'], () => requestTokenRefresh(context)),
+    queryClient.prefetchQuery(['ranking', CUBE_RANK.ALL, ''], () =>
+      requestTopRankingByScore({ limit: COUNT_PER_PAGE }),
+    ),
+  ]);
 
   if (!query) {
     return {

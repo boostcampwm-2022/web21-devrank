@@ -87,7 +87,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const username = context.query.username as string;
 
   const queryClient = new QueryClient();
-  await Promise.all([
+  await Promise.allSettled([
     queryClient.prefetchQuery(['user'], () => requestTokenRefresh(context)),
     queryClient.prefetchQuery(['profile', username], () => requestUserInfoByUsername({ username, method: 'GET' })),
   ]);

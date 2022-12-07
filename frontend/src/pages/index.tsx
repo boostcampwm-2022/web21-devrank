@@ -185,25 +185,19 @@ function Home() {
 export default Home;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        refetchOnWindowFocus: false,
-        refetchOnReconnect: false,
-        refetchOnMount: false,
-      },
-    },
-  });
+  const queryClient = new QueryClient();
 
-  await queryClient.prefetchQuery(['top-ranking-by-score'], () =>
-    requestTopRankingByScore({
-      limit: 12,
-    }),
-  );
-  await queryClient.prefetchQuery(['top-ranking-by-rising'], () => requestTopRankingByRising());
-  await queryClient.prefetchQuery(['top-ranking-by-views'], () => requestTopRankingByViews());
-  await queryClient.prefetchQuery(['top-ranking-by-programming-lang'], () => requestProgrammingLanguageRanking());
-  await queryClient.prefetchQuery(['user'], () => requestTokenRefresh(context));
+  await Promise.allSettled([
+    queryClient.prefetchQuery(['top-ranking-by-score'], () =>
+      requestTopRankingByScore({
+        limit: 12,
+      }),
+    ),
+    queryClient.prefetchQuery(['top-ranking-by-rising'], () => requestTopRankingByRising()),
+    queryClient.prefetchQuery(['top-ranking-by-views'], () => requestTopRankingByViews()),
+    queryClient.prefetchQuery(['top-ranking-by-programming-lang'], () => requestProgrammingLanguageRanking()),
+    queryClient.prefetchQuery(['user'], () => requestTokenRefresh(context)),
+  ]);
 
   return {
     props: {
