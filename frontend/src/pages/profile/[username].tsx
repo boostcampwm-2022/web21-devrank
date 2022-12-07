@@ -11,9 +11,10 @@ import { CommitHistory, EXPbar, PinnedRepository, ProfileCard } from '@component
 import { Paper } from '@components/common';
 import { requestTokenRefresh } from '@apis/auth';
 import { requestUserInfoByUsername } from '@apis/users';
-import { getProfileDescription, transToPieChartData } from '@utils/utils';
+import { getProfileDescription, transToLineChartData, transToPieChartData } from '@utils/utils';
 
 const PieChart = dynamic(() => import('@components/Chart/PieChart'), { ssr: false });
+const LineChart = dynamic(() => import('@components/Chart/LineChart'), { ssr: false });
 
 interface ProfileProps {
   username: string;
@@ -69,9 +70,14 @@ function Profile({ username }: ProfileProps) {
           </Paper>
           <Title>Github stats</Title>
           <Paper>
-            <PieChartContainer>
-              <PieChart data={transToPieChartData(data.history)} />
-            </PieChartContainer>
+            <ChartContainer>
+              <PieChartContainer>
+                <PieChart data={transToPieChartData(data.history)} />
+              </PieChartContainer>
+              <PieChartContainer>
+                <LineChart data={transToLineChartData(data.history.contributionHistory)} />
+              </PieChartContainer>
+            </ChartContainer>
           </Paper>
           <Title>Pinned Repositories</Title>
           <Paper>
@@ -142,6 +148,11 @@ const ContributionHeader = styled.div`
     font-weight: ${({ theme }) => theme.fontWeight.bold};
     margin: 80px 20px 10px;
   }
+`;
+
+const ChartContainer = styled.div`
+  ${({ theme }) => theme.common.flexCenterColumn};
+  width: 100%;
 `;
 
 const PieChartContainer = styled.div`
