@@ -43,12 +43,10 @@ function RisingRanking({ searchUser }: RisingRankingProps) {
             </RankingTable.Element>
             <RankingTable.Element>
               {scoreDifference > 0 ? (
-                <>
-                  <Change>
-                    <Image src='/icons/arrow-up.svg' width={16} height={16} alt='down' />
-                    <span>{numberCompactFormatter(scoreDifference)}</span>
-                  </Change>
-                </>
+                <Change>
+                  <Image src='/icons/arrow-up.svg' width={16} height={16} alt='down' />
+                  <span>{numberCompactFormatter(scoreDifference)}</span>
+                </Change>
               ) : (
                 <NotChange src='/icons/arrow-bar.svg' width={10} height={10} alt='not change' />
               )}
