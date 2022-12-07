@@ -1,5 +1,5 @@
 import { GITHUB_API_DELAY } from '@libs/consts';
-import { getTier, logger, tierCutOffs } from '@libs/utils';
+import { getNeedExp, getStartExp, getTier, logger } from '@libs/utils';
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { Octokit } from '@octokit/core';
 import { AutoCompleteDto } from './dto/auto-complete.dto';
@@ -38,10 +38,8 @@ export class UserService {
     } else {
       user = await this.userRepository.findOneByUsernameAndUpdateViews(username);
     }
-    if (user) {
-      return user;
-    }
-    user = await this.updateUser(username, githubToken);
+
+    if (!user) user = await this.updateUser(username, githubToken);
     if (!user.scoreHistory) user.scoreHistory = [];
     user.scoreHistory.push({ date: new Date(), score: user.score });
     await this.userRepository.createOrUpdate(user);
@@ -50,8 +48,8 @@ export class UserService {
     user.updateDelayTime = await this.userRepository.findUpdateScoreTimeToLive(username);
     user.totalRank = totalRank;
     user.tierRank = tierRank;
-    user.startExp = tierCutOffs[user.tier];
-    user.needExp = tierCutOffs[user.tier] - user.score;
+    user.startExp = getStartExp(user.score);
+    user.needExp = getNeedExp(user.score);
     return user;
   }
 
@@ -84,8 +82,8 @@ export class UserService {
       ...user,
       totalRank,
       tierRank,
-      startExp: tierCutOffs[user.tier],
-      needExp: tierCutOffs[user.tier] - user.score,
+      startExp: getStartExp(user.score),
+      needExp: getNeedExp(user.score),
     };
     return userWithRank;
   }
