@@ -42,7 +42,7 @@ function Header() {
             <Link href='/about'>{t('header:navigate-about')}</Link>
           </li>
           <li>
-            <Link href='/ranking'>{t('header:navigate-ranking')}</Link>
+            <Link href='/ranking?tier=all&page=1'>{t('header:navigate-ranking')}</Link>
           </li>
         </NavMenu>
         <ButtonGroup>
