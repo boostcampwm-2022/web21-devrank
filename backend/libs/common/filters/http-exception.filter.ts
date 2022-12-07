@@ -7,14 +7,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
   public catch(exception: Error, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest<Request>();
     if (!(exception instanceof HttpException)) {
-      logger.error(`${request.url} ${exception.name} ${exception.message}`);
-      // TODO: slack에 에러 로그 전달
-      // errorHook(exception.name, exception.message);
       exception = new InternalServerErrorException('Unknown Error');
+      logger.error(`${exception.stack}`);
     }
-
     return response.status((exception as HttpException).getStatus()).json((exception as HttpException).getResponse());
   }
 }
