@@ -3,19 +3,18 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
-import { useQueryData } from '@hooks';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { Avatar, Button } from '@components/common';
 import Dropdown from '@components/common/Dropdown';
-import { requestUserLogout } from '@apis/auth';
+import { requestTokenRefresh, requestUserLogout } from '@apis/auth';
 import { GITHUB_AUTH_REQUEST_URL } from '@utils/constants';
 
 function Header() {
   const { mutate: logout } = useMutation({
     mutationFn: requestUserLogout,
   });
-  const { removeQueryData: removeUser, queryData: userData } = useQueryData(['user']);
 
+  const { isLoading, data: userData, remove: removeUser } = useQuery(['user'], () => requestTokenRefresh());
   const { t } = useTranslation(['header', 'common']);
   const router = useRouter();
 
@@ -63,7 +62,9 @@ function Header() {
             </Dropdown.ItemList>
           </Dropdown>
           <div className='button-right'>
-            {userData ? (
+            {isLoading ? (
+              <div></div>
+            ) : userData ? (
               <Dropdown>
                 <Dropdown.Trigger>
                   <Avatar src={userData.avatarUrl} />
