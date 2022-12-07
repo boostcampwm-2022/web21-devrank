@@ -75,4 +75,6 @@ export interface ProfileUserResponse {
   organizations: OrganizationType[];
   totalRank: number;
   tierRank: number;
+  startExp: number;
+  needExp: number;
 }
