@@ -15,6 +15,12 @@ const dailyOptions = (level: string) => {
     filename: `%DATE%.${level}.log`,
     maxFiles: 30,
     zippedArchive: true,
+    format: winston.format.combine(
+      winston.format.timestamp(),
+      utilities.format.nestLike('devrank', {
+        prettyPrint: true,
+      }),
+    ),
   };
 };
 

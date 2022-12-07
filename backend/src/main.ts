@@ -3,7 +3,6 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as Sentry from '@sentry/node';
-import * as Tracing from '@sentry/tracing';
 import * as cookieParser from 'cookie-parser';
 import { HttpExceptionFilter } from 'libs/common/filters/http-exception.filter';
 import { AppModule } from './app.module';
