@@ -1,6 +1,6 @@
 import { useTheme } from 'styled-components';
 import { Serie } from '@nivo/line';
-import { CubeRankType, DailyInfo, HistoryType, RANK } from '@type/common';
+import { DailyInfo, HistoryType, RANK } from '@type/common';
 import { ProfileUserResponse } from '@type/response';
 import { CUBE_RANK_RANGE, DEVICON_URL, EXCEPTIONAL_LANGUAGE } from '@utils/constants';
 

@@ -67,15 +67,17 @@ function Profile({ username }: ProfileProps) {
           <Paper>
             <CommitHistory history={data.history} tier={data.tier} />
           </Paper>
-          <Title>Github stats</Title>
+          <Title>Stats</Title>
           <Paper>
             <ChartContainer>
-              <PieChartContainer>
+              <Chart>
+                <ChartTitle>Contribution Statistics</ChartTitle>
                 <PieChart data={transToPieChartData(data.history)} />
-              </PieChartContainer>
-              <PieChartContainer>
+              </Chart>
+              <Chart>
+                <ChartTitle>Contribution History</ChartTitle>
                 <LineChart data={transToLineChartData(data.history.contributionHistory, data.tier)} />
-              </PieChartContainer>
+              </Chart>
             </ChartContainer>
           </Paper>
           <Title>Pinned Repositories</Title>
@@ -152,9 +154,18 @@ const ContributionHeader = styled.div`
 const ChartContainer = styled.ul`
   ${({ theme }) => theme.common.flexCenterColumn};
   width: 100%;
+
+  li + li {
+    margin-top: 50px;
+  }
 `;
 
-const PieChartContainer = styled.li`
+const Chart = styled.li`
   width: 100%;
   height: 400px;
+`;
+
+const ChartTitle = styled.h3`
+  font-size: ${({ theme }) => theme.fontSize.lg};
+  font-weight: ${({ theme }) => theme.fontWeight.bold};
 `;

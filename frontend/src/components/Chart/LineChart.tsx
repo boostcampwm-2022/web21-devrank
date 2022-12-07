@@ -39,7 +39,6 @@ function LineChart({ data }: LineChartProps) {
       enablePoints={false}
       useMesh={true}
       enableSlices={false}
-      animate={false}
     />
   );
 }
