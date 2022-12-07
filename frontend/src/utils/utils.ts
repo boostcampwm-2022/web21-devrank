@@ -1,8 +1,7 @@
+import { useTranslation } from 'next-i18next';
 import { useTheme } from 'styled-components';
 import { Serie } from '@nivo/line';
 import { CubeRankType, DailyInfo, HistoryType, RANK } from '@type/common';
-import { useTranslation } from 'next-i18next';
-import { CubeRankType } from '@type/common';
 import { ProfileUserResponse } from '@type/response';
 import { CUBE_RANK, DEVICON_URL, EXCEPTIONAL_LANGUAGE } from '@utils/constants';
 
@@ -91,7 +90,7 @@ export const transToLineChartData = (data: { [key: string]: DailyInfo }, tier: R
   ];
 
   return ret;
-}
+};
 
 interface QueryValidatorType {
   tier?: string | string[];
