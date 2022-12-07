@@ -8,7 +8,7 @@ import { useQuery } from '@tanstack/react-query';
 import { CubeIcon } from '@components/common';
 import HeadMeta from '@components/common/HeadMeta';
 import { requestTokenRefresh } from '@apis/auth';
-import { CUBE_RANK, DEVELOPER_INFORMATION } from '@utils/constants';
+import { DEVELOPER_INFORMATION } from '@utils/constants';
 
 function About() {
   useQuery(['user'], () => requestTokenRefresh());
@@ -45,20 +45,68 @@ function About() {
         <Content>
           <Title>{t('about:rank-system-heading')}</Title>
           <RankSystem>
-            {Object.values(CUBE_RANK).map((tier) => {
-              if (tier === CUBE_RANK.ALL) return;
-              return (
-                <Rank key={tier}>
-                  <CubeIcon tier={tier} />
-                  <Strong>{t(`tier:${tier}`)}</Strong>
-                  <p>101~200</p>
-                </Rank>
-              );
-            })}
+            <Rank>
+              <CubeIcon tier={'yellow'} />
+              <Strong>{t(`tier:yellow`)}</Strong>
+              <p>0 ~ 99</p>
+            </Rank>
+            <Rank>
+              <CubeIcon tier={'green'} />
+              <Strong>{t(`tier:green`)}</Strong>
+              <p>100 ~ 199</p>
+            </Rank>
+            <Rank>
+              <CubeIcon tier={'mint'} />
+              <Strong>{t(`tier:mint`)}</Strong>
+              <p>200 ~ 499</p>
+            </Rank>
+            <Rank>
+              <CubeIcon tier={'blue'} />
+              <Strong>{t(`tier:blue`)}</Strong>
+              <p>500 ~ 999</p>
+            </Rank>
+            <Rank>
+              <CubeIcon tier={'purple'} />
+              <Strong>{t(`tier:purple`)}</Strong>
+              <p>1000 ~ 1999</p>
+            </Rank>
+            <Rank>
+              <CubeIcon tier={'orange'} />
+              <Strong>{t(`tier:orange`)}</Strong>
+              <p>2000 ~ 4999</p>
+            </Rank>
+            <Rank>
+              <CubeIcon tier={'red'} />
+              <Strong>{t(`tier:red`)}</Strong>
+              <p>5000 ~</p>
+            </Rank>
           </RankSystem>
         </Content>
         <Content>
           <Title>{t('about:score-calucate-method-heading')}</Title>
+          <ScoreInfo>
+            <p>레포점수 = 최대 100개까지의 commit별 (레포 가중치) * (시간 가중치) 합 / 100</p>
+            <p>이슈점수 = 최대 100개까지의 (레포 가중치) * (시간 가중치) 합 / 1000</p>
+            <p>&nbsp;&nbsp; &middot; 레포 가중치 = Star 개수</p>
+            <p>&nbsp;&nbsp; &middot; 시간 가중치 = (1 / 1.0019) ^ 지난 일 수</p>
+            <p>커밋점수 = 개인레포 25개, 외부레포 25개의 레포점수 합</p>
+            <p>유저활동점수 = 커밋점수 + 이슈점수</p>
+            <p>유저개인점수 = 팔로워수 / 100</p>
+            <br />
+            <p>유저점수 = 유저활동점수 + 유저개인점수</p>
+            <br />
+            <Strong>⚠️ 주의</Strong>
+            <br />
+            &middot; y = (1 / 1.0019) ^ x는 1년이 지났을때 시간가중치가 0.5가 되는 지수함수 <br />
+            &middot; 코드가 아닌 문서레포의 기여의 비정상적인 가중치를 제외하기 위하여 <br />
+            &nbsp;&nbsp;문서 위주 레포는 레포점수 0점
+            <br />
+            &middot; branch가 많아질경우 값이 커질 수 있음
+            <br />
+            &middot; collaborator로 등록되지않은 조직 레포는 집계되지 않음
+            <br />
+            &middot; 외부레포는 star 순으로 정렬이 되지 않음
+          </ScoreInfo>
         </Content>
         <Content>
           <Title>Developed By</Title>
@@ -107,6 +155,18 @@ const Container = styled.div`
   align-items: center;
 `;
 
+const ScoreInfo = styled.div`
+  margin: auto;
+  padding: 30px;
+  width: max-content;
+  margin-top: 30px;
+  line-height: 26px;
+  background-color: ${({ theme }) => theme.colors.black4};
+
+  strong {
+    font-size: ${({ theme }) => theme.fontSize.lg};
+  }
+`;
 const Title = styled.h3`
   font-size: ${({ theme }) => theme.fontSize.xl};
 `;
@@ -145,8 +205,12 @@ const FeatureList = styled.ul`
 const RankSystem = styled.ul`
   ${({ theme }) => theme.common.flexCenterColumn}
   gap: 5px;
+  background-color: ${({ theme }) => theme.colors.black4};
+  margin: auto;
   margin-top: 30px;
-  width: 100%;
+  width: 250px;
+  padding: 20px;
+  padding-right: 30px;
 `;
 
 const Rank = styled.li`
@@ -156,6 +220,7 @@ const Rank = styled.li`
   align-items: center;
 
   p {
+    width: max-content;
     font-size: ${({ theme }) => theme.fontSize.xs};
   }
 `;
