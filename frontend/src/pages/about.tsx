@@ -5,10 +5,10 @@ import Image from 'next/image';
 import React from 'react';
 import styled from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
-import HeadMeta from '@components/HeadMeta';
 import { CubeIcon } from '@components/common';
+import HeadMeta from '@components/common/HeadMeta';
 import { requestTokenRefresh } from '@apis/auth';
-import { CUBE_RANK, DEVELOPER_INFORMATION } from '@utils/constants';
+import { DEVELOPER_INFORMATION } from '@utils/constants';
 
 function About() {
   useQuery(['user'], () => requestTokenRefresh());
@@ -18,6 +18,7 @@ function About() {
     <>
       <HeadMeta title={t('meta:about-title')} description={t('meta:main-description')} />
       <Container>
+        {}
         <Logo>
           <Image src='/icons/logo-main.svg' alt='Devrank 로고' width={550} height={230} quality={100} priority />
         </Logo>
@@ -45,20 +46,66 @@ function About() {
         <Content>
           <Title>{t('about:rank-system-heading')}</Title>
           <RankSystem>
-            {Object.values(CUBE_RANK).map((tier) => {
-              if (tier === CUBE_RANK.ALL) return;
-              return (
-                <Rank key={tier}>
-                  <CubeIcon tier={tier} />
-                  <Strong>{t(`tier:${tier}`)}</Strong>
-                  <p>101~200</p>
-                </Rank>
-              );
-            })}
+            <Rank>
+              <CubeIcon tier={'yellow'} />
+              <Strong>{t(`tier:yellow`)}</Strong>
+              <p>0 ~ 99</p>
+            </Rank>
+            <Rank>
+              <CubeIcon tier={'green'} />
+              <Strong>{t(`tier:green`)}</Strong>
+              <p>100 ~ 199</p>
+            </Rank>
+            <Rank>
+              <CubeIcon tier={'mint'} />
+              <Strong>{t(`tier:mint`)}</Strong>
+              <p>200 ~ 499</p>
+            </Rank>
+            <Rank>
+              <CubeIcon tier={'blue'} />
+              <Strong>{t(`tier:blue`)}</Strong>
+              <p>500 ~ 999</p>
+            </Rank>
+            <Rank>
+              <CubeIcon tier={'purple'} />
+              <Strong>{t(`tier:purple`)}</Strong>
+              <p>1000 ~ 1999</p>
+            </Rank>
+            <Rank>
+              <CubeIcon tier={'orange'} />
+              <Strong>{t(`tier:orange`)}</Strong>
+              <p>2000 ~ 4999</p>
+            </Rank>
+            <Rank>
+              <CubeIcon tier={'red'} />
+              <Strong>{t(`tier:red`)}</Strong>
+              <p>5000 ~</p>
+            </Rank>
           </RankSystem>
         </Content>
         <Content>
           <Title>{t('about:score-calucate-method-heading')}</Title>
+          <ScoreInfo>
+            <p>{t('about:score-calucate-method-1')}</p>
+            <p>{t('about:score-calucate-method-2')}</p>
+            <p>&nbsp;&nbsp; {t('about:score-calucate-method-3')}</p>
+            <p>&nbsp;&nbsp; {t('about:score-calucate-method-4')}</p>
+            <p>{t('about:score-calucate-method-5')}</p>
+            <p>{t('about:score-calucate-method-6')}</p>
+            <p>{t('about:score-calucate-method-7')}</p>
+            <br />
+            <p>{t('about:score-calucate-method-8')}</p>
+            <br />
+            <Strong>{t('about:score-calucate-method-9')}</Strong>
+            <br />
+            {t('about:score-calucate-method-10')}
+            <br />
+            {t('about:score-calucate-method-11')}
+            <br />
+            {t('about:score-calucate-method-12')}
+            <br />
+            {t('about:score-calucate-method-13')}
+          </ScoreInfo>
         </Content>
         <Content>
           <Title>Developed By</Title>
@@ -145,8 +192,12 @@ const FeatureList = styled.ul`
 const RankSystem = styled.ul`
   ${({ theme }) => theme.common.flexCenterColumn}
   gap: 5px;
+  background-color: ${({ theme }) => theme.colors.black4};
+  margin: auto;
   margin-top: 30px;
-  width: 100%;
+  width: 250px;
+  padding: 20px;
+  padding-right: 30px;
 `;
 
 const Rank = styled.li`
@@ -156,7 +207,22 @@ const Rank = styled.li`
   align-items: center;
 
   p {
+    width: max-content;
     font-size: ${({ theme }) => theme.fontSize.xs};
+  }
+`;
+
+const ScoreInfo = styled.div`
+  margin: auto;
+  padding: 30px;
+  width: max-content;
+  margin-top: 30px;
+  line-height: 30px;
+  background-color: ${({ theme }) => theme.colors.black4};
+  max-width: 750px;
+
+  strong {
+    font-size: ${({ theme }) => theme.fontSize.lg};
   }
 `;
 

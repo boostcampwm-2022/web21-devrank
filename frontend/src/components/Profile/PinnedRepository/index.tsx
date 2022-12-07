@@ -10,7 +10,9 @@ interface PinnedRepositoryProps {
 }
 
 function PinnedRepository({ repositories }: PinnedRepositoryProps) {
-  return (
+  return repositories.length === 0 ? (
+    <NotExist>There are no pinned repositories</NotExist>
+  ) : (
     <Container>
       {repositories.map(({ name, description, languages, forkCount, stargazerCount, url }) => (
         <Link href={url} key={`${name}-${description}`}>
@@ -59,6 +61,13 @@ const Repository = styled.section`
   border-radius: 8px;
   width: 100%;
   padding: 20px 30px;
+`;
+
+const NotExist = styled.p`
+  width: 100%;
+  height: 200px;
+  ${({ theme }) => theme.common.flexCenter};
+  font-size: 24px;
 `;
 
 const Name = styled.h4`

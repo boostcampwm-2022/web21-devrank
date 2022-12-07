@@ -7,12 +7,10 @@ import { QueryClient, dehydrate, useQuery } from '@tanstack/react-query';
 import { CubeRankType } from '@type/common';
 import { RankingPaiginationResponse } from '@type/response';
 import Filterbar from '@components/Filterbar';
-import HeadMeta from '@components/HeadMeta';
 import Pagination from '@components/Pagination';
-import RankingTable from '@components/Ranking';
-import NotFound from '@components/Ranking/NotFound';
-import RankingSearchbar from '@components/Ranking/RankingSearchbar';
+import { NotFound, RankingSearchbar, RankingTable } from '@components/Ranking';
 import { Avatar, CubeIcon, LanguageIcon, RankingSkeleton } from '@components/common';
+import HeadMeta from '@components/common/HeadMeta';
 import { requestTokenRefresh } from '@apis/auth';
 import { requestTopRankingByScore } from '@apis/ranking';
 import { COUNT_PER_PAGE, CUBE_RANK } from '@utils/constants';
@@ -123,13 +121,15 @@ export default Ranking;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const queryClient = new QueryClient();
-  await queryClient.prefetchQuery(['user'], () => requestTokenRefresh(context));
-  await queryClient.prefetchQuery(['ranking', CUBE_RANK.ALL, ''], () =>
-    requestTopRankingByScore({ limit: COUNT_PER_PAGE }),
-  );
-
   const { tier, username, page } = context.query;
   const query = queryValidator({ tier, username, page });
+
+  await Promise.allSettled([
+    queryClient.prefetchQuery(['user'], () => requestTokenRefresh(context)),
+    queryClient.prefetchQuery(['ranking', CUBE_RANK.ALL, ''], () =>
+      requestTopRankingByScore({ limit: COUNT_PER_PAGE }),
+    ),
+  ]);
 
   if (!query) {
     return {
