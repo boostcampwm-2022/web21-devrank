@@ -105,8 +105,6 @@ function About() {
             {t('about:score-calucate-method-12')}
             <br />
             {t('about:score-calucate-method-13')}
-            <br />
-            {t('about:score-calucate-method-14')}
           </ScoreInfo>
         </Content>
         <Content>
@@ -156,19 +154,6 @@ const Container = styled.div`
   align-items: center;
 `;
 
-const ScoreInfo = styled.div`
-  margin: auto;
-  padding: 30px;
-  width: max-content;
-  margin-top: 30px;
-  line-height: 26px;
-  background-color: ${({ theme }) => theme.colors.black4};
-  max-width: 750px;
-
-  strong {
-    font-size: ${({ theme }) => theme.fontSize.lg};
-  }
-`;
 const Title = styled.h3`
   font-size: ${({ theme }) => theme.fontSize.xl};
 `;
@@ -224,6 +209,20 @@ const Rank = styled.li`
   p {
     width: max-content;
     font-size: ${({ theme }) => theme.fontSize.xs};
+  }
+`;
+
+const ScoreInfo = styled.div`
+  margin: auto;
+  padding: 30px;
+  width: max-content;
+  margin-top: 30px;
+  line-height: 30px;
+  background-color: ${({ theme }) => theme.colors.black4};
+  max-width: 750px;
+
+  strong {
+    font-size: ${({ theme }) => theme.fontSize.lg};
   }
 `;
 
