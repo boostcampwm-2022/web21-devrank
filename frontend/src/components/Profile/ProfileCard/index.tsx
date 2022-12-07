@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import ProfileRefreshButton from '../ProfileRefreshButton';
-import { CubeRankType, OrganizationType } from '@type/common';
+import { OrganizationType, RANK } from '@type/common';
 import { ProfileLabel } from '@components/Profile';
 import { Avatar, CubeIcon, Paper } from '@components/common';
 import { getRankingUnit } from '@utils/utils';
@@ -19,13 +19,17 @@ interface ProfileCardProps {
     email: string;
     avatarUrl: string;
     organizations: OrganizationType[];
-    tier: CubeRankType;
+    tier: RANK;
     tierRank: number;
     totalRank: number;
     updateDelayTime: number;
     updateData: () => void;
     isLoading: boolean;
   };
+}
+
+interface StyledColorProps {
+  tier: RANK;
 }
 
 function ProfileCard({ profileData }: ProfileCardProps) {
@@ -108,11 +112,12 @@ function ProfileCard({ profileData }: ProfileCardProps) {
       <ProfileRank>
         <CubeIcon tier={tier} size={160} />
         <p>
-          {t('profile:total')}: {totalRank}
+          {t('profile:total')}&nbsp;{totalRank}
           {getRankingUnit(locale, totalRank)}
         </p>
         <p>
-          {t(`tier:${tier}`)}: {tierRank}
+          <ColorPoint tier={tier}>{t(`tier:${tier}`)}</ColorPoint>
+          &nbsp;{tierRank}
           {getRankingUnit(locale, tierRank)}
         </p>
       </ProfileRank>
@@ -121,6 +126,10 @@ function ProfileCard({ profileData }: ProfileCardProps) {
 }
 
 export default ProfileCard;
+
+const ColorPoint = styled.span<StyledColorProps>`
+  color: ${({ theme, tier }) => theme.colors[`${tier}2`]};
+`;
 
 const ProfileInfos = styled.ul`
   width: 100%;
