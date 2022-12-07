@@ -1,11 +1,12 @@
 import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { QueryClient, dehydrate, useMutation, useQuery } from '@tanstack/react-query';
 import { ProfileUserResponse } from '@type/response';
 import HeadMeta from '@components/HeadMeta';
-import { CommitHistory, EXPbar, PinnedRepository, ProfileCard } from '@components/Profile';
+import { CommitHistory, ContributionStatistic, EXPbar, PinnedRepository, ProfileCard } from '@components/Profile';
 import { Paper } from '@components/common';
 import { requestTokenRefresh } from '@apis/auth';
 import { requestUserInfoByUsername } from '@apis/users';
@@ -17,22 +18,25 @@ interface ProfileProps {
 
 function Profile({ username }: ProfileProps) {
   const MAX_COMMIT_STREAK = 368;
+  const router = useRouter();
+  const locale = router.locale as string;
   const { data, refetch } = useQuery<ProfileUserResponse>(['profile', username], () =>
     requestUserInfoByUsername({ username, method: 'GET' }),
   );
-  
+
   const { mutate, isLoading } = useMutation<ProfileUserResponse>({
     mutationFn: () => requestUserInfoByUsername({ username, method: 'PATCH' }),
     onError: () => alert('최근에 업데이트 했습니다.'),
     onSettled: () => refetch(),
   });
 
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation(['profile', 'meta']);
 
   return (
     <Container>
       {data && (
         <>
+          <HeadMeta title={`${username}${t('meta:profile-title')}`} description={getProfileDescription(locale, data)} />
           <ProfileCard
             profileData={{
               username,
@@ -53,7 +57,7 @@ function Profile({ username }: ProfileProps) {
             }}
           />
           <Title>EXP</Title>
-          <EXPbar exp={data?.score} />
+          <EXPbar tier={data.tier} exp={data.score} needExp={data.needExp} startExp={data.startExp} />
           <ContributionHeader>
             <Title>Contributions</Title>
             <p>{`${t('maximum-continuous-commit-history')} : ${data.history.maxContinuosCount}${
@@ -63,8 +67,10 @@ function Profile({ username }: ProfileProps) {
           <Paper>
             <CommitHistory history={data.history} tier={data.tier} />
           </Paper>
-          <Title>Github stats</Title>
-          <Paper></Paper>
+          <Title>Stats</Title>
+          <Paper>
+            <ContributionStatistic data={data} />
+          </Paper>
           <Title>Pinned Repositories</Title>
           <Paper>
             <PinnedRepository repositories={data.pinnedRepositories} />

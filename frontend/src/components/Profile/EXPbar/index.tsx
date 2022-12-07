@@ -1,12 +1,13 @@
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { RANK } from '@type/common';
-import { CUBE_RANK_RANGE } from '@utils/constants';
-import { getTierFromExp } from '@utils/utils';
 
 interface EXPbarProps {
   /** exp 점수 **/
+  tier: RANK;
   exp: number;
+  needExp: number;
+  startExp: number;
 }
 
 interface StyledActiveProps {
@@ -14,10 +15,10 @@ interface StyledActiveProps {
   tier: RANK;
 }
 
-function EXPbar({ exp }: EXPbarProps) {
+function EXPbar({ tier, exp, startExp, needExp }: EXPbarProps) {
   const { t } = useTranslation('profile');
-  const tier = getTierFromExp(exp);
-  const [min, max] = CUBE_RANK_RANGE[tier];
+  const max = needExp + exp;
+  const min = startExp;
   const percent = ((exp - min) / (max - min)) * 100;
   return (
     <>
