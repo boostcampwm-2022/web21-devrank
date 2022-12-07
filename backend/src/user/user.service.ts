@@ -40,8 +40,6 @@ export class UserService {
     }
 
     if (!user) user = await this.updateUser(username, githubToken);
-    if (!user.scoreHistory) user.scoreHistory = [];
-    user.scoreHistory.push({ date: new Date(), score: user.score });
     await this.userRepository.createOrUpdate(user);
     const { totalRank, tierRank } = await this.getUserRelativeRanking(user);
     this.userRepository.setDuplicatedRequestIp(ip, username);
@@ -114,8 +112,12 @@ export class UserService {
           date: new Date(),
           score: user.score,
         });
-        updatedUser.scoreDifference =
-          updatedUser.score - updatedUser.scoreHistory[updatedUser.scoreHistory.length - 2].score;
+        if (updatedUser.scoreHistory.length > 1) {
+          updatedUser.scoreDifference =
+            updatedUser.score - updatedUser.scoreHistory[updatedUser.scoreHistory.length - 2].score;
+        } else {
+          updatedUser.scoreDifference = 0;
+        }
         updatedUser.dailyViews = 0;
         this.userRepository.createOrUpdate(updatedUser);
       } catch {
