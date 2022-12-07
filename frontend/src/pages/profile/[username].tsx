@@ -5,7 +5,6 @@ import dynamic from 'next/dynamic';
 import styled from 'styled-components';
 import { QueryClient, dehydrate, useMutation, useQuery } from '@tanstack/react-query';
 import { ProfileUserResponse } from '@type/response';
-// import PieChart from '@components/Chart/PieChart';
 import HeadMeta from '@components/HeadMeta';
 import { CommitHistory, EXPbar, PinnedRepository, ProfileCard } from '@components/Profile';
 import { Paper } from '@components/common';
@@ -75,7 +74,7 @@ function Profile({ username }: ProfileProps) {
                 <PieChart data={transToPieChartData(data.history)} />
               </PieChartContainer>
               <PieChartContainer>
-                <LineChart data={transToLineChartData(data.history.contributionHistory)} />
+                <LineChart data={transToLineChartData(data.history.contributionHistory, data.tier)} />
               </PieChartContainer>
             </ChartContainer>
           </Paper>
@@ -150,12 +149,12 @@ const ContributionHeader = styled.div`
   }
 `;
 
-const ChartContainer = styled.div`
+const ChartContainer = styled.ul`
   ${({ theme }) => theme.common.flexCenterColumn};
   width: 100%;
 `;
 
-const PieChartContainer = styled.div`
+const PieChartContainer = styled.li`
   width: 100%;
   height: 400px;
 `;
