@@ -24,4 +24,10 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
     - run: cd backend && yarn deploy:prod
-    - run: cd frontend && yarn deploy:prod
+    - run: |
+        cd frontend
+        echo "NODE_ENV=production" >> .env.production
+        echo "NEXT_PUBLIC_GITHUB_CLIENT_ID=${{ secrets.NEXT_PUBLIC_GITHUB_CLIENT_ID }}" >> .env.production
+        echo "NEXT_PUBLIC_GITHUB_SECRET_ID=${{ secrets.NEXT_PUBLIC_GITHUB_SECRET_ID }}" >> .env.production
+        echo "NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}" >> .env.production
+        yarn deploy:prod
