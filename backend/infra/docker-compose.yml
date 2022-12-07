@@ -10,9 +10,9 @@ services:
     volumes:
       - ./nginx/:/etc/nginx/conf.d/
       - ./logs/nginx/:/var/log/nginx/
-  blue:
+  backend-blue:
     image: devrank/backend-api:latest
-    container_name: blue
+    container_name: backend-blue
     restart: always
     env_file:
       - ./.env
@@ -22,9 +22,9 @@ services:
       - 3001
     depends_on:
       - redis
-  green:
+  backend-green:
     image: devrank/backend-api:latest
-    container_name: green
+    container_name: backend-green
     restart: always
     env_file:
       - ./.env
@@ -41,3 +41,15 @@ services:
       - /usr/local/redis/data:/data
     ports:
       - 6379:6379
+  frontend-blue:
+    image: devrank/frontend:latest
+    container_name: frontend-blue
+    restart: always
+    expose:
+      - 8080
+  frontend-green:
+    image: devrank/frontend:latest
+    container_name: frontend-green
+    restart: always
+    expose:
+      - 8080
