@@ -57,7 +57,7 @@ function Profile({ username }: ProfileProps) {
             }}
           />
           <Title>EXP</Title>
-          <EXPbar exp={data?.score} />
+          <EXPbar tier={data.tier} exp={data.score} needExp={data.needExp} startExp={data.startExp} />
           <ContributionHeader>
             <Title>Contributions</Title>
             <p>{`${t('maximum-continuous-commit-history')} : ${data.history.maxContinuosCount}${
