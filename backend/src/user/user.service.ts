@@ -39,7 +39,14 @@ export class UserService {
       user = await this.userRepository.findOneByUsernameAndUpdateViews(username);
     }
 
-    if (!user) user = await this.updateUser(username, githubToken);
+    if (!user) {
+      user = await this.updateUser(username, githubToken);
+      if (!user.scoreHistory) {
+        user.scoreHistory = [];
+      }
+      user.scoreHistory.push({ date: new Date(), score: user.score });
+      user = await this.userRepository.createOrUpdate(user);
+    }
     await this.userRepository.createOrUpdate(user);
     const { totalRank, tierRank } = await this.getUserRelativeRanking(user);
     this.userRepository.setDuplicatedRequestIp(ip, username);
@@ -87,12 +94,22 @@ export class UserService {
   }
 
   async updateAllUsers(githubToken: string): Promise<void> {
-    const sleep = (m) => new Promise((r) => setTimeout(r, m));
+    const sleep = (m: number) => new Promise((r) => setTimeout(r, m));
     const users = await this.userRepository.findAll({}, false, ['username']);
     for (const user of users) {
       await sleep(GITHUB_API_DELAY);
       try {
-        await this.updateUser(user.username, githubToken);
+        const updateUser = await this.updateUser(user.username, githubToken);
+        if (!updateUser.scoreHistory) updateUser.scoreHistory = [];
+        if (updateUser.scoreHistory.length) updateUser.scoreHistory.pop();
+        updateUser.scoreHistory.push({ date: new Date(), score: updateUser.score });
+        if (updateUser.scoreHistory.length > 1) {
+          updateUser.scoreDifference =
+            updateUser.score - updateUser.scoreHistory[updateUser.scoreHistory.length - 2].score;
+        } else {
+          updateUser.scoreDifference = 0;
+        }
+        this.userRepository.createOrUpdate(updateUser);
       } catch {
         logger.error(`can't update user ${user.username}`);
       }
