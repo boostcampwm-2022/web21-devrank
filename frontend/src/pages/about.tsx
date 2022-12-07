@@ -18,6 +18,7 @@ function About() {
     <>
       <HeadMeta title={t('meta:about-title')} description={t('meta:main-description')} />
       <Container>
+        {}
         <Logo>
           <Image src='/icons/logo-main.svg' alt='Devrank 로고' width={550} height={230} quality={100} priority />
         </Logo>
@@ -85,27 +86,27 @@ function About() {
         <Content>
           <Title>{t('about:score-calucate-method-heading')}</Title>
           <ScoreInfo>
-            <p>레포점수 = 최대 100개까지의 commit별 (레포 가중치) * (시간 가중치) 합 / 100</p>
-            <p>이슈점수 = 최대 100개까지의 (레포 가중치) * (시간 가중치) 합 / 1000</p>
-            <p>&nbsp;&nbsp; &middot; 레포 가중치 = Star 개수</p>
-            <p>&nbsp;&nbsp; &middot; 시간 가중치 = (1 / 1.0019) ^ 지난 일 수</p>
-            <p>커밋점수 = 개인레포 25개, 외부레포 25개의 레포점수 합</p>
-            <p>유저활동점수 = 커밋점수 + 이슈점수</p>
-            <p>유저개인점수 = 팔로워수 / 100</p>
+            <p>{t('about:score-calucate-method-1')}</p>
+            <p>{t('about:score-calucate-method-2')}</p>
+            <p>&nbsp;&nbsp; {t('about:score-calucate-method-3')}</p>
+            <p>&nbsp;&nbsp; {t('about:score-calucate-method-4')}</p>
+            <p>{t('about:score-calucate-method-5')}</p>
+            <p>{t('about:score-calucate-method-6')}</p>
+            <p>{t('about:score-calucate-method-7')}</p>
             <br />
-            <p>유저점수 = 유저활동점수 + 유저개인점수</p>
+            <p>{t('about:score-calucate-method-8')}</p>
             <br />
-            <Strong>⚠️ 주의</Strong>
+            <Strong>{t('about:score-calucate-method-9')}</Strong>
             <br />
-            &middot; y = (1 / 1.0019) ^ x는 1년이 지났을때 시간가중치가 0.5가 되는 지수함수 <br />
-            &middot; 코드가 아닌 문서레포의 기여의 비정상적인 가중치를 제외하기 위하여 <br />
-            &nbsp;&nbsp;문서 위주 레포는 레포점수 0점
+            {t('about:score-calucate-method-10')}
             <br />
-            &middot; branch가 많아질경우 값이 커질 수 있음
+            {t('about:score-calucate-method-11')}
             <br />
-            &middot; collaborator로 등록되지않은 조직 레포는 집계되지 않음
+            {t('about:score-calucate-method-12')}
             <br />
-            &middot; 외부레포는 star 순으로 정렬이 되지 않음
+            {t('about:score-calucate-method-13')}
+            <br />
+            {t('about:score-calucate-method-14')}
           </ScoreInfo>
         </Content>
         <Content>
@@ -162,6 +163,7 @@ const ScoreInfo = styled.div`
   margin-top: 30px;
   line-height: 26px;
   background-color: ${({ theme }) => theme.colors.black4};
+  max-width: 750px;
 
   strong {
     font-size: ${({ theme }) => theme.fontSize.lg};
