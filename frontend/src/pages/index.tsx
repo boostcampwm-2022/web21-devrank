@@ -6,10 +6,10 @@ import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { QueryClient, dehydrate, useQuery } from '@tanstack/react-query';
 import { ProgrammingLanguageRankingResponse, RankingPaiginationResponse, RankingResponse } from '@type/response';
-import HeadMeta from '@components/HeadMeta';
 import Ranking from '@components/Ranking';
 import { Avatar, LanguageIcon } from '@components/common';
 import CubeIcon from '@components/common/CubeIcon';
+import HeadMeta from '@components/common/HeadMeta';
 import AutoCompleteSearchbar from '@components/common/Searchbar/AutoComplete';
 import { requestTokenRefresh } from '@apis/auth';
 import {

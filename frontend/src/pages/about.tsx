@@ -5,8 +5,8 @@ import Image from 'next/image';
 import React from 'react';
 import styled from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
-import HeadMeta from '@components/HeadMeta';
 import { CubeIcon } from '@components/common';
+import HeadMeta from '@components/common/HeadMeta';
 import { requestTokenRefresh } from '@apis/auth';
 import { CUBE_RANK, DEVELOPER_INFORMATION } from '@utils/constants';
 
