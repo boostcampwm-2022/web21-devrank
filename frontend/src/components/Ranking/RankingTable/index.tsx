@@ -1,4 +1,4 @@
-import React from 'react';
+import { Children } from 'react';
 import styled from 'styled-components';
 
 type TextAlignType = 'center' | 'right' | 'left';
@@ -60,8 +60,8 @@ function Element({ children }: ElementProps) {
 /**
  * Ranking 컴포넌트는 Row와 Element 컴포넌트를 자식 컴포넌트로 가져야합니다.
  */
-function Ranking({ width, columnWidthList, columnAlignList, children }: RankingProps) {
-  const doms = React.Children.toArray(children);
+function RankingTable({ width, columnWidthList, columnAlignList, children }: RankingProps) {
+  const doms = Children.toArray(children);
   return (
     <Container width={width} tdWidthList={columnWidthList} tdAlignList={columnAlignList}>
       {doms[0]}
@@ -70,11 +70,11 @@ function Ranking({ width, columnWidthList, columnAlignList, children }: RankingP
   );
 }
 
-Ranking.Head = Head;
-Ranking.Row = Row;
-Ranking.Element = Element;
+RankingTable.Head = Head;
+RankingTable.Row = Row;
+RankingTable.Element = Element;
 
-export default Ranking;
+export default RankingTable;
 
 const Container = styled.table<StyledContainer>`
   border-collapse: separate;

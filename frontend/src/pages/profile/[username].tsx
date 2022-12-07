@@ -5,9 +5,9 @@ import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { QueryClient, dehydrate, useMutation, useQuery } from '@tanstack/react-query';
 import { ProfileUserResponse } from '@type/response';
-import HeadMeta from '@components/HeadMeta';
 import { CommitHistory, ContributionStatistic, EXPbar, PinnedRepository, ProfileCard } from '@components/Profile';
 import { Paper } from '@components/common';
+import HeadMeta from '@components/common/HeadMeta';
 import { requestTokenRefresh } from '@apis/auth';
 import { requestUserInfoByUsername } from '@apis/users';
 import { getProfileDescription } from '@utils/utils';
@@ -87,7 +87,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const username = context.query.username as string;
 
   const queryClient = new QueryClient();
-  await Promise.all([
+  await Promise.allSettled([
     queryClient.prefetchQuery(['user'], () => requestTokenRefresh(context)),
     queryClient.prefetchQuery(['profile', username], () => requestUserInfoByUsername({ username, method: 'GET' })),
   ]);

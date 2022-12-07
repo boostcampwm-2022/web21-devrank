@@ -4,12 +4,12 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
-import { QueryClient, dehydrate, useQuery } from '@tanstack/react-query';
-import { ProgrammingLanguageRankingResponse, RankingPaiginationResponse, RankingResponse } from '@type/response';
-import HeadMeta from '@components/HeadMeta';
-import Ranking from '@components/Ranking';
-import { Avatar, LanguageIcon } from '@components/common';
-import CubeIcon from '@components/common/CubeIcon';
+import { QueryClient, dehydrate } from '@tanstack/react-query';
+import LanguageRanking from '@components/Ranking/LanguageRanking';
+import OverrallRanking from '@components/Ranking/OverallRanking';
+import RisingRanking from '@components/Ranking/RisingRanking';
+import ViewsRanking from '@components/Ranking/ViewsRanking';
+import HeadMeta from '@components/common/HeadMeta';
 import AutoCompleteSearchbar from '@components/common/Searchbar/AutoComplete';
 import { requestTokenRefresh } from '@apis/auth';
 import {
@@ -18,27 +18,10 @@ import {
   requestTopRankingByScore,
   requestTopRankingByViews,
 } from '@apis/ranking';
-import { MAIN_PAGE_RANK_COUNT } from '@utils/constants';
 
 function Home() {
   const { t } = useTranslation(['index', 'common', 'meta']);
   const router = useRouter();
-
-  const { data: rankingByScore } = useQuery<RankingPaiginationResponse>(['top-ranking-by-score'], () =>
-    requestTopRankingByScore({
-      limit: MAIN_PAGE_RANK_COUNT,
-    }),
-  );
-  const { data: rankingByRising } = useQuery<RankingResponse[]>(['top-ranking-by-rising'], () =>
-    requestTopRankingByRising(),
-  );
-  const { data: rankingByViews } = useQuery<RankingResponse[]>(['top-ranking-by-views'], () =>
-    requestTopRankingByViews(),
-  );
-  const { data: rankingByProgrammingLang } = useQuery<ProgrammingLanguageRankingResponse[]>(
-    ['top-ranking-by-programming-lang'],
-    () => requestProgrammingLanguageRanking(),
-  );
 
   const searchUser = (username: string) => {
     router.push(`/profile/${username}`);
@@ -58,124 +41,18 @@ function Home() {
           submitAlign='right'
         />
         <Content>
-          <OverallRanking>
-            <Title>{t('index:overall-ranking')}</Title>
-            <Ranking
-              width={'512px'}
-              columnWidthList={['12%', '8%', '58%', '20%']}
-              columnAlignList={['left', 'left', 'left', 'right']}
-            >
-              <Ranking.Head>
-                <Ranking.Element>{t('common:table-tier')}</Ranking.Element>
-                <Ranking.Element>#</Ranking.Element>
-                <Ranking.Element>{t('common:table-user')}</Ranking.Element>
-                <Ranking.Element>{t('common:table-score')}</Ranking.Element>
-              </Ranking.Head>
-              {rankingByScore?.users.map(({ id, tier, avatarUrl, username, score }, index) => (
-                <Ranking.Row key={id} onClick={() => searchUser(username)}>
-                  <Ranking.Element>
-                    <CubeIcon tier={tier} />
-                  </Ranking.Element>
-                  <Ranking.Element>
-                    <GrayText>{index + 1}</GrayText>
-                  </Ranking.Element>
-                  <Ranking.Element>
-                    <Avatar src={avatarUrl} name={username} />
-                  </Ranking.Element>
-                  <Ranking.Element>
-                    <GrayText>{score.toLocaleString()}</GrayText>
-                  </Ranking.Element>
-                </Ranking.Row>
-              ))}
-            </Ranking>
-          </OverallRanking>
-          <RisingRanking>
-            <Title>{t('index:rising-user-top-3')}</Title>
-            <Ranking
-              width={'512px'}
-              columnWidthList={['12%', '8%', '58%', '20%']}
-              columnAlignList={['left', 'left', 'left', 'right']}
-            >
-              <Ranking.Head>
-                <Ranking.Element>{t('common:table-tier')}</Ranking.Element>
-                <Ranking.Element>#</Ranking.Element>
-                <Ranking.Element>{t('common:table-user')}</Ranking.Element>
-                <Ranking.Element>{t('common:table-score')}</Ranking.Element>
-              </Ranking.Head>
-              {rankingByRising?.map(({ id, tier, username, avatarUrl, score }, index) => (
-                <Ranking.Row key={id} onClick={() => searchUser(username)}>
-                  <Ranking.Element>
-                    <CubeIcon tier={tier} />
-                  </Ranking.Element>
-                  <Ranking.Element>
-                    <GrayText>{index + 1}</GrayText>
-                  </Ranking.Element>
-                  <Ranking.Element>
-                    <Avatar src={avatarUrl} name={username} />
-                  </Ranking.Element>
-                  <Ranking.Element>
-                    <GrayText>{score.toLocaleString()}</GrayText>
-                  </Ranking.Element>
-                </Ranking.Row>
-              ))}
-            </Ranking>
-          </RisingRanking>
-          <DailyRanking>
-            <Title>{t('index:daily-views-top-3')}</Title>
-            <Ranking
-              width={'512px'}
-              columnWidthList={['12%', '8%', '58%', '20%']}
-              columnAlignList={['left', 'left', 'left', 'right']}
-            >
-              <Ranking.Head>
-                <Ranking.Element>{t('common:table-tier')}</Ranking.Element>
-                <Ranking.Element>#</Ranking.Element>
-                <Ranking.Element>{t('common:table-user')}</Ranking.Element>
-                <Ranking.Element>{t('common:table-views')}</Ranking.Element>
-              </Ranking.Head>
-              {rankingByViews?.map(({ id, tier, username, avatarUrl, dailyViews }, index) => (
-                <Ranking.Row key={id} onClick={() => searchUser(username)}>
-                  <Ranking.Element>
-                    <CubeIcon tier={tier} />
-                  </Ranking.Element>
-                  <Ranking.Element>
-                    <GrayText>{index + 1}</GrayText>
-                  </Ranking.Element>
-                  <Ranking.Element>
-                    <Avatar src={avatarUrl} name={username} />
-                  </Ranking.Element>
-                  <Ranking.Element>
-                    <GrayText>{dailyViews.toLocaleString()}</GrayText>
-                  </Ranking.Element>
-                </Ranking.Row>
-              ))}
-            </Ranking>
-          </DailyRanking>
-          <LanguageRanking>
-            <Title>{t('index:most-programming-lang-top-3')}</Title>
-            <Ranking
-              width={'512px'}
-              columnWidthList={['13%', '56%', '31%']}
-              columnAlignList={['left', 'left', 'right']}
-            >
-              <Ranking.Head>
-                <Ranking.Element>{t('common:table-programming-lang')}</Ranking.Element>
-                <Ranking.Element />
-                <Ranking.Element>{t('common:table-user-num')}</Ranking.Element>
-              </Ranking.Head>
-              {rankingByProgrammingLang?.map(({ language, count }) => (
-                <Ranking.Row key={language}>
-                  <Ranking.Element>
-                    <LanguageIcon language={language} width={30} height={30} />
-                  </Ranking.Element>
-                  <Ranking.Element>{language}</Ranking.Element>
-                  <Ranking.Element>
-                    <GrayText>{count}</GrayText>
-                  </Ranking.Element>
-                </Ranking.Row>
-              ))}
-            </Ranking>
-          </LanguageRanking>
+          <OverallRankingSection>
+            <OverrallRanking searchUser={searchUser} />
+          </OverallRankingSection>
+          <RisingRankingSection>
+            <RisingRanking searchUser={searchUser} />
+          </RisingRankingSection>
+          <ViewRankingSection>
+            <ViewsRanking searchUser={searchUser} />
+          </ViewRankingSection>
+          <LanguageRankingSection>
+            <LanguageRanking />
+          </LanguageRankingSection>
         </Content>
       </Container>
     </>
@@ -185,25 +62,19 @@ function Home() {
 export default Home;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        refetchOnWindowFocus: false,
-        refetchOnReconnect: false,
-        refetchOnMount: false,
-      },
-    },
-  });
+  const queryClient = new QueryClient();
 
-  await queryClient.prefetchQuery(['top-ranking-by-score'], () =>
-    requestTopRankingByScore({
-      limit: 12,
-    }),
-  );
-  await queryClient.prefetchQuery(['top-ranking-by-rising'], () => requestTopRankingByRising());
-  await queryClient.prefetchQuery(['top-ranking-by-views'], () => requestTopRankingByViews());
-  await queryClient.prefetchQuery(['top-ranking-by-programming-lang'], () => requestProgrammingLanguageRanking());
-  await queryClient.prefetchQuery(['user'], () => requestTokenRefresh(context));
+  await Promise.allSettled([
+    queryClient.prefetchQuery(['top-ranking-by-score'], () =>
+      requestTopRankingByScore({
+        limit: 12,
+      }),
+    ),
+    queryClient.prefetchQuery(['top-ranking-by-rising'], () => requestTopRankingByRising()),
+    queryClient.prefetchQuery(['top-ranking-by-views'], () => requestTopRankingByViews()),
+    queryClient.prefetchQuery(['top-ranking-by-programming-lang'], () => requestProgrammingLanguageRanking()),
+    queryClient.prefetchQuery(['user'], () => requestTokenRefresh(context)),
+  ]);
 
   return {
     props: {
@@ -229,31 +100,28 @@ const Content = styled.div`
     'a b'
     'a c'
     'a d';
-  grid-gap: 1.37rem;
+  grid-gap: 16px;
+  color: ${({ theme }) => theme.colors.gray6};
   margin-top: 50px;
+
+  h3 {
+    font-size: ${({ theme }) => theme.fontSize.xl};
+    margin-bottom: 8px;
+  }
 `;
 
-const Title = styled.h3`
-  font-size: ${({ theme }) => theme.fontSize.xl};
-  margin-bottom: 0.5rem;
-`;
-
-const OverallRanking = styled.div`
+const OverallRankingSection = styled.section`
   grid-area: a;
 `;
 
-const RisingRanking = styled.div`
+const RisingRankingSection = styled.section`
   grid-area: b;
 `;
 
-const DailyRanking = styled.div`
+const ViewRankingSection = styled.section`
   grid-area: c;
 `;
 
-const LanguageRanking = styled.div`
+const LanguageRankingSection = styled.section`
   grid-area: d;
-`;
-
-const GrayText = styled.span`
-  color: ${({ theme }) => theme.colors.gray6};
 `;
