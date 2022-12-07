@@ -1,19 +1,16 @@
 import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import dynamic from 'next/dynamic';
 import styled from 'styled-components';
 import { QueryClient, dehydrate, useMutation, useQuery } from '@tanstack/react-query';
 import { ProfileUserResponse } from '@type/response';
 import HeadMeta from '@components/HeadMeta';
 import { CommitHistory, EXPbar, PinnedRepository, ProfileCard } from '@components/Profile';
+import ContributionStatistic from '@components/Profile/ContributionStatistic';
 import { Paper } from '@components/common';
 import { requestTokenRefresh } from '@apis/auth';
 import { requestUserInfoByUsername } from '@apis/users';
-import { getProfileDescription, transToLineChartData, transToPieChartData } from '@utils/utils';
-
-const PieChart = dynamic(() => import('@components/Chart/PieChart'), { ssr: false });
-const LineChart = dynamic(() => import('@components/Chart/LineChart'), { ssr: false });
+import { getProfileDescription } from '@utils/utils';
 
 interface ProfileProps {
   username: string;
@@ -69,16 +66,7 @@ function Profile({ username }: ProfileProps) {
           </Paper>
           <Title>Stats</Title>
           <Paper>
-            <ChartContainer>
-              <Chart>
-                <ChartTitle>Contribution Statistics</ChartTitle>
-                <PieChart data={transToPieChartData(data.history)} />
-              </Chart>
-              <Chart>
-                <ChartTitle>Contribution History</ChartTitle>
-                <LineChart data={transToLineChartData(data.history.contributionHistory, data.tier)} />
-              </Chart>
-            </ChartContainer>
+            <ContributionStatistic data={data} />
           </Paper>
           <Title>Pinned Repositories</Title>
           <Paper>
