@@ -7,9 +7,11 @@ services:
     restart: always
     ports:
       - '80:80'
+      - '443:443'
     volumes:
       - ./nginx/:/etc/nginx/conf.d/
       - ./logs/nginx/:/var/log/nginx/
+      - /etc/letsencrypt/:/etc/letsencrypt/
   backend-blue:
     image: devrank/backend-api:latest
     container_name: backend-blue
