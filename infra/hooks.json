@@ -1,0 +1,40 @@
+[
+  {
+    "id": "backend",
+    "execute-command": "/home/ddong/web21-devrank/backend-deploy.sh",
+    "command-working-directory": "/home/ddong/web21-devrank",
+    "response-message": "Execute re-deploy backend",
+    "trigger-rule":
+    {
+        "match":
+        {
+          "type": "value",
+          "value": "{{ TOKEN_VALUE }}",
+          "parameter":
+          {
+            "source": "url",
+            "name": "token"
+          }
+        }
+    }
+  },
+  {
+    "id": "frontend",
+    "execute-command": "/home/ddong/web21-devrank/frontend-deploy.sh",
+    "command-working-directory": "/home/ddong/web21-devrank",
+    "response-message": "Execute re-deploy fronted",
+    "trigger-rule":
+    {
+        "match":
+        {
+          "type": "value",
+          "value": "{{ TOKEN_VALUE }}",
+          "parameter":
+          {
+            "source": "url",
+            "name": "token"
+          }
+        }
+    }
+  }
+]       
