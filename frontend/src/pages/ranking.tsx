@@ -56,7 +56,11 @@ function Ranking({ tier, username, page }: RankingProps) {
       <Container>
         <Filterbar active={tier} setActive={setTier} />
         <SearchbarContainer>
-          {username !== '' && <SearchInfo>&apos;{username}&apos;에 대한 검색 결과 입니다.</SearchInfo>}
+          {username !== '' && (
+            <SearchInfo>
+              {router.locale === 'ko' ? `"${username}"${t('search-user')}` : `${t('search-user')} "${username}"`}
+            </SearchInfo>
+          )}
           <RankingSearchbar placeholder={t('ranking:search-placeholder')} width={200} onSearch={setUsername} />
         </SearchbarContainer>
         <RankingTable
