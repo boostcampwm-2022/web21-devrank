@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { QueryClient, dehydrate, useQuery } from '@tanstack/react-query';
 import { CubeRankType } from '@type/common';
-import { RankingPaiginationResponse } from '@type/response';
+import { RankingPaginationResponse } from '@type/response';
 import Filterbar from '@components/Filterbar';
 import Pagination from '@components/Pagination';
 import { NotFound, RankingSearchbar, RankingTable } from '@components/Ranking';
@@ -26,7 +26,7 @@ function Ranking({ tier, username, page }: RankingProps) {
   const router = useRouter();
   const { t } = useTranslation(['ranking', 'common', 'meta']);
 
-  const { isLoading, isError, data } = useQuery<RankingPaiginationResponse>(['ranking', tier, username, page], () =>
+  const { isLoading, isError, data } = useQuery<RankingPaginationResponse>(['ranking', tier, username, page], () =>
     requestTopRankingByScore({ limit: COUNT_PER_PAGE, tier, username, page }),
   );
 
