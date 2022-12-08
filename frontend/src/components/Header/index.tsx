@@ -63,7 +63,7 @@ function Header() {
           </Dropdown>
           <div className='button-right'>
             {isLoading ? (
-              <div></div>
+              <></>
             ) : userData ? (
               <Dropdown>
                 <Dropdown.Trigger>
