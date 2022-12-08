@@ -62,9 +62,7 @@ function Header() {
             </Dropdown.ItemList>
           </Dropdown>
           <div className='button-right'>
-            {isLoading ? (
-              <></>
-            ) : userData ? (
+            {isLoading ? null : userData ? (
               <Dropdown>
                 <Dropdown.Trigger>
                   <Avatar src={userData.avatarUrl} />
