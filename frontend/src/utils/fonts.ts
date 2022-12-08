@@ -1,10 +1,5 @@
-import { Aldrich, Noto_Sans_KR } from '@next/font/google';
+import { Aldrich } from '@next/font/google';
 import localFont from '@next/font/local';
-
-export const notoSansKR = Noto_Sans_KR({
-  weight: ['100', '300', '400', '500', '700', '900'],
-  subsets: ['latin'],
-});
 
 export const aldrich = Aldrich({
   weight: '400',

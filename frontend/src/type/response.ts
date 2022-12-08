@@ -39,7 +39,7 @@ export interface RankingMeta {
   right: boolean;
 }
 
-export interface RankingPaiginationResponse {
+export interface RankingPaginationResponse {
   metadata: RankingMeta;
   users: RankingResponse[];
 }
