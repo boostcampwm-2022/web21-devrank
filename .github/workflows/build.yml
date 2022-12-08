@@ -16,6 +16,16 @@ jobs:
         node-version: 16.x
         cache: 'yarn'
         cache-dependency-path: 'backend/yarn.lock'
+    - name: extract version
+      run: |
+        VERSION=$(grep -o -E "v[0-9]+\.[0-9]+\.[0-9]+" <<< ${{ github.event.head_commit.message }})
+    - name: create Github release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.ADD_TO_PROJECT_PAT }}
+      with:
+        tag_name: ${{ env.VERSION }}
+        release_name: ${{ env.VERSION }}
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
     - name: Login to Docker Hub
@@ -23,7 +33,12 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
-    - run: cd backend && yarn deploy:prod
+    - run: |
+        cd backend
+        docker build -t devrank/backend-api:latest -f Dockerfile . --platform linux/x86_64
+        docker push devrank/backend-api:latest
+        docker tag devrank/backend-api:latest devrank/backend-api:${{ env.VERSION }}
+        docker push devrank/backend-api:${{ env.VERSION }}
     - run: |
         cd frontend
         echo "NODE_ENV=production" >> .env.production
