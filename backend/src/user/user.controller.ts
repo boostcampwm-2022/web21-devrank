@@ -1,3 +1,4 @@
+import { UserGithubId } from '@libs/common/decorators/user-github-id.decorator';
 import { UserGithubToken } from '@libs/common/decorators/user-github-token.decorator';
 import { UPDATE_DELAY_TIME } from '@libs/consts';
 import {
@@ -67,9 +68,13 @@ export class UserController {
   @ApiResponse({ status: 200, description: '유저 정보 업데이트 성공', type: UserDto })
   async updateScore(
     @UserGithubToken() githubToken: string,
+    @UserGithubId() id: string,
     @Param('username') username: string,
   ): Promise<UserProfileDto> {
-    if ((await this.userService.findUpdateScoreTimeToLive(username)) > 0) {
+    if (
+      (await this.userService.findUpdateScoreTimeToLive(username)) > 0 &&
+      (await this.userService.findOneByFilter({ username }))?.id !== id
+    ) {
       throw new BadRequestException('user score has been updated recently.');
     }
     const user = await this.userService.updateUser(
