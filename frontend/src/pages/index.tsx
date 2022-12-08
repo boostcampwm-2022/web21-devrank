@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { QueryClient, dehydrate } from '@tanstack/react-query';
 import LanguageRanking from '@components/Ranking/LanguageRanking';
-import OverrallRanking from '@components/Ranking/OverallRanking';
+import OverallRanking from '@components/Ranking/OverallRanking';
 import RisingRanking from '@components/Ranking/RisingRanking';
 import ViewsRanking from '@components/Ranking/ViewsRanking';
 import HeadMeta from '@components/common/HeadMeta';
@@ -42,7 +42,7 @@ function Home() {
         />
         <Content>
           <OverallRankingSection>
-            <OverrallRanking searchUser={searchUser} />
+            <OverallRanking searchUser={searchUser} />
           </OverallRankingSection>
           <RisingRankingSection>
             <RisingRanking searchUser={searchUser} />

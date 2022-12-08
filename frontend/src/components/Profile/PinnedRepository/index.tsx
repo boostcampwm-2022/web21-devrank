@@ -82,7 +82,7 @@ const Name = styled.h4`
 
 const Description = styled.p`
   width: 100%;
-  height: 38px;
+  height: 36px;
   line-height: 18px;
   overflow: hidden;
   text-overflow: ellipsis;

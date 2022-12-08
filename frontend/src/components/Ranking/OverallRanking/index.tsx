@@ -1,6 +1,6 @@
 import { useTranslation } from 'next-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { RankingPaiginationResponse } from '@type/response';
+import { RankingPaginationResponse } from '@type/response';
 import { RankingTable } from '@components/Ranking';
 import { Avatar, CubeIcon } from '@components/common';
 import { requestTopRankingByScore } from '@apis/ranking';
@@ -11,7 +11,7 @@ interface OverallRankingProps {
 }
 
 function OverallRanking({ searchUser }: OverallRankingProps) {
-  const { data: rankingByScore } = useQuery<RankingPaiginationResponse>(['top-ranking-by-score'], () =>
+  const { data: rankingByScore } = useQuery<RankingPaginationResponse>(['top-ranking-by-score'], () =>
     requestTopRankingByScore({
       limit: MAIN_PAGE_RANK_COUNT,
     }),

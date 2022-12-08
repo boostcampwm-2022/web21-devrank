@@ -28,11 +28,10 @@ export const getDate = (dateString: string) => {
 
 export const getProfileDescription = (locale: string, data: ProfileUserResponse) => {
   const { t } = useTranslation();
-  const { username, tier, score, totalRank, tierRank, primaryLanguages } = data;
+  const { tier, score, totalRank, tierRank, primaryLanguages } = data;
   const languageStr = primaryLanguages.join(', ');
 
   return (
-    `${username} / ` +
     `${t('profile:rank')}: ${tier} / ` +
     `${t('profile:current-score')}: ${score} / ` +
     `${t('profile:total')}: ${totalRank}${getRankingUnit(locale, totalRank)} / ` +
