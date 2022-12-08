@@ -72,6 +72,7 @@ export class AuthController {
     } catch {
       await this.userService.createOrUpdate(user);
       user = await this.userService.updateUser(user.username, githubToken);
+      user.scoreHistory.push({ score: user.score, date: new Date() });
       await this.userService.createOrUpdate(user);
     }
 
