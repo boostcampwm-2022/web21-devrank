@@ -1,0 +1,10 @@
+[Unit]
+Description=backend-auto-deploy-endpoint
+
+[Service]
+ExecStart=/usr/bin/webhook -hooks {{ HOOKS_FILE_PATH }} -port {{ PORT }} --verbose
+User={{ USERNAME }}
+Group={{ GROUP }}
+
+[Install]
+WantedBy=multi-user.target
