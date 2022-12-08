@@ -20,11 +20,11 @@ jobs:
         VERSION=$(grep -o -E "v[0-9]+\.[0-9]+\.[0-9]+" <<< "${{ github.event.head_commit.message }}")
     - name: create Github release
       uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.ADD_TO_PROJECT_PAT }}
       with:
         tag_name: ${{ env.VERSION }}
         release_name: ${{ env.VERSION }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.ADD_TO_PROJECT_PAT }}
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
     - name: Login to Docker Hub
