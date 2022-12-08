@@ -23,8 +23,8 @@ function RisingRanking({ searchUser }: RisingRankingProps) {
       <h3>{t('index:rising-user-top-3')}</h3>
       <RankingTable
         width={'512px'}
-        columnWidthList={['12%', '8%', '58%', '20%']}
-        columnAlignList={['left', 'left', 'left', 'right']}
+        columnWidthList={['10%', '11%', '59%', '20%']}
+        columnAlignList={['right', 'center', 'left', 'right']}
       >
         <RankingTable.Head>
           <RankingTable.Element>{t('common:table-tier')}</RankingTable.Element>
