@@ -52,9 +52,9 @@ function CommitHistory({ history, tier }: CommitHistoryProps) {
         })}
       </CommitHistoryGroup>
       <DayLabel>
-        <div>Mon</div>
-        <div>Wed</div>
-        <div>Fri</div>
+        <li>Mon</li>
+        <li>Wed</li>
+        <li>Fri</li>
       </DayLabel>
     </Container>
   );
@@ -162,7 +162,7 @@ const MonthLabel = styled.div`
   pointer-events: none;
 `;
 
-const DayLabel = styled.div`
+const DayLabel = styled.ul`
   position: absolute;
   top: 0;
   left: -20px;

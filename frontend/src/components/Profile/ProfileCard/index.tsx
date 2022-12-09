@@ -7,7 +7,7 @@ import { OrganizationType, RANK } from '@type/common';
 import { ProfileLabel } from '@components/Profile';
 import { Avatar, Paper } from '@components/common';
 import CubeLogo from '@components/common/CubeLogo';
-import { CUBE_COLOR_MAP, MEDAL_IMG } from '@utils/constants';
+import { CUBE_COLOR_MAP } from '@utils/constants';
 import { getRankingUnit } from '@utils/utils';
 
 interface ProfileCardProps {
