@@ -49,12 +49,12 @@ function CommitHistory({ history, tier }: CommitHistoryProps) {
             </CommitHistoryBlock>
           );
         })}
-        <DayLabel>
-          <div>Mon</div>
-          <div>Wed</div>
-          <div>Fri</div>
-        </DayLabel>
       </CommitHistoryGroup>
+      <DayLabel>
+        <div>Mon</div>
+        <div>Wed</div>
+        <div>Fri</div>
+      </DayLabel>
     </Container>
   );
 }
@@ -62,6 +62,7 @@ function CommitHistory({ history, tier }: CommitHistoryProps) {
 export default CommitHistory;
 
 const Container = styled.div`
+  position: relative;
   ${({ theme }) => theme.common.flexCenterColumn};
   width: 100%;
   padding-top: 20px;
@@ -164,7 +165,8 @@ const MonthLabel = styled.div`
 
 const DayLabel = styled.div`
   position: absolute;
-  left: -45px;
+  top: 0;
+  left: -20px;
   font-size: 16px;
   height: 100%;
   ${({ theme }) => theme.common.flexCenterColumn};
