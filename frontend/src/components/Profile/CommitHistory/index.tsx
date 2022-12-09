@@ -39,7 +39,7 @@ function CommitHistory({ history, tier }: CommitHistoryProps) {
             prevMonth = month;
           }
           return (
-            <CommitHistoryBlock key={idx} tier={tier} level={level}>
+            <CommitHistoryBlock key={dateString} tier={tier} level={level}>
               {date < 24 && day === 0 && isMonthLabelChange ? (
                 <MonthLabel>{MONTH_LABEL_MAPPING[month]}</MonthLabel>
               ) : null}
