@@ -42,30 +42,59 @@ export default CubeLogo;
 const color = keyframes`
   0% {
     fill: #f60b50;
+    fill: ${CUBE_COLOR_MAP['red']};
   }
   14% {
     fill: #f3753a;
+    fill: ${CUBE_COLOR_MAP['orange']};
   }
   28% {
-    fill: #c455fa;
+    fill: ${CUBE_COLOR_MAP['purple']};
   }
   42% {
-    fill: #558ef8;
+    fill: ${CUBE_COLOR_MAP['blue']};
   }
   56% {
     fill: #33d7e0;
+    fill: ${CUBE_COLOR_MAP['mint']};
   }
   70% {
     fill:#3ac63a;
+    fill: ${CUBE_COLOR_MAP['green']};
   }
   84%{
     fill: #ffe375;
+    fill: ${CUBE_COLOR_MAP['yellow']};
   }
   100% {
     fill: #f60b50;
+    fill: ${CUBE_COLOR_MAP['red']};
   }
 `;
 
+const floating = keyframes`
+  0%{
+    transform: translateY(0);
+  }
+  50%{
+    transform: translateY(-7%);
+  }
+  100%{
+    transform: translateY(0);
+  }
+`;
+
+const shadow = keyframes`
+  0%{
+    transform: translateX(-50%) scale(1);
+  }
+  50%{
+    transform: translateX(-50%) scale(0.8);
+  }
+  100%{
+    transform: translateX(-50%) scale(1);
+  }
+`;
 const Container = styled.div`
   position: relative;
 `;

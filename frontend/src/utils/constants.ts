@@ -1,3 +1,5 @@
+import { RANK } from '@type/common';
+
 export const EXCEPTIONAL_LANGUAGE = ['rust'];
 
 export const DEVICON_URL = 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/';
@@ -94,4 +96,16 @@ export const MONTH_LABEL_MAPPING: {
   10: 'Oct',
   11: 'Nov',
   12: 'Dec',
+};
+
+export const CUBE_COLOR_MAP: {
+  [key in RANK]: string;
+} = {
+  red: ' #f60b50',
+  orange: '#f3753a',
+  purple: '#c455fa',
+  blue: '#558ef8',
+  mint: '#33d7e0',
+  green: '#3ac63a',
+  yellow: '#ffe375',
 };
