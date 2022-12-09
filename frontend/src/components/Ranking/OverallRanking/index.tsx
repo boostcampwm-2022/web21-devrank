@@ -1,4 +1,5 @@
 import { useTranslation } from 'next-i18next';
+import Image from 'next/image';
 import { useQuery } from '@tanstack/react-query';
 import { RankingPaginationResponse } from '@type/response';
 import { RankingTable } from '@components/Ranking';
@@ -19,6 +20,14 @@ function OverallRanking({ searchUser }: OverallRankingProps) {
 
   const { t } = useTranslation(['ranking', 'common']);
 
+  const medalImg: {
+    [key: number]: string;
+  } = {
+    0: '/icons/ranking-1st.svg',
+    1: '/icons/ranking-2nd.svg',
+    2: '/icons/ranking-3rd.svg',
+  };
+
   return (
     <>
       <h3>{t('index:overall-ranking')}</h3>
@@ -33,13 +42,13 @@ function OverallRanking({ searchUser }: OverallRankingProps) {
           <RankingTable.Element>{t('common:table-user')}</RankingTable.Element>
           <RankingTable.Element>{t('common:table-score')}</RankingTable.Element>
         </RankingTable.Head>
-        {rankingByScore?.users.map(({ id, tier, avatarUrl, username, score }, index) => (
+        {rankingByScore?.users.map(({ id, tier, avatarUrl, username, score }, idx) => (
           <RankingTable.Row key={id} onClick={() => searchUser(username)}>
             <RankingTable.Element>
               <CubeIcon tier={tier} />
             </RankingTable.Element>
             <RankingTable.Element>
-              <span>{index + 1}</span>
+              <span> {idx < 3 ? <Image src={medalImg[idx]} width={20} height={30} alt='medal' /> : idx + 1}</span>
             </RankingTable.Element>
             <RankingTable.Element>
               <Avatar src={avatarUrl} name={username} />
