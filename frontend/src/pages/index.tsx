@@ -1,7 +1,6 @@
 import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import Image from 'next/image';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { QueryClient, dehydrate } from '@tanstack/react-query';
@@ -9,6 +8,7 @@ import LanguageRanking from '@components/Ranking/LanguageRanking';
 import OverallRanking from '@components/Ranking/OverallRanking';
 import RisingRanking from '@components/Ranking/RisingRanking';
 import ViewsRanking from '@components/Ranking/ViewsRanking';
+import CubeLogo from '@components/common/CubeLogo';
 import HeadMeta from '@components/common/HeadMeta';
 import AutoCompleteSearchbar from '@components/common/Searchbar/AutoComplete';
 import { requestTokenRefresh } from '@apis/auth';
@@ -32,7 +32,7 @@ function Home() {
       <HeadMeta title={t('meta:main-title')} description={t('meta:main-description')} />
       <Container>
         <h2>
-          <Image src='/icons/logo-main.svg' alt='Devrank 로고' width={550} height={230} quality={100} priority />
+          <CubeLogo size='lg' tier='all' />
         </h2>
         <AutoCompleteSearchbar
           type='text'
