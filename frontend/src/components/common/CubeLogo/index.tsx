@@ -43,6 +43,9 @@ const SIZE_MAP: {
       height: 21,
     },
   },
+};
+
+const CUBE_PATH_LIST = [
   'M363.989 36.9978L336.047 52.3652L369.211 68.0242L367.119 101.917L394.375 85.7092L396.961 52.0263L397 52.003L363.989 36.9978Z',
   'M326.944 48.0722L354.473 32.78L356.911 33.7831L323.324 18.5198L295.347 33.1544L326.944 48.0722Z',
   'M285.324 28.4199L313.685 14.1347L283.316 0.331055L254.885 14.6291L255.527 14.3496L285.324 28.4199Z',
@@ -64,14 +67,9 @@ const SIZE_MAP: {
   'M258.05 95.2628L257.925 130.472L290.049 147.733L320.512 129.625L321.629 94.4603L288.931 78.2781L258.05 95.2628Z',
 ];
 
-function CubeLogo() {
 function CubeLogo({ size, tier }: CubeLogoProps) {
   return (
     <Container>
-      <Logo src='/icons/devrank-logo.svg' width={630} height={127} alt='logo' />
-      <svg width='630' height='232' viewBox='0 0 574 232' fill='none' xmlns='http://www.w3.org/2000/svg'>
-        {cubePath.map((d) => (
-          <Path key={d} d={d} />
       <Shadow size={size} />
       <Svg
         width={SIZE_MAP[size].width}
@@ -92,11 +90,9 @@ export default CubeLogo;
 
 const color = keyframes`
   0% {
-    fill: #f60b50;
     fill: ${CUBE_COLOR_MAP['red']};
   }
   14% {
-    fill: #f3753a;
     fill: ${CUBE_COLOR_MAP['orange']};
   }
   28% {
@@ -106,19 +102,15 @@ const color = keyframes`
     fill: ${CUBE_COLOR_MAP['blue']};
   }
   56% {
-    fill: #33d7e0;
     fill: ${CUBE_COLOR_MAP['mint']};
   }
   70% {
-    fill:#3ac63a;
     fill: ${CUBE_COLOR_MAP['green']};
   }
   84%{
-    fill: #ffe375;
     fill: ${CUBE_COLOR_MAP['yellow']};
   }
   100% {
-    fill: #f60b50;
     fill: ${CUBE_COLOR_MAP['red']};
   }
 `;
