@@ -21,6 +21,7 @@ import {
 
 function Home() {
   const { t } = useTranslation(['index', 'common', 'meta']);
+  const [isSearchLoading, setIsSearchLoading] = useState(false);
   const router = useRouter();
 
   const searchUser = (username: string) => {
@@ -29,6 +30,16 @@ function Home() {
 
   return (
     <>
+  useEffect(() => {
+    const handleStart = () => {
+      setIsSearchLoading(true);
+    };
+    router.events.on('routeChangeStart', handleStart);
+
+    return () => {
+      router.events.off('routeChangeStart', handleStart);
+    };
+  }, [router]);
       <HeadMeta title={t('meta:main-title')} description={t('meta:main-description')} />
       <Container>
         <h2>
