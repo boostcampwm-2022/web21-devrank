@@ -7,6 +7,7 @@ import { OrganizationType, RANK } from '@type/common';
 import { ProfileLabel } from '@components/Profile';
 import { Avatar, Paper } from '@components/common';
 import CubeLogo from '@components/common/CubeLogo';
+import { CUBE_COLOR_MAP, MEDAL_IMG } from '@utils/constants';
 import { getRankingUnit } from '@utils/utils';
 
 interface ProfileCardProps {
@@ -30,7 +31,7 @@ interface ProfileCardProps {
 }
 
 interface StyledColorProps {
-  tier: RANK;
+  color: string;
 }
 
 function ProfileCard({ profileData }: ProfileCardProps) {
@@ -118,7 +119,7 @@ function ProfileCard({ profileData }: ProfileCardProps) {
             {getRankingUnit(locale, totalRank)}
           </p>
           <p>
-            <ColorPoint tier={tier}>{t(`tier:${tier}`)}</ColorPoint>
+            <ColorPoint color={CUBE_COLOR_MAP[tier]}>{t(`tier:${tier}`)}</ColorPoint>
             &nbsp;{tierRank}
             {getRankingUnit(locale, tierRank)}
           </p>
@@ -131,7 +132,7 @@ function ProfileCard({ profileData }: ProfileCardProps) {
 export default ProfileCard;
 
 const ColorPoint = styled.span<StyledColorProps>`
-  color: ${({ theme, tier }) => theme.colors[`${tier}2`]};
+  color: ${({ color }) => color};
 `;
 
 const ProfileInfos = styled.ul`
