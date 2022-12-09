@@ -109,3 +109,11 @@ export const CUBE_COLOR_MAP: {
   green: '#3ac63a',
   yellow: '#ffe375',
 };
+
+export const MEDAL_IMG: {
+  [key: number]: string;
+} = {
+  0: '/icons/ranking-1st.svg',
+  1: '/icons/ranking-2nd.svg',
+  2: '/icons/ranking-3rd.svg',
+};

@@ -5,7 +5,7 @@ import { RankingPaginationResponse } from '@type/response';
 import { RankingTable } from '@components/Ranking';
 import { Avatar, CubeIcon } from '@components/common';
 import { requestTopRankingByScore } from '@apis/ranking';
-import { MAIN_PAGE_RANK_COUNT } from '@utils/constants';
+import { MAIN_PAGE_RANK_COUNT, MEDAL_IMG } from '@utils/constants';
 
 interface OverallRankingProps {
   searchUser: (username: string) => void;
@@ -19,14 +19,6 @@ function OverallRanking({ searchUser }: OverallRankingProps) {
   );
 
   const { t } = useTranslation(['ranking', 'common']);
-
-  const medalImg: {
-    [key: number]: string;
-  } = {
-    0: '/icons/ranking-1st.svg',
-    1: '/icons/ranking-2nd.svg',
-    2: '/icons/ranking-3rd.svg',
-  };
 
   return (
     <>
@@ -48,7 +40,7 @@ function OverallRanking({ searchUser }: OverallRankingProps) {
               <CubeIcon tier={tier} />
             </RankingTable.Element>
             <RankingTable.Element>
-              <span> {idx < 3 ? <Image src={medalImg[idx]} width={20} height={30} alt='medal' /> : idx + 1}</span>
+              <span> {idx < 3 ? <Image src={MEDAL_IMG[idx]} width={20} height={30} alt='medal' /> : idx + 1}</span>
             </RankingTable.Element>
             <RankingTable.Element>
               <Avatar src={avatarUrl} name={username} />
