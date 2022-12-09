@@ -5,7 +5,8 @@ import styled from 'styled-components';
 import ProfileRefreshButton from '../ProfileRefreshButton';
 import { OrganizationType, RANK } from '@type/common';
 import { ProfileLabel } from '@components/Profile';
-import { Avatar, CubeIcon, Paper } from '@components/common';
+import { Avatar, Paper } from '@components/common';
+import CubeLogo from '@components/common/CubeLogo';
 import { getRankingUnit } from '@utils/utils';
 
 interface ProfileCardProps {
@@ -110,16 +111,18 @@ function ProfileCard({ profileData }: ProfileCardProps) {
         )}
       </ProfileInfos>
       <ProfileRank>
-        <CubeIcon tier={tier} size={160} />
-        <p>
-          {t('profile:total')}&nbsp;{totalRank}
-          {getRankingUnit(locale, totalRank)}
-        </p>
-        <p>
-          <ColorPoint tier={tier}>{t(`tier:${tier}`)}</ColorPoint>
-          &nbsp;{tierRank}
-          {getRankingUnit(locale, tierRank)}
-        </p>
+        <CubeLogo tier={tier} size={'sm'} />
+        <div>
+          <p>
+            {t('profile:total')}&nbsp;{totalRank}
+            {getRankingUnit(locale, totalRank)}
+          </p>
+          <p>
+            <ColorPoint tier={tier}>{t(`tier:${tier}`)}</ColorPoint>
+            &nbsp;{tierRank}
+            {getRankingUnit(locale, tierRank)}
+          </p>
+        </div>
       </ProfileRank>
     </Paper>
   );
@@ -159,12 +162,14 @@ const ProfileInfos = styled.ul`
 `;
 
 const ProfileRank = styled.div`
-  ${({ theme }) => theme.common.flexCenterColumn};
   max-width: 300px;
   width: 100%;
-
-  p {
-    margin-top: 8px;
+  div {
+    margin-top: 20px;
+    ${({ theme }) => theme.common.flexCenterColumn};
+    p {
+      margin-top: 8px;
+    }
   }
 
   transform: translateZ(-50);
