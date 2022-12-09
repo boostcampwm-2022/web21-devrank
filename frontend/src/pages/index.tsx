@@ -3,12 +3,14 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { QueryClient, dehydrate } from '@tanstack/react-query';
 import LanguageRanking from '@components/Ranking/LanguageRanking';
 import OverallRanking from '@components/Ranking/OverallRanking';
 import RisingRanking from '@components/Ranking/RisingRanking';
 import ViewsRanking from '@components/Ranking/ViewsRanking';
+import { Spinner } from '@components/common';
 import HeadMeta from '@components/common/HeadMeta';
 import AutoCompleteSearchbar from '@components/common/Searchbar/AutoComplete';
 import { requestTokenRefresh } from '@apis/auth';
@@ -28,8 +30,6 @@ function Home() {
     router.push(`/profile/${username}`);
   };
 
-  return (
-    <>
   useEffect(() => {
     const handleStart = () => {
       setIsSearchLoading(true);
@@ -40,33 +40,33 @@ function Home() {
       router.events.off('routeChangeStart', handleStart);
     };
   }, [router]);
+
+  return isSearchLoading ? (
+    <Loading>
+      <Spinner size={50} />
+    </Loading>
+  ) : (
+    <Container>
       <HeadMeta title={t('meta:main-title')} description={t('meta:main-description')} />
-      <Container>
-        <h2>
-          <Image src='/icons/logo-main.svg' alt='Devrank 로고' width={550} height={230} quality={100} priority />
-        </h2>
-        <AutoCompleteSearchbar
-          type='text'
-          width={600}
-          placeholder={t('index:search-placeholder')}
-          submitAlign='right'
-        />
-        <Content>
-          <OverallRankingSection>
-            <OverallRanking searchUser={searchUser} />
-          </OverallRankingSection>
-          <RisingRankingSection>
-            <RisingRanking searchUser={searchUser} />
-          </RisingRankingSection>
-          <ViewRankingSection>
-            <ViewsRanking searchUser={searchUser} />
-          </ViewRankingSection>
-          <LanguageRankingSection>
-            <LanguageRanking />
-          </LanguageRankingSection>
-        </Content>
-      </Container>
-    </>
+      <h2>
+        <Image src='/icons/logo-main.svg' alt='Devrank 로고' width={550} height={230} quality={100} priority />
+      </h2>
+      <AutoCompleteSearchbar type='text' width={600} placeholder={t('index:search-placeholder')} submitAlign='right' />
+      <Content>
+        <OverallRankingSection>
+          <OverallRanking searchUser={searchUser} />
+        </OverallRankingSection>
+        <RisingRankingSection>
+          <RisingRanking searchUser={searchUser} />
+        </RisingRankingSection>
+        <ViewRankingSection>
+          <ViewsRanking searchUser={searchUser} />
+        </ViewRankingSection>
+        <LanguageRankingSection>
+          <LanguageRanking />
+        </LanguageRankingSection>
+      </Content>
+    </Container>
   );
 }
 
@@ -103,6 +103,19 @@ const Container = styled.div`
   h2 {
     margin-bottom: 100px;
   }
+`;
+
+const Loading = styled.div`
+  ${({ theme }) => theme.common.flexCenter};
+  background-color: ${({ theme }) => theme.colors.black1};
+  width: 100%;
+  height: 100%;
+
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  z-index: 10;
 `;
 
 const Content = styled.div`
