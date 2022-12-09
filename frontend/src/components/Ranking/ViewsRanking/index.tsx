@@ -30,13 +30,13 @@ function ViewsRanking({ searchUser }: ViewsRankingProps) {
           <RankingTable.Element>{t('common:table-user')}</RankingTable.Element>
           <RankingTable.Element>{t('common:table-views')}</RankingTable.Element>
         </RankingTable.Head>
-        {rankingByViews?.map(({ id, tier, username, avatarUrl, dailyViews }, index) => (
+        {rankingByViews?.map(({ id, tier, username, avatarUrl, dailyViews }, idx) => (
           <RankingTable.Row key={id} onClick={() => searchUser(username)}>
             <RankingTable.Element>
               <CubeIcon tier={tier} />
             </RankingTable.Element>
             <RankingTable.Element>
-              <span>{index + 1}</span>
+              <span>{idx + 1}</span>
             </RankingTable.Element>
             <RankingTable.Element>
               <Avatar src={avatarUrl} name={username} />
