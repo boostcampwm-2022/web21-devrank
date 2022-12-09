@@ -1,17 +1,15 @@
 import styled from 'styled-components';
-import { CommitLevelType, HistoryType, RANK } from '@type/common';
+import { HistoryType, RANK } from '@type/common';
+import { colors } from '@styles/theme';
 import { MONTH_LABEL_MAPPING } from '@utils/constants';
 import { getDate } from '@utils/utils';
 
 const COMMIT_LEFT_BOUNDARY = 5;
 
 const COMMIT_RIGHT_BOUNDARY = 48;
+
 interface CommitHistoryProps {
   history: HistoryType;
-  tier: RANK;
-}
-interface StyledHistoryBlockProps {
-  level: CommitLevelType;
   tier: RANK;
 }
 interface StyledTooltipProps {
@@ -39,7 +37,10 @@ function CommitHistory({ history, tier }: CommitHistoryProps) {
             prevMonth = month;
           }
           return (
-            <CommitHistoryBlock key={dateString} tier={tier} level={level}>
+            <CommitHistoryBlock
+              key={dateString}
+              style={{ backgroundColor: level === 0 ? colors.commit0 : colors[`${tier}${level}`] }}
+            >
               {date < 24 && day === 0 && isMonthLabelChange ? (
                 <MonthLabel>{MONTH_LABEL_MAPPING[month]}</MonthLabel>
               ) : null}
@@ -78,12 +79,10 @@ const CommitHistoryGroup = styled.ul`
   width: 100%;
 `;
 
-const CommitHistoryBlock = styled.li<StyledHistoryBlockProps>`
+const CommitHistoryBlock = styled.li`
   width: 16px;
   aspect-ratio: 1;
   position: relative;
-  background-color: ${({ theme, level, tier }) =>
-    level === 0 ? theme.colors.commit0 : `${theme.colors[`${tier}${level}`]}`};
   border-radius: 2px;
   &:hover .tooltip {
     display: block;
