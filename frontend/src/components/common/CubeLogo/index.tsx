@@ -1,8 +1,48 @@
-import Image from 'next/image';
 import React from 'react';
-import styled, { keyframes } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
+import { CubeRankType } from '@type/common';
+import { CUBE_COLOR_MAP } from '@utils/constants';
 
-const cubePath = [
+type sizeType = 'sm' | 'lg';
+interface CubeLogoProps {
+  size: sizeType;
+  tier: CubeRankType;
+}
+
+interface StyledSVGProps {
+  tier: CubeRankType;
+}
+
+interface StyledShadowProps {
+  size: sizeType;
+}
+
+const SIZE_MAP: {
+  [key in sizeType]: {
+    width: number;
+    height: number;
+    shadow: {
+      width: number;
+      height: number;
+    };
+  };
+} = {
+  lg: {
+    width: 630,
+    height: 232,
+    shadow: {
+      width: 185,
+      height: 30,
+    },
+  },
+  sm: {
+    width: 420,
+    height: 155,
+    shadow: {
+      width: 128,
+      height: 21,
+    },
+  },
   'M363.989 36.9978L336.047 52.3652L369.211 68.0242L367.119 101.917L394.375 85.7092L396.961 52.0263L397 52.003L363.989 36.9978Z',
   'M326.944 48.0722L354.473 32.78L356.911 33.7831L323.324 18.5198L295.347 33.1544L326.944 48.0722Z',
   'M285.324 28.4199L313.685 14.1347L283.316 0.331055L254.885 14.6291L255.527 14.3496L285.324 28.4199Z',
@@ -25,14 +65,25 @@ const cubePath = [
 ];
 
 function CubeLogo() {
+function CubeLogo({ size, tier }: CubeLogoProps) {
   return (
     <Container>
       <Logo src='/icons/devrank-logo.svg' width={630} height={127} alt='logo' />
       <svg width='630' height='232' viewBox='0 0 574 232' fill='none' xmlns='http://www.w3.org/2000/svg'>
         {cubePath.map((d) => (
           <Path key={d} d={d} />
+      <Shadow size={size} />
+      <Svg
+        width={SIZE_MAP[size].width}
+        height={SIZE_MAP[size].height}
+        viewBox='0 0 574 232'
+        fill='none'
+        xmlns='http://www.w3.org/2000/svg'
+      >
+        {CUBE_PATH_LIST.map((d) => (
+          <Path key={d} d={d} tier={tier} />
         ))}
-      </svg>
+      </Svg>
     </Container>
   );
 }
@@ -99,13 +150,29 @@ const Container = styled.div`
   position: relative;
 `;
 
-const Path = styled.path`
-  animation: ${color} 8s linear infinite;
+const Shadow = styled.div<StyledShadowProps>`
+  position: absolute;
+  bottom: -8.5%;
+  left: 50%;
+  ${({ size }) => css`
+    width: ${SIZE_MAP[size].shadow.width}px;
+    height: ${SIZE_MAP[size].shadow.height}px;
+  `}
+  border-radius: 50%;
+  background: ${({ theme }) => theme.colors.black4};
+  filter: blur(3px);
+  animation: ${shadow} 4s cubic-bezier(0.28, 0, 0.44, 0.99) infinite;
 `;
 
-const Logo = styled(Image)`
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
+const Svg = styled.svg`
+  animation: ${floating} 4s cubic-bezier(0.28, 0, 0.44, 0.99) infinite;
+`;
+
+const Path = styled.path<StyledSVGProps>`
+  fill: ${({ tier }) => tier !== 'all' && CUBE_COLOR_MAP[tier]};
+  ${({ tier }) =>
+    tier === 'all' &&
+    css`
+      animation: ${color} 80s linear infinite;
+    `};
 `;
