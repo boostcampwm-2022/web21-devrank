@@ -1,12 +1,14 @@
 import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
-import Image from 'next/image';
 import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import LanguageRanking from '@components/Ranking/LanguageRanking';
 import OverallRanking from '@components/Ranking/OverallRanking';
 import RisingRanking from '@components/Ranking/RisingRanking';
 import ViewsRanking from '@components/Ranking/ViewsRanking';
+import { Spinner } from '@components/common';
+import CubeLogo from '@components/common/CubeLogo';
 import HeadMeta from '@components/common/HeadMeta';
 import AutoCompleteSearchbar from '@components/common/Searchbar/AutoComplete';
 import { requestTokenRefresh } from '@apis/auth';
@@ -20,18 +22,34 @@ import { ssrWrapper } from '@utils/wrapper';
 
 function Home() {
   const { t } = useTranslation(['index', 'common', 'meta']);
+  const [isSearchLoading, setIsSearchLoading] = useState(false);
   const router = useRouter();
 
   const searchUser = (username: string) => {
     router.push(`/profile/${username}`);
   };
 
-  return (
+  useEffect(() => {
+    const handleStart = () => {
+      setIsSearchLoading(true);
+    };
+    router.events.on('routeChangeStart', handleStart);
+
+    return () => {
+      router.events.off('routeChangeStart', handleStart);
+    };
+  }, [router]);
+
+  return isSearchLoading ? (
+    <Loading>
+      <Spinner size={50} />
+    </Loading>
+  ) : (
     <>
       <HeadMeta title={t('meta:main-title')} description={t('meta:main-description')} />
       <Container>
         <h2>
-          <Image src='/icons/logo-main.svg' alt='Devrank 로고' width={550} height={230} quality={100} priority />
+          <CubeLogo size='lg' tier='all' />
         </h2>
         <AutoCompleteSearchbar
           type='text'
@@ -93,6 +111,19 @@ const Container = styled.div`
   h2 {
     margin-bottom: 100px;
   }
+`;
+
+const Loading = styled.div`
+  ${({ theme }) => theme.common.flexCenter};
+  background-color: ${({ theme }) => theme.colors.black1};
+  width: 100%;
+  height: 100%;
+
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  z-index: 10;
 `;
 
 const Content = styled.div`

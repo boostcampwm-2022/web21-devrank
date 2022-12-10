@@ -127,7 +127,7 @@ export class UserService {
         if (!updatedUser.scoreHistory) updatedUser.scoreHistory = [];
         updatedUser.scoreHistory.push({
           date: new Date(),
-          score: user.score,
+          score: updatedUser.score,
         });
         if (updatedUser.scoreHistory.length > 1) {
           updatedUser.scoreDifference =

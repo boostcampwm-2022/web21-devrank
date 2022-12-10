@@ -33,6 +33,7 @@ function EXPbar({ tier, exp, startExp, needExp }: EXPbarProps) {
 export default EXPbar;
 
 const Score = styled.div`
+  font-size: 20px;
   margin-top: 10px;
   margin-left: 10px;
 `;
