@@ -1,20 +1,19 @@
 import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
-import { QueryClient, dehydrate, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { CubeRankType } from '@type/common';
 import { RankingPaginationResponse } from '@type/response';
 import Filterbar from '@components/Filterbar';
 import Pagination from '@components/Pagination';
 import { NotFound, RankingSearchbar, RankingTable } from '@components/Ranking';
-import { Avatar, CubeIcon, LanguageIcon, RankingSkeleton } from '@components/common';
-import HeadMeta from '@components/common/HeadMeta';
+import { Avatar, CubeIcon, HeadMeta, LanguageIcon, RankingSkeleton } from '@components/common';
 import { requestTokenRefresh } from '@apis/auth';
 import { requestTopRankingByScore } from '@apis/ranking';
 import { COUNT_PER_PAGE, CUBE_RANK } from '@utils/constants';
 import { queryValidator } from '@utils/utils';
+import { ssrWrapper } from '@utils/wrapper';
 
 interface RankingProps {
   tier: string;
@@ -123,42 +122,27 @@ function Ranking({ tier, username, page }: RankingProps) {
 
 export default Ranking;
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const queryClient = new QueryClient();
-  const { tier, username, page } = context.query;
-  const query = queryValidator({ tier, username, page });
+export const getServerSideProps: GetServerSideProps = ssrWrapper(
+  ['common', 'header', 'footer', 'tier', 'ranking', 'meta'],
+  async (context, queryClient) => {
+    const { tier, username, page } = context.query;
+    const query = queryValidator({ tier, username, page });
+    await Promise.allSettled([
+      queryClient.prefetchQuery(['user'], () => requestTokenRefresh(context)),
+      queryClient.prefetchQuery(['ranking', CUBE_RANK.ALL, ''], () =>
+        requestTopRankingByScore({ limit: COUNT_PER_PAGE }),
+      ),
+    ]);
 
-  await Promise.allSettled([
-    queryClient.prefetchQuery(['user'], () => requestTokenRefresh(context)),
-    queryClient.prefetchQuery(['ranking', CUBE_RANK.ALL, ''], () =>
-      requestTopRankingByScore({ limit: COUNT_PER_PAGE }),
-    ),
-  ]);
-
-  if (!query) {
     return {
+      data: query,
       redirect: {
-        destination: '/profile/404',
-        permanent: false,
+        trigger: !query,
+        url: '/404',
       },
     };
-  } else {
-    return {
-      props: {
-        ...query,
-        dehydratedState: dehydrate(queryClient),
-        ...(await serverSideTranslations(context.locale as string, [
-          'common',
-          'header',
-          'footer',
-          'tier',
-          'ranking',
-          'meta',
-        ])),
-      },
-    };
-  }
-};
+  },
+);
 
 const Container = styled.div`
   ${({ theme }) => theme.common.flexCenterColumn};

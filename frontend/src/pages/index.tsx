@@ -1,10 +1,8 @@
 import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
-import { QueryClient, dehydrate } from '@tanstack/react-query';
 import LanguageRanking from '@components/Ranking/LanguageRanking';
 import OverallRanking from '@components/Ranking/OverallRanking';
 import RisingRanking from '@components/Ranking/RisingRanking';
@@ -18,6 +16,7 @@ import {
   requestTopRankingByScore,
   requestTopRankingByViews,
 } from '@apis/ranking';
+import { ssrWrapper } from '@utils/wrapper';
 
 function Home() {
   const { t } = useTranslation(['index', 'common', 'meta']);
@@ -61,28 +60,29 @@ function Home() {
 
 export default Home;
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const queryClient = new QueryClient();
-
-  await Promise.allSettled([
-    queryClient.prefetchQuery(['top-ranking-by-score'], () =>
-      requestTopRankingByScore({
-        limit: 12,
-      }),
-    ),
-    queryClient.prefetchQuery(['top-ranking-by-rising'], () => requestTopRankingByRising()),
-    queryClient.prefetchQuery(['top-ranking-by-views'], () => requestTopRankingByViews()),
-    queryClient.prefetchQuery(['top-ranking-by-programming-lang'], () => requestProgrammingLanguageRanking()),
-    queryClient.prefetchQuery(['user'], () => requestTokenRefresh(context)),
-  ]);
-
-  return {
-    props: {
-      dehydratedState: dehydrate(queryClient),
-      ...(await serverSideTranslations(context.locale as string, ['index', 'common', 'header', 'footer', 'meta'])),
-    },
-  };
-};
+export const getServerSideProps: GetServerSideProps = ssrWrapper(
+  ['index', 'common', 'header', 'footer', 'meta'],
+  async (context, queryClient) => {
+    await Promise.allSettled([
+      queryClient.prefetchQuery(['top-ranking-by-score'], () =>
+        requestTopRankingByScore({
+          limit: 12,
+        }),
+      ),
+      queryClient.prefetchQuery(['top-ranking-by-rising'], () => requestTopRankingByRising()),
+      queryClient.prefetchQuery(['top-ranking-by-views'], () => requestTopRankingByViews()),
+      queryClient.prefetchQuery(['top-ranking-by-programming-lang'], () => requestProgrammingLanguageRanking()),
+      queryClient.prefetchQuery(['user'], () => requestTokenRefresh(context)),
+    ]);
+    return {
+      data: {},
+      redirect: {
+        trigger: false,
+        url: '',
+      },
+    };
+  },
+);
 
 const Container = styled.div`
   ${({ theme }) => theme.common.flexCenterColumn};

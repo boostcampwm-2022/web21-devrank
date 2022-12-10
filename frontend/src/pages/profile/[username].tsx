@@ -32,6 +32,8 @@ function Profile({ username }: ProfileProps) {
 
   const { t } = useTranslation(['profile', 'meta']);
 
+  console.log(data);
+
   return (
     <Container>
       {data && (
