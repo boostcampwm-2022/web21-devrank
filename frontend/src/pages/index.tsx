@@ -74,6 +74,7 @@ export const getServerSideProps: GetServerSideProps = ssrWrapper(
       queryClient.prefetchQuery(['top-ranking-by-programming-lang'], () => requestProgrammingLanguageRanking()),
       queryClient.prefetchQuery(['user'], () => requestTokenRefresh(context)),
     ]);
+
     return {
       data: {},
       redirect: {

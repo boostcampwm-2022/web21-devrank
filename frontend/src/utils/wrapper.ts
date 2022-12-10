@@ -9,12 +9,14 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { ParsedUrlQuery } from 'querystring';
 import { QueryClient, dehydrate } from '@tanstack/react-query';
 
+interface Redirect {
+  trigger: boolean;
+  url: string;
+}
+
 export interface PropsData {
   data: any;
-  redirect: {
-    trigger: boolean;
-    url: string;
-  };
+  redirect: Redirect;
 }
 
 export function ssrWrapper(
@@ -22,12 +24,12 @@ export function ssrWrapper(
   callback?: (
     context: GetServerSidePropsContext<ParsedUrlQuery, PreviewData>,
     queryClient: QueryClient,
-  ) => PropsData | any,
+  ) => Promise<PropsData>,
 ): GetServerSideProps {
   return async (context) => {
     const queryClient = new QueryClient();
     let propsData: PropsData = {
-      data: null,
+      data: {},
       redirect: {
         trigger: false,
         url: '',
@@ -57,12 +59,15 @@ export function ssrWrapper(
 
 export function ssgWrapper(
   namespaces: string[],
-  callback?: (context: GetStaticPropsContext<ParsedUrlQuery, PreviewData>, queryClient: QueryClient) => PropsData | any,
+  callback?: (
+    context: GetStaticPropsContext<ParsedUrlQuery, PreviewData>,
+    queryClient: QueryClient,
+  ) => Promise<PropsData>,
 ): GetStaticProps {
   return async (context) => {
     const queryClient = new QueryClient();
     let propsData: PropsData = {
-      data: null,
+      data: {},
       redirect: {
         trigger: false,
         url: '',
