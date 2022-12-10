@@ -34,10 +34,18 @@ function Home() {
     const handleStart = () => {
       setIsSearchLoading(true);
     };
+
+    const handleEnd = () => {
+      setIsSearchLoading(false);
+    };
     router.events.on('routeChangeStart', handleStart);
+    router.events.on('routeChangeComplete', handleEnd);
+    router.events.on('routeChangeError', handleEnd);
 
     return () => {
       router.events.off('routeChangeStart', handleStart);
+      router.events.off('routeChangeStart', handleEnd);
+      router.events.off('routeChangeError', handleEnd);
     };
   }, [router]);
 
