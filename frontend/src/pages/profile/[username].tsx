@@ -29,14 +29,18 @@ function Profile({ username }: ProfileProps) {
     onError: () => alert('최근에 업데이트 했습니다.'),
     onSettled: () => refetch(),
   });
-
   const { t } = useTranslation(['profile', 'meta']);
 
+  const ogImage = `https://dreamdev.me/api/og-image/?username=${username}&tier=${data?.tier}&image=${data?.avatarUrl}`;
   return (
     <Container>
       {data && (
         <>
-          <HeadMeta title={`${username}${t('meta:profile-title')}`} description={getProfileDescription(locale, data)} />
+          <HeadMeta
+            title={`${username}${t('meta:profile-title')}`}
+            image={ogImage}
+            description={getProfileDescription(locale, data)}
+          />
           <ProfileCard
             profileData={{
               username,
