@@ -1,5 +1,3 @@
-import { GetStaticProps } from 'next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import styled from 'styled-components';
@@ -40,14 +38,6 @@ function Callback() {
 }
 
 export default Callback;
-
-export const getStaticProps: GetStaticProps = async (context) => {
-  return {
-    props: {
-      ...(await serverSideTranslations(context.locale as string, ['common', 'footer', 'header'])),
-    },
-  };
-};
 
 const Container = styled.div`
   ${({ theme }) => theme.common.flexCenter};
