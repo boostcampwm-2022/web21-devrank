@@ -1,7 +1,6 @@
 import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
@@ -11,6 +10,7 @@ import OverallRanking from '@components/Ranking/OverallRanking';
 import RisingRanking from '@components/Ranking/RisingRanking';
 import ViewsRanking from '@components/Ranking/ViewsRanking';
 import { Spinner } from '@components/common';
+import CubeLogo from '@components/common/CubeLogo';
 import HeadMeta from '@components/common/HeadMeta';
 import AutoCompleteSearchbar from '@components/common/Searchbar/AutoComplete';
 import { requestTokenRefresh } from '@apis/auth';
@@ -46,27 +46,34 @@ function Home() {
       <Spinner size={50} />
     </Loading>
   ) : (
-    <Container>
+    <>
       <HeadMeta title={t('meta:main-title')} description={t('meta:main-description')} />
-      <h2>
-        <Image src='/icons/logo-main.svg' alt='Devrank 로고' width={550} height={230} quality={100} priority />
-      </h2>
-      <AutoCompleteSearchbar type='text' width={600} placeholder={t('index:search-placeholder')} submitAlign='right' />
-      <Content>
-        <OverallRankingSection>
-          <OverallRanking searchUser={searchUser} />
-        </OverallRankingSection>
-        <RisingRankingSection>
-          <RisingRanking searchUser={searchUser} />
-        </RisingRankingSection>
-        <ViewRankingSection>
-          <ViewsRanking searchUser={searchUser} />
-        </ViewRankingSection>
-        <LanguageRankingSection>
-          <LanguageRanking />
-        </LanguageRankingSection>
-      </Content>
-    </Container>
+      <Container>
+        <h2>
+          <CubeLogo size='lg' tier='all' />
+        </h2>
+        <AutoCompleteSearchbar
+          type='text'
+          width={600}
+          placeholder={t('index:search-placeholder')}
+          submitAlign='right'
+        />
+        <Content>
+          <OverallRankingSection>
+            <OverallRanking searchUser={searchUser} />
+          </OverallRankingSection>
+          <RisingRankingSection>
+            <RisingRanking searchUser={searchUser} />
+          </RisingRankingSection>
+          <ViewRankingSection>
+            <ViewsRanking searchUser={searchUser} />
+          </ViewRankingSection>
+          <LanguageRankingSection>
+            <LanguageRanking />
+          </LanguageRankingSection>
+        </Content>
+      </Container>
+    </>
   );
 }
 
