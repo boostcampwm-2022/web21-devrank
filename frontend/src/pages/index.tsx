@@ -2,12 +2,14 @@ import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { QueryClient, dehydrate } from '@tanstack/react-query';
 import LanguageRanking from '@components/Ranking/LanguageRanking';
 import OverallRanking from '@components/Ranking/OverallRanking';
 import RisingRanking from '@components/Ranking/RisingRanking';
 import ViewsRanking from '@components/Ranking/ViewsRanking';
+import { Spinner } from '@components/common';
 import CubeLogo from '@components/common/CubeLogo';
 import HeadMeta from '@components/common/HeadMeta';
 import AutoCompleteSearchbar from '@components/common/Searchbar/AutoComplete';
@@ -21,13 +23,29 @@ import {
 
 function Home() {
   const { t } = useTranslation(['index', 'common', 'meta']);
+  const [isSearchLoading, setIsSearchLoading] = useState(false);
   const router = useRouter();
 
   const searchUser = (username: string) => {
     router.push(`/profile/${username}`);
   };
 
-  return (
+  useEffect(() => {
+    const handleStart = () => {
+      setIsSearchLoading(true);
+    };
+    router.events.on('routeChangeStart', handleStart);
+
+    return () => {
+      router.events.off('routeChangeStart', handleStart);
+    };
+  }, [router]);
+
+  return isSearchLoading ? (
+    <Loading>
+      <Spinner size={50} />
+    </Loading>
+  ) : (
     <>
       <HeadMeta title={t('meta:main-title')} description={t('meta:main-description')} />
       <Container>
@@ -92,6 +110,19 @@ const Container = styled.div`
   h2 {
     margin-bottom: 100px;
   }
+`;
+
+const Loading = styled.div`
+  ${({ theme }) => theme.common.flexCenter};
+  background-color: ${({ theme }) => theme.colors.black1};
+  width: 100%;
+  height: 100%;
+
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  z-index: 10;
 `;
 
 const Content = styled.div`
