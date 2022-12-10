@@ -1,17 +1,15 @@
 import styled from 'styled-components';
-import { CommitLevelType, HistoryType, RANK } from '@type/common';
+import { HistoryType, RANK } from '@type/common';
+import { colors } from '@styles/theme';
 import { MONTH_LABEL_MAPPING } from '@utils/constants';
 import { getDate } from '@utils/utils';
 
 const COMMIT_LEFT_BOUNDARY = 5;
 
 const COMMIT_RIGHT_BOUNDARY = 48;
+
 interface CommitHistoryProps {
   history: HistoryType;
-  tier: RANK;
-}
-interface StyledHistoryBlockProps {
-  level: CommitLevelType;
   tier: RANK;
 }
 interface StyledTooltipProps {
@@ -39,7 +37,10 @@ function CommitHistory({ history, tier }: CommitHistoryProps) {
             prevMonth = month;
           }
           return (
-            <CommitHistoryBlock key={idx} tier={tier} level={level}>
+            <CommitHistoryBlock
+              key={dateString}
+              style={{ backgroundColor: level === 0 ? colors.commit0 : colors[`${tier}${level}`] }}
+            >
               {date < 24 && day === 0 && isMonthLabelChange ? (
                 <MonthLabel>{MONTH_LABEL_MAPPING[month]}</MonthLabel>
               ) : null}
@@ -49,12 +50,12 @@ function CommitHistory({ history, tier }: CommitHistoryProps) {
             </CommitHistoryBlock>
           );
         })}
-        <DayLabel>
-          <div>Mon</div>
-          <div>Wed</div>
-          <div>Fri</div>
-        </DayLabel>
       </CommitHistoryGroup>
+      <DayLabel>
+        <li>Mon</li>
+        <li>Wed</li>
+        <li>Fri</li>
+      </DayLabel>
     </Container>
   );
 }
@@ -62,6 +63,7 @@ function CommitHistory({ history, tier }: CommitHistoryProps) {
 export default CommitHistory;
 
 const Container = styled.div`
+  position: relative;
   ${({ theme }) => theme.common.flexCenterColumn};
   width: 100%;
   padding-top: 20px;
@@ -77,12 +79,10 @@ const CommitHistoryGroup = styled.ul`
   width: 100%;
 `;
 
-const CommitHistoryBlock = styled.li<StyledHistoryBlockProps>`
+const CommitHistoryBlock = styled.li`
   width: 16px;
   aspect-ratio: 1;
   position: relative;
-  background-color: ${({ theme, level, tier }) =>
-    level === 0 ? theme.colors.commit0 : `${theme.colors[`${tier}${level}`]}`};
   border-radius: 2px;
   &:hover .tooltip {
     display: block;
@@ -162,9 +162,10 @@ const MonthLabel = styled.div`
   pointer-events: none;
 `;
 
-const DayLabel = styled.div`
+const DayLabel = styled.ul`
   position: absolute;
-  left: -45px;
+  top: 0;
+  left: -20px;
   font-size: 16px;
   height: 100%;
   ${({ theme }) => theme.common.flexCenterColumn};

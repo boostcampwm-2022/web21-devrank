@@ -1,6 +1,6 @@
 import { DefaultTheme } from 'styled-components';
 
-const colors = {
+export const colors = {
   text: '#FBFBFB',
   logo: '#D9D9BF',
   commit0: '#474747',
@@ -38,8 +38,8 @@ const colors = {
   purple4: '#561A72',
   orange1: '#F6BEA4',
   orange2: '#F3753A',
-  orange3: '#CA4405',
-  orange4: '#872C02',
+  orange3: '#E54500',
+  orange4: '#B33600',
   red1: '#F3AFC3',
   red2: '#F65988',
   red3: '#F60B51',
