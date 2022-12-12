@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { QueryClient, dehydrate, useMutation, useQuery } from '@tanstack/react-query';
 import { ProfileUserResponse } from '@type/response';
-import { CommitHistory, ContributionStatistic, EXPbar, PinnedRepository, ProfileCard } from '@components/Profile';
+import { CommitHistory, EXPbar, PinnedRepository, ProfileCard, Statistic } from '@components/Profile';
 import { Paper } from '@components/common';
 import HeadMeta from '@components/common/HeadMeta';
 import { requestTokenRefresh } from '@apis/auth';
@@ -74,7 +74,7 @@ function Profile({ username }: ProfileProps) {
           </Paper>
           <Title>Stats</Title>
           <Paper>
-            <ContributionStatistic data={data} />
+            <Statistic data={data} />
           </Paper>
           <Title>Pinned Repositories</Title>
           <Paper>

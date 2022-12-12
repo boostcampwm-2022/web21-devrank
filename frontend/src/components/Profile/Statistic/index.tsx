@@ -18,7 +18,7 @@ interface ContributionStatisticProps {
   data: ProfileUserResponse;
 }
 
-function ContributionStatistic({ data }: ContributionStatisticProps) {
+function Statistic({ data }: ContributionStatisticProps) {
   const theme = useTheme();
   const pieChartData = transToPieChartData(data.history);
   const contributionHistoryData = transContributionHistoryToLineChartData(data.history.contributionHistory, data.tier);
@@ -61,7 +61,7 @@ function ContributionStatistic({ data }: ContributionStatisticProps) {
   );
 }
 
-export default ContributionStatistic;
+export default Statistic;
 
 const ChartContainer = styled.ul`
   ${({ theme }) => theme.common.flexCenterColumn};
