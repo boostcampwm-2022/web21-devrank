@@ -7,7 +7,7 @@ import { Request } from 'express';
 import * as jwt from 'jsonwebtoken';
 import * as URL from 'url';
 import { AuthRepository } from './auth.repository';
-import { GithubProfile } from './types';
+import { GithubProfile, Payload } from './types';
 
 @Injectable()
 export class AuthService {
@@ -58,9 +58,13 @@ export class AuthService {
     return request.cookies?.[this.configService.get('REFRESH_TOKEN_KEY')];
   }
 
-  checkRefreshToken(refreshToken: string): jwt.JwtPayload {
+  async checkRefreshToken(refreshToken: string): Promise<void> {
     try {
-      return jwt.verify(refreshToken, this.configService.get('JWT_REFRESH_SECRET')) as jwt.JwtPayload;
+      const payload = jwt.verify(refreshToken, this.configService.get('JWT_REFRESH_SECRET')) as Payload;
+      const storedRefreshToken = await this.authRepository.findRefreshTokenById(payload.id);
+      if (refreshToken !== storedRefreshToken) {
+        throw new UnauthorizedException('invalid token.');
+      }
     } catch {
       throw new UnauthorizedException('invalid token.');
     }
@@ -70,15 +74,15 @@ export class AuthService {
     await this.authRepository.create(id, refreshToken);
   }
 
-  async replaceRefreshToken(id: string, refreshToken: string, githubToken: string): Promise<string> {
-    const storedRefreshToken = await this.authRepository.findRefreshTokenById(id);
-    if (refreshToken !== storedRefreshToken) {
-      throw new UnauthorizedException('invalid token.');
-    }
-    const newRefreshToken = this.issueRefreshToken(id, githubToken);
-    await this.authRepository.create(id, newRefreshToken);
-    return newRefreshToken;
-  }
+  // async replaceRefreshToken(id: string, refreshToken: string, githubToken: string): Promise<string> {
+  //   const storedRefreshToken = await this.authRepository.findRefreshTokenById(id);
+  //   if (refreshToken !== storedRefreshToken) {
+  //     throw new UnauthorizedException('invalid token.');
+  //   }
+  //   const newRefreshToken = this.issueRefreshToken(id, githubToken);
+  //   await this.authRepository.create(id, newRefreshToken);
+  //   return newRefreshToken;
+  // }
 
   async deleteRefreshToken(id: string): Promise<void> {
     await this.authRepository.delete(id);
