@@ -7,8 +7,9 @@ interface ProfileRefreshButtonProps {
   updateDelayTime: number;
   updateData: () => void;
   isLoading: boolean;
+  isMine: boolean;
 }
-function ProfileRefreshButton({ updateDelayTime, updateData, isLoading }: ProfileRefreshButtonProps) {
+function ProfileRefreshButton({ updateDelayTime, updateData, isLoading, isMine }: ProfileRefreshButtonProps) {
   const [count, setCount] = useState(updateDelayTime);
 
   useInterval(() => {
@@ -18,12 +19,11 @@ function ProfileRefreshButton({ updateDelayTime, updateData, isLoading }: Profil
   useEffect(() => {
     setCount(updateDelayTime);
   }, [updateDelayTime, isLoading]);
-
   return (
     <Container>
       {isLoading ? (
         <Image src='/icons/refresh.svg' width={32} height={32} alt='refresh' className='active' />
-      ) : count > 0 ? (
+      ) : count > 0 && !isMine ? (
         <Timer>
           <span>{count}</span>초후 업데이트 가능합니다.
         </Timer>

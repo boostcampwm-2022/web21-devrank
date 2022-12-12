@@ -123,4 +123,8 @@ export class UserRepository {
     this.redis.hset(scoreKey, scores);
     this.redis.expire(scoreKey, RANK_CACHE_DELAY);
   }
+
+  async deleteCachedUserRank(scoreKey: string): Promise<void> {
+    this.redis.del(scoreKey);
+  }
 }

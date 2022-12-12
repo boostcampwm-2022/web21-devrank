@@ -13,7 +13,7 @@ instance.interceptors.response.use(
     // 응답와서 access token 있으면 Authorization Header에 저장
     const accessToken = res.data.accessToken;
     if (accessToken) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+      instance.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
     }
 
     return res;
@@ -26,7 +26,7 @@ instance.interceptors.response.use(
       if (err.response.status === 401 && err.response.retry) {
         try {
           const { data } = await instance.post('/auth/refresh');
-          axios.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`;
+          instance.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`;
 
           return instance(originConfig);
         } catch (_err) {

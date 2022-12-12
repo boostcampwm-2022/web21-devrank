@@ -2,10 +2,12 @@ import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 import styled from 'styled-components';
+import { useQueryData } from '@hooks';
 import { QueryClient, dehydrate, useMutation, useQuery } from '@tanstack/react-query';
 import { ProfileUserResponse } from '@type/response';
-import { CommitHistory, ContributionStatistic, EXPbar, PinnedRepository, ProfileCard } from '@components/Profile';
+import { CommitHistory, EXPbar, PinnedRepository, ProfileCard, Statistic } from '@components/Profile';
 import { Paper } from '@components/common';
 import HeadMeta from '@components/common/HeadMeta';
 import { requestTokenRefresh } from '@apis/auth';
@@ -20,9 +22,12 @@ function Profile({ username }: ProfileProps) {
   const MAX_COMMIT_STREAK = 368;
   const router = useRouter();
   const locale = router.locale as string;
+
   const { data, refetch } = useQuery<ProfileUserResponse>(['profile', username], () =>
     requestUserInfoByUsername({ username, method: 'GET' }),
   );
+
+  const { queryData: userData } = useQueryData(['user']);
 
   const { mutate, isLoading } = useMutation<ProfileUserResponse>({
     mutationFn: () => requestUserInfoByUsername({ username, method: 'PATCH' }),
@@ -30,16 +35,17 @@ function Profile({ username }: ProfileProps) {
     onSettled: () => refetch(),
   });
   const { t } = useTranslation(['profile', 'meta']);
-  
-  const ogImage = `https://dreamdev.me/api/og-image/?username=${username}&tier=${data?.tier}&image=${data?.avatarUrl}`;
 
+  useEffect(() => {
+    requestTokenRefresh();
+  }, []);
   return (
     <Container>
       {data && (
         <>
           <HeadMeta
             title={`${username}${t('meta:profile-title')}`}
-            image={ogImage}
+            image={`https://dreamdev.me/api/og-image/?username=${username}&tier=${data.tier}&image=${data.avatarUrl}`}
             description={getProfileDescription(locale, data)}
           />
           <ProfileCard
@@ -59,14 +65,15 @@ function Profile({ username }: ProfileProps) {
               updateDelayTime: data.updateDelayTime,
               updateData: mutate,
               isLoading,
+              isMine: userData?.username === username,
             }}
           />
           <Title>EXP</Title>
           <EXPbar tier={data.tier} exp={data.score} needExp={data.needExp} startExp={data.startExp} />
           <ContributionHeader>
             <Title>Contributions</Title>
-            <p>{`${t('maximum-continuous-commit-history')} : ${data.history.maxContinuosCount}${
-              data.history.maxContinuosCount >= MAX_COMMIT_STREAK ? `${t('day')}~` : t('day')
+            <p>{`${t('maximum-continuous-commit-history')} : ${data.history.maxContinuousCount}${
+              data.history.maxContinuousCount >= MAX_COMMIT_STREAK ? `${t('day')}~` : t('day')
             }`}</p>
           </ContributionHeader>
           <Paper>
@@ -74,7 +81,7 @@ function Profile({ username }: ProfileProps) {
           </Paper>
           <Title>Stats</Title>
           <Paper>
-            <ContributionStatistic data={data} />
+            <Statistic data={data} />
           </Paper>
           <Title>Pinned Repositories</Title>
           <Paper>
