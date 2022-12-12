@@ -7,7 +7,7 @@ import styled from 'styled-components';
 import { useQueryData } from '@hooks';
 import { QueryClient, dehydrate, useMutation, useQuery } from '@tanstack/react-query';
 import { ProfileUserResponse } from '@type/response';
-import { CommitHistory, ContributionStatistic, EXPbar, PinnedRepository, ProfileCard } from '@components/Profile';
+import { CommitHistory, EXPbar, PinnedRepository, ProfileCard, Statistic } from '@components/Profile';
 import { Paper } from '@components/common';
 import HeadMeta from '@components/common/HeadMeta';
 import { requestTokenRefresh } from '@apis/auth';
@@ -72,8 +72,8 @@ function Profile({ username }: ProfileProps) {
           <EXPbar tier={data.tier} exp={data.score} needExp={data.needExp} startExp={data.startExp} />
           <ContributionHeader>
             <Title>Contributions</Title>
-            <p>{`${t('maximum-continuous-commit-history')} : ${data.history.maxContinuosCount}${
-              data.history.maxContinuosCount >= MAX_COMMIT_STREAK ? `${t('day')}~` : t('day')
+            <p>{`${t('maximum-continuous-commit-history')} : ${data.history.maxContinuousCount}${
+              data.history.maxContinuousCount >= MAX_COMMIT_STREAK ? `${t('day')}~` : t('day')
             }`}</p>
           </ContributionHeader>
           <Paper>
@@ -81,7 +81,7 @@ function Profile({ username }: ProfileProps) {
           </Paper>
           <Title>Stats</Title>
           <Paper>
-            <ContributionStatistic data={data} />
+            <Statistic data={data} />
           </Paper>
           <Title>Pinned Repositories</Title>
           <Paper>

@@ -36,7 +36,7 @@ export class History {
   forkCount: number;
 
   @ApiProperty()
-  maxContinuosCount: number;
+  maxContinuousCount: number;
 
   @ApiProperty({
     isArray: true,

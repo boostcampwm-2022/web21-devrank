@@ -48,7 +48,9 @@ export class UserService {
       user = await this.userRepository.createOrUpdate(user);
     }
     await this.userRepository.createOrUpdate(user);
-    const { totalRank, tierRank } = await this.getUserRelativeRanking(user);
+
+    const { totalRank, tierRank } =
+      (await this.getUserRelativeRanking(user)) || (await this.setUserRelativeRanking(user));
     this.userRepository.setDuplicatedRequestIp(ip, username);
     user.updateDelayTime = await this.userRepository.findUpdateScoreTimeToLive(username);
     user.totalRank = totalRank;
@@ -69,11 +71,11 @@ export class UserService {
     const octokit = new Octokit({
       auth: githubToken,
     });
-    const [scores, history, { organizations, pinnedRepositories }] = await Promise.all([
-      this.getUserScore(username, octokit),
+    const [history, { organizations, pinnedRepositories }] = await Promise.all([
       this.getUserHistory(username, octokit),
       this.getUserOrganizationAndPinnedRepositories(username, octokit),
     ]);
+    const scores = await this.getUserScore(username, octokit, history);
     const updatedUser: UserDto = {
       ...user,
       ...scores,
@@ -82,7 +84,8 @@ export class UserService {
       pinnedRepositories,
     };
     user = await this.userRepository.createOrUpdate(updatedUser);
-    const { totalRank, tierRank } = await this.getUserRelativeRanking(user);
+
+    const { totalRank, tierRank } = await this.setUserRelativeRanking(user);
     const userWithRank: UserProfileDto = {
       ...user,
       totalRank,
@@ -110,6 +113,7 @@ export class UserService {
           updateUser.scoreDifference = 0;
         }
         this.userRepository.createOrUpdate(updateUser);
+        this.userRepository.deleteCachedUserRank(updateUser.username + '&');
       } catch {
         logger.error(`can't update user ${user.username}`);
       }
@@ -188,7 +192,7 @@ export class UserService {
     }
   }
 
-  async getUserScore(username: string, octokit: Octokit): Promise<Partial<UserDto>> {
+  async getUserScore(username: string, octokit: Octokit, history: History): Promise<Partial<UserDto>> {
     const res: any = await octokit.request('GET /users/{username}', {
       username,
     });
@@ -250,11 +254,17 @@ export class UserService {
         return repository.parent;
       });
 
+      const contributionScore =
+        history.totalCommitContributions +
+        history.totalIssueContributions +
+        history.totalPullRequestContributions +
+        history.totalRepositoryContributions +
+        history.totalPullRequestReviewContributions;
       const forkScore = forkRepositories.reduce(getCommitScore, 0);
       const followersScore = Math.floor(followersResponse.user.followers.totalCount / 10);
       const personalRepositories = personalResponse.user.repositories.nodes;
       const personalScore = personalRepositories.reduce(getCommitScore, 0);
-      const commitsScore = parseInt(forkScore + personalScore);
+      const commitsScore = parseInt(forkScore + personalScore) + contributionScore;
       const issuesScore = Math.floor(
         issuesResponse.user.issues.edges.reduce((acc, issue) => {
           const time = +new Date() - +new Date(issue.node.createdAt);
@@ -290,14 +300,14 @@ export class UserService {
     } = response.contributionsCollection;
 
     const { colors, weeks } = response.contributionsCollection.contributionCalendar;
-    let [continuosCount, maxContinuosCount] = [0, 0];
+    let [continuousCount, maxContinuousCount] = [0, 0];
     const contributionHistory = weeks.reduce((acc, week) => {
       week.contributionDays.forEach((day) => {
         acc[day.date] = { count: day.contributionCount, level: colors.indexOf(day.color) + 1 };
         if (day.contributionCount !== 0) {
-          maxContinuosCount = Math.max(++continuosCount, maxContinuosCount);
+          maxContinuousCount = Math.max(++continuousCount, maxContinuousCount);
         } else {
-          continuosCount = 0;
+          continuousCount = 0;
         }
       });
       return acc;
@@ -319,7 +329,7 @@ export class UserService {
       totalRepositoryContributions,
       stargazerCount,
       forkCount,
-      maxContinuosCount,
+      maxContinuousCount,
       contributionHistory,
     };
   }
@@ -342,11 +352,15 @@ export class UserService {
     };
   }
 
-  async getUserRelativeRanking(user: UserDto): Promise<Rank> {
+  async getUserRelativeRanking(user: UserDto): Promise<Rank | false> {
     const cachedRanks = await this.userRepository.findCachedUserRank(user.id + '&');
     if (Object.keys(cachedRanks).length) {
       return cachedRanks;
     }
+    return false;
+  }
+
+  async setUserRelativeRanking(user: UserDto): Promise<Rank> {
     const users = await this.userRepository.findAll({}, true, ['username', 'tier', 'score']);
     let tierRank = 0;
     for (let rank = 0; rank < users.length; rank++) {
@@ -355,7 +369,7 @@ export class UserService {
           totalRank: rank + 1,
           tierRank: tierRank + 1,
         };
-        this.userRepository.setCachedUserRank(user.id + '&', rankInfo);
+        await this.userRepository.setCachedUserRank(user.id + '&', rankInfo);
         return rankInfo;
       }
       if (users[rank].tier === user.tier) {
