@@ -3,6 +3,7 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
+import { useQueryData } from '@hooks';
 import { QueryClient, dehydrate, useMutation, useQuery } from '@tanstack/react-query';
 import { ProfileUserResponse } from '@type/response';
 import { CommitHistory, ContributionStatistic, EXPbar, PinnedRepository, ProfileCard } from '@components/Profile';
@@ -24,22 +25,21 @@ function Profile({ username }: ProfileProps) {
     requestUserInfoByUsername({ username, method: 'GET' }),
   );
 
+  const { queryData: userData } = useQueryData(['user']);
+
   const { mutate, isLoading } = useMutation<ProfileUserResponse>({
     mutationFn: () => requestUserInfoByUsername({ username, method: 'PATCH' }),
     onError: () => alert('최근에 업데이트 했습니다.'),
     onSettled: () => refetch(),
   });
   const { t } = useTranslation(['profile', 'meta']);
-
-  const ogImage = `https://dreamdev.me/api/og-image/?username=${username}&tier=${data?.tier}&image=${data?.avatarUrl}`;
-
   return (
     <Container>
       {data && (
         <>
           <HeadMeta
             title={`${username}${t('meta:profile-title')}`}
-            image={ogImage}
+            image={`https://dreamdev.me/api/og-image/?username=${username}&tier=${data.tier}&image=${data.avatarUrl}`}
             description={getProfileDescription(locale, data)}
           />
           <ProfileCard
@@ -59,6 +59,7 @@ function Profile({ username }: ProfileProps) {
               updateDelayTime: data.updateDelayTime,
               updateData: mutate,
               isLoading,
+              isMine: userData?.username === username,
             }}
           />
           <Title>EXP</Title>
