@@ -1,6 +1,5 @@
 import { GetStaticProps } from 'next';
 import { useTranslation } from 'next-i18next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
@@ -9,6 +8,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Button } from '@components/common';
 import { requestTokenRefresh } from '@apis/auth';
 import { aldrich, lineSeedKR } from '@utils/fonts';
+import { ssgWrapper } from '@utils/wrapper';
 
 function NotFound() {
   useQuery(['user'], () => requestTokenRefresh(), {
@@ -45,13 +45,7 @@ function NotFound() {
 
 export default NotFound;
 
-export const getStaticProps: GetStaticProps = async (context) => {
-  return {
-    props: {
-      ...(await serverSideTranslations(context.locale as string, ['common', 'footer', 'header', '404', 'meta'])),
-    },
-  };
-};
+export const getStaticProps: GetStaticProps = ssgWrapper(['common', 'footer', 'header', '404', 'meta']);
 
 const Container = styled.div`
   ${({ theme }) => theme.common.flexCenterColumn};

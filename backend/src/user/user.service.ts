@@ -71,11 +71,11 @@ export class UserService {
     const octokit = new Octokit({
       auth: githubToken,
     });
-    const [scores, history, { organizations, pinnedRepositories }] = await Promise.all([
-      this.getUserScore(username, octokit),
+    const [history, { organizations, pinnedRepositories }] = await Promise.all([
       this.getUserHistory(username, octokit),
       this.getUserOrganizationAndPinnedRepositories(username, octokit),
     ]);
+    const scores = await this.getUserScore(username, octokit, history);
     const updatedUser: UserDto = {
       ...user,
       ...scores,
@@ -192,7 +192,7 @@ export class UserService {
     }
   }
 
-  async getUserScore(username: string, octokit: Octokit): Promise<Partial<UserDto>> {
+  async getUserScore(username: string, octokit: Octokit, history: History): Promise<Partial<UserDto>> {
     const res: any = await octokit.request('GET /users/{username}', {
       username,
     });
@@ -254,11 +254,17 @@ export class UserService {
         return repository.parent;
       });
 
+      const contributionScore =
+        history.totalCommitContributions +
+        history.totalIssueContributions +
+        history.totalPullRequestContributions +
+        history.totalRepositoryContributions +
+        history.totalPullRequestReviewContributions;
       const forkScore = forkRepositories.reduce(getCommitScore, 0);
       const followersScore = Math.floor(followersResponse.user.followers.totalCount / 10);
       const personalRepositories = personalResponse.user.repositories.nodes;
       const personalScore = personalRepositories.reduce(getCommitScore, 0);
-      const commitsScore = parseInt(forkScore + personalScore);
+      const commitsScore = parseInt(forkScore + personalScore) + contributionScore;
       const issuesScore = Math.floor(
         issuesResponse.user.issues.edges.reduce((acc, issue) => {
           const time = +new Date() - +new Date(issue.node.createdAt);

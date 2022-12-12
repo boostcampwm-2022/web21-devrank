@@ -1,6 +1,5 @@
 import { GetStaticProps } from 'next';
 import { useTranslation } from 'next-i18next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Image from 'next/image';
 import React from 'react';
 import styled from 'styled-components';
@@ -9,6 +8,7 @@ import { CubeIcon } from '@components/common';
 import HeadMeta from '@components/common/HeadMeta';
 import { requestTokenRefresh } from '@apis/auth';
 import { DEVELOPER_INFORMATION } from '@utils/constants';
+import { ssgWrapper } from '@utils/wrapper';
 
 function About() {
   useQuery(['user'], () => requestTokenRefresh(), {
@@ -135,20 +135,7 @@ function About() {
 
 export default About;
 
-export const getStaticProps: GetStaticProps = async (context) => {
-  return {
-    props: {
-      ...(await serverSideTranslations(context.locale as string, [
-        'about',
-        'tier',
-        'meta',
-        'common',
-        'header',
-        'footer',
-      ])),
-    },
-  };
-};
+export const getStaticProps: GetStaticProps = ssgWrapper(['about', 'tier', 'meta', 'common', 'header', 'footer']);
 
 const Container = styled.div`
   display: flex;

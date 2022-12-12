@@ -57,12 +57,6 @@ export const transToPieChartData = (data: HistoryType) => {
       color: theme.colors.red2,
     },
     {
-      id: 'Pull Request',
-      label: 'Pull Request',
-      value: data.totalPullRequestContributions,
-      color: theme.colors.blue2,
-    },
-    {
       id: 'Review',
       label: 'Review',
       value: data.totalPullRequestReviewContributions,
@@ -73,6 +67,12 @@ export const transToPieChartData = (data: HistoryType) => {
       label: 'Repository',
       value: data.totalRepositoryContributions,
       color: theme.colors.green1,
+    },
+    {
+      id: 'Pull Request',
+      label: 'Pull Request',
+      value: data.totalPullRequestContributions,
+      color: theme.colors.blue2,
     },
   ];
 };
