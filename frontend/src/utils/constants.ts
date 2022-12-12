@@ -117,3 +117,12 @@ export const MEDAL_IMG: {
   1: '/icons/ranking-2nd.svg',
   2: '/icons/ranking-3rd.svg',
 };
+
+export const TIER_OFFSET = {
+  green: 100,
+  mint: 200,
+  blue: 500,
+  purple: 1000,
+  orange: 2000,
+  red: 5000,
+} as const;

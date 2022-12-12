@@ -1,7 +1,7 @@
 import { useTranslation } from 'next-i18next';
 import { useTheme } from 'styled-components';
 import { Serie } from '@nivo/line';
-import { CubeRankType, DailyInfo, HistoryType, RANK } from '@type/common';
+import { CubeRankType, DailyInfo, HistoryType, RANK, ScoreHistory } from '@type/common';
 import { ProfileUserResponse } from '@type/response';
 import { CUBE_RANK, DEVICON_URL, EXCEPTIONAL_LANGUAGE } from '@utils/constants';
 
@@ -77,18 +77,37 @@ export const transToPieChartData = (data: HistoryType) => {
   ];
 };
 
-export const transToLineChartData = (data: { [key: string]: DailyInfo }, tier: RANK): Serie[] => {
+export const transContributionHistoryToLineChartData = (data: { [key: string]: DailyInfo }, tier: RANK): Serie[] => {
   const theme = useTheme();
 
-  const ret = [
+  return [
     {
       id: 'contribution',
       color: theme.colors[`${tier}2`],
       data: Object.entries(data).map(([key, value]) => ({ x: key, y: value.count })),
     },
   ];
+};
 
-  return ret;
+export const transScoreHistoryToLineChartData = (data: ScoreHistory[], tier: RANK): Serie[] => {
+  const theme = useTheme();
+
+  return [
+    {
+      id: 'contribution',
+      color: theme.colors[`${tier}2`],
+      data: data.map((value) => ({ x: value.date.slice(0, 10), y: value.score })),
+    },
+  ];
+};
+
+export const getLineChartMinMaxValue = (data: Serie[]) => {
+  const values = data[0].data.map((i) => i.y) as number[];
+  let min = Math.min(...values);
+  min = min <= 100 ? 0 : min - 100;
+  const max = Math.max(...values) + 100;
+
+  return { min, max };
 };
 
 interface QueryValidatorType {
