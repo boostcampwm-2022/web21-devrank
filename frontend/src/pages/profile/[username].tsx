@@ -2,7 +2,9 @@ import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 import styled from 'styled-components';
+import { useQueryData } from '@hooks';
 import { QueryClient, dehydrate, useMutation, useQuery } from '@tanstack/react-query';
 import { ProfileUserResponse } from '@type/response';
 import { CommitHistory, EXPbar, PinnedRepository, ProfileCard, Statistic } from '@components/Profile';
@@ -20,9 +22,12 @@ function Profile({ username }: ProfileProps) {
   const MAX_COMMIT_STREAK = 368;
   const router = useRouter();
   const locale = router.locale as string;
+
   const { data, refetch } = useQuery<ProfileUserResponse>(['profile', username], () =>
     requestUserInfoByUsername({ username, method: 'GET' }),
   );
+
+  const { queryData: userData } = useQueryData(['user']);
 
   const { mutate, isLoading } = useMutation<ProfileUserResponse>({
     mutationFn: () => requestUserInfoByUsername({ username, method: 'PATCH' }),
@@ -31,15 +36,16 @@ function Profile({ username }: ProfileProps) {
   });
   const { t } = useTranslation(['profile', 'meta']);
 
-  const ogImage = `https://dreamdev.me/api/og-image/?username=${username}&tier=${data?.tier}&image=${data?.avatarUrl}`;
-
+  useEffect(() => {
+    requestTokenRefresh();
+  }, []);
   return (
     <Container>
       {data && (
         <>
           <HeadMeta
             title={`${username}${t('meta:profile-title')}`}
-            image={ogImage}
+            image={`https://dreamdev.me/api/og-image/?username=${username}&tier=${data.tier}&image=${data.avatarUrl}`}
             description={getProfileDescription(locale, data)}
           />
           <ProfileCard
@@ -59,6 +65,7 @@ function Profile({ username }: ProfileProps) {
               updateDelayTime: data.updateDelayTime,
               updateData: mutate,
               isLoading,
+              isMine: userData?.username === username,
             }}
           />
           <Title>EXP</Title>

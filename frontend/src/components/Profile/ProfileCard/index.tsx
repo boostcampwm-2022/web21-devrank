@@ -27,6 +27,7 @@ interface ProfileCardProps {
     updateDelayTime: number;
     updateData: () => void;
     isLoading: boolean;
+    isMine: boolean;
   };
 }
 
@@ -51,6 +52,7 @@ function ProfileCard({ profileData }: ProfileCardProps) {
     updateDelayTime,
     updateData,
     isLoading,
+    isMine,
   } = profileData;
 
   const { t } = useTranslation(['profile', 'tier']);
@@ -66,7 +68,12 @@ function ProfileCard({ profileData }: ProfileCardProps) {
       <ProfileInfos>
         <li>
           <h3 onClick={() => gotoGithub(username)}>{username}</h3>
-          <ProfileRefreshButton updateData={updateData} updateDelayTime={updateDelayTime} isLoading={isLoading} />
+          <ProfileRefreshButton
+            updateData={updateData}
+            updateDelayTime={updateDelayTime}
+            isLoading={isLoading}
+            isMine={isMine}
+          />
         </li>
         {name && (
           <ProfileLabel>
