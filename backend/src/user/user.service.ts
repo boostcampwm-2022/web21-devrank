@@ -125,7 +125,6 @@ export class UserService {
     for (const user of users) {
       await sleep(GITHUB_API_DELAY);
       try {
-        await this.updateUser(user.lowerUsername, githubToken);
         const updatedUser = await this.updateUser(user.lowerUsername, githubToken);
         if (!updatedUser.scoreHistory) updatedUser.scoreHistory = [];
         updatedUser.scoreHistory.push({
