@@ -2,12 +2,11 @@ import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import LanguageRanking from '@components/Ranking/LanguageRanking';
 import OverallRanking from '@components/Ranking/OverallRanking';
 import RisingRanking from '@components/Ranking/RisingRanking';
 import ViewsRanking from '@components/Ranking/ViewsRanking';
-import { Spinner } from '@components/common';
 import CubeLogo from '@components/common/CubeLogo';
 import HeadMeta from '@components/common/HeadMeta';
 import AutoCompleteSearchbar from '@components/common/Searchbar/AutoComplete';
@@ -29,20 +28,11 @@ function Home() {
     router.push(`/profile/${username}`);
   };
 
-  useEffect(() => {
-    const handleStart = () => {
-      setIsSearchLoading(true);
-    };
-    router.events.on('routeChangeStart', handleStart);
-
-    return () => {
-      router.events.off('routeChangeStart', handleStart);
-    };
-  }, [router]);
-
   return isSearchLoading ? (
     <Loading>
-      <Spinner size={50} />
+      <div>
+        사용자 검색 중 입니다<span>.</span>
+      </div>
     </Loading>
   ) : (
     <>
@@ -56,6 +46,7 @@ function Home() {
           width={600}
           placeholder={t('index:search-placeholder')}
           submitAlign='right'
+          onBeforeSearch={() => setIsSearchLoading(true)}
         />
         <Content>
           <OverallRankingSection>
@@ -113,8 +104,23 @@ const Container = styled.div`
   }
 `;
 
+const loading = keyframes`
+  0% {
+    content: '';
+  }
+
+  33% {
+    content: '.';
+  }
+
+  66% {
+    content: '..';
+  }
+`;
+
 const Loading = styled.div`
   ${({ theme }) => theme.common.flexCenter};
+  font-size: ${({ theme }) => theme.fontSize.lg};
   background-color: ${({ theme }) => theme.colors.black1};
   width: 100%;
   height: 100%;
@@ -124,6 +130,20 @@ const Loading = styled.div`
   left: 0;
 
   z-index: 10;
+  div {
+    position: relative;
+
+    span {
+      position: absolute;
+      right: -5px;
+
+      &:after {
+        content: '';
+        position: absolute;
+        animation: ${loading} 2s linear infinite;
+      }
+    }
+  }
 `;
 
 const Content = styled.div`
