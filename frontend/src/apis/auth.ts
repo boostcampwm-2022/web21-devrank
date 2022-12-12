@@ -12,6 +12,9 @@ export const requestGithubLogin = async (code: string): Promise<LoginResponse> =
 };
 
 export const requestUserLogout = async () => {
+  if (axiosInstance.defaults.headers.common['Authorization']) {
+    axiosInstance.defaults.headers.common['Authorization'] = null;
+  }
   await axiosInstance.delete('/auth/logout');
 };
 
@@ -24,5 +27,5 @@ export const requestTokenRefresh = async (
 
   if (context && response.headers['set-cookie']) context.res.setHeader('Set-Cookie', response.headers['set-cookie']);
 
-  return response.data;
+  return response?.data || null;
 };
