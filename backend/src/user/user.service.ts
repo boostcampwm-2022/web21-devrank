@@ -296,14 +296,14 @@ export class UserService {
     } = response.contributionsCollection;
 
     const { colors, weeks } = response.contributionsCollection.contributionCalendar;
-    let [continuosCount, maxContinuosCount] = [0, 0];
+    let [continuousCount, maxContinuousCount] = [0, 0];
     const contributionHistory = weeks.reduce((acc, week) => {
       week.contributionDays.forEach((day) => {
         acc[day.date] = { count: day.contributionCount, level: colors.indexOf(day.color) + 1 };
         if (day.contributionCount !== 0) {
-          maxContinuosCount = Math.max(++continuosCount, maxContinuosCount);
+          maxContinuousCount = Math.max(++continuousCount, maxContinuousCount);
         } else {
-          continuosCount = 0;
+          continuousCount = 0;
         }
       });
       return acc;
@@ -325,7 +325,7 @@ export class UserService {
       totalRepositoryContributions,
       stargazerCount,
       forkCount,
-      maxContinuosCount,
+      maxContinuousCount,
       contributionHistory,
     };
   }
