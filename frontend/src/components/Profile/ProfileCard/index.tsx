@@ -104,7 +104,7 @@ function ProfileCard({ profileData }: ProfileCardProps) {
             <ProfileLabel.Contents>
               {organizations?.map(({ avatarUrl, name, url }) => (
                 <a key={name} href={url}>
-                  <Image src={avatarUrl} width={27} height={27} alt={name} quality={100} style={ImageStyle} />
+                  <Image src={avatarUrl} width={27} height={27} alt={name} style={ImageStyle} />
                 </a>
               ))}
             </ProfileLabel.Contents>

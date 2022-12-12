@@ -1,15 +1,12 @@
 import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import styled from 'styled-components';
-import { QueryClient, dehydrate } from '@tanstack/react-query';
+import styled, { keyframes } from 'styled-components';
 import LanguageRanking from '@components/Ranking/LanguageRanking';
 import OverallRanking from '@components/Ranking/OverallRanking';
 import RisingRanking from '@components/Ranking/RisingRanking';
 import ViewsRanking from '@components/Ranking/ViewsRanking';
-import { Spinner } from '@components/common';
 import CubeLogo from '@components/common/CubeLogo';
 import HeadMeta from '@components/common/HeadMeta';
 import AutoCompleteSearchbar from '@components/common/Searchbar/AutoComplete';
@@ -20,6 +17,7 @@ import {
   requestTopRankingByScore,
   requestTopRankingByViews,
 } from '@apis/ranking';
+import { ssrWrapper } from '@utils/wrapper';
 
 function Home() {
   const { t } = useTranslation(['index', 'common', 'meta']);
@@ -30,28 +28,11 @@ function Home() {
     router.push(`/profile/${username}`);
   };
 
-  useEffect(() => {
-    const handleStart = () => {
-      setIsSearchLoading(true);
-    };
-
-    const handleEnd = () => {
-      setIsSearchLoading(false);
-    };
-    router.events.on('routeChangeStart', handleStart);
-    router.events.on('routeChangeComplete', handleEnd);
-    router.events.on('routeChangeError', handleEnd);
-
-    return () => {
-      router.events.off('routeChangeStart', handleStart);
-      router.events.off('routeChangeStart', handleEnd);
-      router.events.off('routeChangeError', handleEnd);
-    };
-  }, [router]);
-
   return isSearchLoading ? (
     <Loading>
-      <Spinner size={50} />
+      <div>
+        사용자 검색 중 입니다<span>.</span>
+      </div>
     </Loading>
   ) : (
     <>
@@ -65,6 +46,7 @@ function Home() {
           width={600}
           placeholder={t('index:search-placeholder')}
           submitAlign='right'
+          onBeforeSearch={() => setIsSearchLoading(true)}
         />
         <Content>
           <OverallRankingSection>
@@ -87,28 +69,30 @@ function Home() {
 
 export default Home;
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const queryClient = new QueryClient();
+export const getServerSideProps: GetServerSideProps = ssrWrapper(
+  ['index', 'common', 'header', 'footer', 'meta'],
+  async (context, queryClient) => {
+    await Promise.allSettled([
+      queryClient.prefetchQuery(['top-ranking-by-score'], () =>
+        requestTopRankingByScore({
+          limit: 12,
+        }),
+      ),
+      queryClient.prefetchQuery(['top-ranking-by-rising'], () => requestTopRankingByRising()),
+      queryClient.prefetchQuery(['top-ranking-by-views'], () => requestTopRankingByViews()),
+      queryClient.prefetchQuery(['top-ranking-by-programming-lang'], () => requestProgrammingLanguageRanking()),
+      queryClient.prefetchQuery(['user'], () => requestTokenRefresh(context)),
+    ]);
 
-  await Promise.allSettled([
-    queryClient.prefetchQuery(['top-ranking-by-score'], () =>
-      requestTopRankingByScore({
-        limit: 12,
-      }),
-    ),
-    queryClient.prefetchQuery(['top-ranking-by-rising'], () => requestTopRankingByRising()),
-    queryClient.prefetchQuery(['top-ranking-by-views'], () => requestTopRankingByViews()),
-    queryClient.prefetchQuery(['top-ranking-by-programming-lang'], () => requestProgrammingLanguageRanking()),
-    queryClient.prefetchQuery(['user'], () => requestTokenRefresh(context)),
-  ]);
-
-  return {
-    props: {
-      dehydratedState: dehydrate(queryClient),
-      ...(await serverSideTranslations(context.locale as string, ['index', 'common', 'header', 'footer', 'meta'])),
-    },
-  };
-};
+    return {
+      data: {},
+      redirect: {
+        trigger: false,
+        url: '',
+      },
+    };
+  },
+);
 
 const Container = styled.div`
   ${({ theme }) => theme.common.flexCenterColumn};
@@ -120,8 +104,23 @@ const Container = styled.div`
   }
 `;
 
+const loading = keyframes`
+  0% {
+    content: '';
+  }
+
+  33% {
+    content: '.';
+  }
+
+  66% {
+    content: '..';
+  }
+`;
+
 const Loading = styled.div`
   ${({ theme }) => theme.common.flexCenter};
+  font-size: ${({ theme }) => theme.fontSize.lg};
   background-color: ${({ theme }) => theme.colors.black1};
   width: 100%;
   height: 100%;
@@ -131,6 +130,20 @@ const Loading = styled.div`
   left: 0;
 
   z-index: 10;
+  div {
+    position: relative;
+
+    span {
+      position: absolute;
+      right: -5px;
+
+      &:after {
+        content: '';
+        position: absolute;
+        animation: ${loading} 2s linear infinite;
+      }
+    }
+  }
 `;
 
 const Content = styled.div`

@@ -102,25 +102,24 @@ export class AuthController {
     type: LoginResponseDto,
   })
   @UseGuards(RefreshGuard)
-  async refresh(@CurrentUser() currentUser: Payload, @Res() response: Response): Promise<void> {
+  async refresh(@CurrentUser() currentUser: Payload): Promise<LoginResponseDto> {
     const { id, githubToken, refreshToken } = currentUser;
-    const newRefreshToken = await this.authService.replaceRefreshToken(id, refreshToken, githubToken);
+    await this.authService.checkRefreshToken(refreshToken);
     const accessToken = this.authService.issueAccessToken(id, githubToken);
     const user = await this.userService.findOneByFilter({ id: id });
-    const cookieOption = this.authService.getCookieOption();
     const responseData: LoginResponseDto = { accessToken, id, username: user.username, avatarUrl: user.avatarUrl };
-
-    response.cookie(this.configService.get('REFRESH_TOKEN_KEY'), newRefreshToken, cookieOption).json(responseData);
+    return responseData;
   }
 
   @Delete('logout')
   @ApiOperation({ summary: '로그아웃', description: '클라이언트에 저장된 쿠키를 삭제하고, Redis에서도 삭제한다' })
   @ApiOkResponse({ description: '로그아웃 성공' })
-  async logout(@Req() request: Request, @Res({ passthrough: true }) response: Response): Promise<void> {
+  @UseGuards(RefreshGuard)
+  async logout(@CurrentUser() currentUser: Payload, @Res({ passthrough: true }) response: Response): Promise<void> {
+    const { id, githubToken, refreshToken } = currentUser;
     const cookieOption = this.authService.getCookieOption();
-    const refreshToken = this.authService.extractRefreshToken(request);
     if (refreshToken) {
-      await this.authService.deleteRefreshToken(refreshToken);
+      await this.authService.deleteRefreshToken(id);
     }
     response.clearCookie(this.configService.get('REFRESH_TOKEN_KEY'), cookieOption);
   }
