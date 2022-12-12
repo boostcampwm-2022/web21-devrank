@@ -2,6 +2,7 @@ import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 import styled from 'styled-components';
 import { useQueryData } from '@hooks';
 import { QueryClient, dehydrate, useMutation, useQuery } from '@tanstack/react-query';
@@ -21,7 +22,7 @@ function Profile({ username }: ProfileProps) {
   const MAX_COMMIT_STREAK = 368;
   const router = useRouter();
   const locale = router.locale as string;
-  requestTokenRefresh();
+
   const { data, refetch } = useQuery<ProfileUserResponse>(['profile', username], () =>
     requestUserInfoByUsername({ username, method: 'GET' }),
   );
@@ -34,6 +35,10 @@ function Profile({ username }: ProfileProps) {
     onSettled: () => refetch(),
   });
   const { t } = useTranslation(['profile', 'meta']);
+
+  useEffect(() => {
+    requestTokenRefresh();
+  }, []);
   return (
     <Container>
       {data && (
