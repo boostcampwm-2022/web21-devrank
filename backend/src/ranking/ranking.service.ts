@@ -13,9 +13,9 @@ export class RankingService {
     page: number,
     limit: number,
     tier: string,
-    username: string,
+    lowerUsername: string,
   ): Promise<RankingPaginationDto> {
-    const paginationResult = await this.userRepository.findPaginationRankings(page, limit, tier, username);
+    const paginationResult = await this.userRepository.findPaginationRankings(page, limit, tier, lowerUsername);
     if (!paginationResult?.metadata || paginationResult?.users.length === 0) {
       throw new NotFoundException('user not found.');
     }
