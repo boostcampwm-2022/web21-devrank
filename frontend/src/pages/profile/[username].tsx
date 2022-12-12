@@ -65,8 +65,8 @@ function Profile({ username }: ProfileProps) {
           <EXPbar tier={data.tier} exp={data.score} needExp={data.needExp} startExp={data.startExp} />
           <ContributionHeader>
             <Title>Contributions</Title>
-            <p>{`${t('maximum-continuous-commit-history')} : ${data.history.maxContinuosCount}${
-              data.history.maxContinuosCount >= MAX_COMMIT_STREAK ? `${t('day')}~` : t('day')
+            <p>{`${t('maximum-continuous-commit-history')} : ${data.history.maxContinuousCount}${
+              data.history.maxContinuousCount >= MAX_COMMIT_STREAK ? `${t('day')}~` : t('day')
             }`}</p>
           </ContributionHeader>
           <Paper>
