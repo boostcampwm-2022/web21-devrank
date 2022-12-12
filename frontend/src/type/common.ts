@@ -36,8 +36,13 @@ export interface HistoryType {
   totalRepositoryContributions: number;
   stargazerCount: number;
   forkCount: number;
-  maxContinuosCount: number;
+  maxContinuousCount: number;
   contributionHistory: { [key: string]: DailyInfo };
+}
+
+export interface ScoreHistory {
+  date: string;
+  score: number;
 }
 
 export interface OrganizationType {

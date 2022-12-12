@@ -19,6 +19,9 @@ export class UserDto {
   username: string;
 
   @ApiProperty()
+  lowerUsername: string;
+
+  @ApiProperty()
   following: number;
 
   @ApiProperty()

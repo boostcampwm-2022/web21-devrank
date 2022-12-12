@@ -86,27 +86,28 @@ function About() {
           </RankSystem>
         </Content>
         <Content>
-          <Title>{t('about:score-calucate-method-heading')}</Title>
+          <Title>{t('about:score-calculate-method-heading')}</Title>
           <ScoreInfo>
-            <p>{t('about:score-calucate-method-1')}</p>
-            <p>{t('about:score-calucate-method-2')}</p>
-            <p>&nbsp;&nbsp; {t('about:score-calucate-method-3')}</p>
-            <p>&nbsp;&nbsp; {t('about:score-calucate-method-4')}</p>
-            <p>{t('about:score-calucate-method-5')}</p>
-            <p>{t('about:score-calucate-method-6')}</p>
-            <p>{t('about:score-calucate-method-7')}</p>
+            <p>{t('about:score-calculate-method-1')}</p>
+            <p>{t('about:score-calculate-method-2')}</p>
+            <p>&nbsp;&nbsp; {t('about:score-calculate-method-3')}</p>
+            <p>&nbsp;&nbsp; {t('about:score-calculate-method-4')}</p>
+            <p>{t('about:score-calculate-method-5')}</p>
+            <p>{t('about:score-calculate-method-6')}</p>
+            <p>{t('about:score-calculate-method-7')}</p>
+            <p>{t('about:score-calculate-method-8')}</p>
             <br />
-            <p>{t('about:score-calucate-method-8')}</p>
+            <p>{t('about:score-calculate-method-9')}</p>
             <br />
-            <Strong>{t('about:score-calucate-method-9')}</Strong>
+            <Strong>{t('about:score-calculate-method-10')}</Strong>
             <br />
-            {t('about:score-calucate-method-10')}
+            {t('about:score-calculate-method-11')}
             <br />
-            {t('about:score-calucate-method-11')}
+            {t('about:score-calculate-method-12')}
             <br />
-            {t('about:score-calucate-method-12')}
+            {t('about:score-calculate-method-13')}
             <br />
-            {t('about:score-calucate-method-13')}
+            {t('about:score-calculate-method-14')}
           </ScoreInfo>
         </Content>
         <Content>

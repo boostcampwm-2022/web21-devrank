@@ -31,16 +31,16 @@ export class UserService {
     return user;
   }
 
-  async findOneByUsername(githubToken: string, ip: string, username: string): Promise<UserProfileDto> {
+  async findOneByUsername(githubToken: string, ip: string, lowerUsername: string): Promise<UserProfileDto> {
     let user = null;
-    if (await this.userRepository.isDuplicatedRequestIp(ip, username)) {
-      user = await this.userRepository.findOneByUsername(username);
+    if (await this.userRepository.isDuplicatedRequestIp(ip, lowerUsername)) {
+      user = await this.userRepository.findOneByLowerUsername(lowerUsername);
     } else {
-      user = await this.userRepository.findOneByUsernameAndUpdateViews(username);
+      user = await this.userRepository.findOneByLowerUsernameAndUpdateViews(lowerUsername);
     }
 
     if (!user) {
-      user = await this.updateUser(username, githubToken);
+      user = await this.updateUser(lowerUsername, githubToken);
       if (!user.scoreHistory) {
         user.scoreHistory = [];
       }
@@ -48,9 +48,11 @@ export class UserService {
       user = await this.userRepository.createOrUpdate(user);
     }
     await this.userRepository.createOrUpdate(user);
-    const { totalRank, tierRank } = await this.getUserRelativeRanking(user);
-    this.userRepository.setDuplicatedRequestIp(ip, username);
-    user.updateDelayTime = await this.userRepository.findUpdateScoreTimeToLive(username);
+
+    const { totalRank, tierRank } =
+      (await this.getUserRelativeRanking(user)) || (await this.setUserRelativeRanking(user));
+    this.userRepository.setDuplicatedRequestIp(ip, lowerUsername);
+    user.updateDelayTime = await this.userRepository.findUpdateScoreTimeToLive(lowerUsername);
     user.totalRank = totalRank;
     user.tierRank = tierRank;
     user.startExp = getStartExp(user.score);
@@ -58,22 +60,22 @@ export class UserService {
     return user;
   }
 
-  async findAllByPrefixUsername(limit: number, username: string): Promise<AutoCompleteDto[]> {
-    const users = await this.userRepository.findAllByPrefixUsername(limit, username);
+  async findAllByPrefixUsername(limit: number, lowerUsername: string): Promise<AutoCompleteDto[]> {
+    const users = await this.userRepository.findAllByPrefixLowerUsername(limit, lowerUsername);
     return users.map((user) => new AutoCompleteDto().of(user));
   }
 
-  async updateUser(username: string, githubToken: string): Promise<UserProfileDto> {
-    let user = await this.getUserInfo(githubToken, username);
+  async updateUser(lowerUsername: string, githubToken: string): Promise<UserProfileDto> {
+    let user = await this.getUserInfo(githubToken, lowerUsername);
     user = await this.userRepository.createOrUpdate(user);
     const octokit = new Octokit({
       auth: githubToken,
     });
     const [history, { organizations, pinnedRepositories }] = await Promise.all([
-      this.getUserHistory(username, octokit),
-      this.getUserOrganizationAndPinnedRepositories(username, octokit),
+      this.getUserHistory(lowerUsername, octokit),
+      this.getUserOrganizationAndPinnedRepositories(lowerUsername, octokit),
     ]);
-    const scores = await this.getUserScore(username, octokit, history);
+    const scores = await this.getUserScore(lowerUsername, octokit, history);
     const updatedUser: UserDto = {
       ...user,
       ...scores,
@@ -82,7 +84,7 @@ export class UserService {
       pinnedRepositories,
     };
     user = await this.userRepository.createOrUpdate(updatedUser);
-    const { totalRank, tierRank } = await this.getUserRelativeRanking(user);
+    const { totalRank, tierRank } = await this.setUserRelativeRanking(user);
     const userWithRank: UserProfileDto = {
       ...user,
       totalRank,
@@ -95,11 +97,11 @@ export class UserService {
 
   async updateAllUsers(githubToken: string): Promise<void> {
     const sleep = (m: number) => new Promise((r) => setTimeout(r, m));
-    const users = await this.userRepository.findAll({}, false, ['username']);
+    const users = await this.userRepository.findAll({}, false, ['lowerUsername']);
     for (const user of users) {
       await sleep(GITHUB_API_DELAY);
       try {
-        const updateUser = await this.updateUser(user.username, githubToken);
+        const updateUser = await this.updateUser(user.lowerUsername, githubToken);
         if (!updateUser.scoreHistory) updateUser.scoreHistory = [];
         if (updateUser.scoreHistory.length) updateUser.scoreHistory.pop();
         updateUser.scoreHistory.push({ date: new Date(), score: updateUser.score });
@@ -110,20 +112,21 @@ export class UserService {
           updateUser.scoreDifference = 0;
         }
         this.userRepository.createOrUpdate(updateUser);
+        this.userRepository.deleteCachedUserRank(updateUser.lowerUsername + '&');
       } catch {
-        logger.error(`can't update user ${user.username}`);
+        logger.error(`can't update user ${user.lowerUsername}`);
       }
     }
   }
 
   async dailyUpdateAllUsers(githubToken: string): Promise<void> {
     const sleep = (m) => new Promise((r) => setTimeout(r, m));
-    const users = await this.userRepository.findAll({}, false, ['username']);
+    const users = await this.userRepository.findAll({}, false, ['lowerUsername']);
     for (const user of users) {
       await sleep(GITHUB_API_DELAY);
       try {
-        await this.updateUser(user.username, githubToken);
-        const updatedUser = await this.updateUser(user.username, githubToken);
+        await this.updateUser(user.lowerUsername, githubToken);
+        const updatedUser = await this.updateUser(user.lowerUsername, githubToken);
         if (!updatedUser.scoreHistory) updatedUser.scoreHistory = [];
         updatedUser.scoreHistory.push({
           date: new Date(),
@@ -138,33 +141,33 @@ export class UserService {
         updatedUser.dailyViews = 0;
         this.userRepository.createOrUpdate(updatedUser);
       } catch {
-        logger.error(`can't update user ${user.username}`);
+        logger.error(`can't update user ${user.lowerUsername}`);
       }
     }
   }
 
-  async isDuplicatedRequestIp(ip: string, username: string): Promise<boolean> {
-    return this.userRepository.isDuplicatedRequestIp(ip, username);
+  async isDuplicatedRequestIp(ip: string, lowerUsername: string): Promise<boolean> {
+    return this.userRepository.isDuplicatedRequestIp(ip, lowerUsername);
   }
-  async findUpdateScoreTimeToLive(username: string): Promise<number> {
-    return this.userRepository.findUpdateScoreTimeToLive(username);
+  async findUpdateScoreTimeToLive(lowerUsername: string): Promise<number> {
+    return this.userRepository.findUpdateScoreTimeToLive(lowerUsername);
   }
 
-  async setUpdateScoreDelayTime(username: string, seconds: number): Promise<any> {
-    return this.userRepository.setUpdateScoreDelayTime(username, seconds);
+  async setUpdateScoreDelayTime(lowerUsername: string, seconds: number): Promise<any> {
+    return this.userRepository.setUpdateScoreDelayTime(lowerUsername, seconds);
   }
 
   async createOrUpdate(user: UserDto): Promise<UserDto> {
     return this.userRepository.createOrUpdate(user);
   }
 
-  async getUserInfo(githubToken: string, username: string): Promise<UserDto> {
+  async getUserInfo(githubToken: string, lowerUsername: string): Promise<UserDto> {
     const octokit = new Octokit({
       auth: githubToken,
     });
     try {
       const response = await octokit.request('GET /users/{username}', {
-        username: username,
+        username: lowerUsername,
       });
       if (response.data.type !== 'User') {
         throw new NotFoundException('User not found.');
@@ -172,6 +175,7 @@ export class UserService {
       const user: UserDto = {
         id: response.data.node_id,
         username: response.data.login,
+        lowerUsername: response.data.login.toLowerCase(),
         following: response.data.following,
         followers: response.data.followers,
         avatarUrl: response.data.avatar_url,
@@ -188,29 +192,29 @@ export class UserService {
     }
   }
 
-  async getUserScore(username: string, octokit: Octokit, history: History): Promise<Partial<UserDto>> {
+  async getUserScore(lowerUsername: string, octokit: Octokit, history: History): Promise<Partial<UserDto>> {
     const res: any = await octokit.request('GET /users/{username}', {
-      username,
+      username: lowerUsername,
     });
     const id = res.data.node_id;
 
     try {
       const forkResponse: any = await octokit.graphql(forkRepositoryQuery, {
-        username,
+        username: lowerUsername,
         id,
       });
 
       const personalResponse: any = await octokit.graphql(nonForkRepositoryQuery, {
-        username,
+        username: lowerUsername,
         id,
       });
 
       const followersResponse: any = await octokit.graphql(followersQuery, {
-        username,
+        username: lowerUsername,
       });
 
       const issuesResponse: any = await octokit.graphql(issueQuery, {
-        username,
+        username: lowerUsername,
       });
 
       let languagesScore = new Map();
@@ -285,8 +289,8 @@ export class UserService {
     }
   }
 
-  async getUserHistory(username: string, octokit: Octokit): Promise<History> {
-    const { user: response }: any = await octokit.graphql(userHistoryQuery, { username });
+  async getUserHistory(lowerUsername: string, octokit: Octokit): Promise<History> {
+    const { user: response }: any = await octokit.graphql(userHistoryQuery, { username: lowerUsername });
     const {
       totalCommitContributions,
       totalIssueContributions,
@@ -296,14 +300,14 @@ export class UserService {
     } = response.contributionsCollection;
 
     const { colors, weeks } = response.contributionsCollection.contributionCalendar;
-    let [continuosCount, maxContinuosCount] = [0, 0];
+    let [continuousCount, maxContinuousCount] = [0, 0];
     const contributionHistory = weeks.reduce((acc, week) => {
       week.contributionDays.forEach((day) => {
         acc[day.date] = { count: day.contributionCount, level: colors.indexOf(day.color) + 1 };
         if (day.contributionCount !== 0) {
-          maxContinuosCount = Math.max(++continuosCount, maxContinuosCount);
+          maxContinuousCount = Math.max(++continuousCount, maxContinuousCount);
         } else {
-          continuosCount = 0;
+          continuousCount = 0;
         }
       });
       return acc;
@@ -325,17 +329,17 @@ export class UserService {
       totalRepositoryContributions,
       stargazerCount,
       forkCount,
-      maxContinuosCount,
+      maxContinuousCount,
       contributionHistory,
     };
   }
 
   async getUserOrganizationAndPinnedRepositories(
-    username: string,
+    lowerUsername: string,
     octokit: Octokit,
   ): Promise<{ organizations: OrganizationDto[]; pinnedRepositories: PinnedRepositoryDto[] }> {
     const response: any = await octokit.graphql(pinnedRepositoriesQuery, {
-      username,
+      username: lowerUsername,
     });
     const organizations = response.user.organizations.nodes;
     const pinnedRepositories = response.user.pinnedItems.nodes;
@@ -348,20 +352,24 @@ export class UserService {
     };
   }
 
-  async getUserRelativeRanking(user: UserDto): Promise<Rank> {
+  async getUserRelativeRanking(user: UserDto): Promise<Rank | false> {
     const cachedRanks = await this.userRepository.findCachedUserRank(user.id + '&');
     if (Object.keys(cachedRanks).length) {
       return cachedRanks;
     }
-    const users = await this.userRepository.findAll({}, true, ['username', 'tier', 'score']);
+    return false;
+  }
+
+  async setUserRelativeRanking(user: UserDto): Promise<Rank> {
+    const users = await this.userRepository.findAll({}, true, ['lowerUsername', 'tier', 'score']);
     let tierRank = 0;
     for (let rank = 0; rank < users.length; rank++) {
-      if (users[rank].username === user.username) {
+      if (users[rank].lowerUsername === user.lowerUsername) {
         const rankInfo = {
           totalRank: rank + 1,
           tierRank: tierRank + 1,
         };
-        this.userRepository.setCachedUserRank(user.id + '&', rankInfo);
+        await this.userRepository.setCachedUserRank(user.id + '&', rankInfo);
         return rankInfo;
       }
       if (users[rank].tier === user.tier) {

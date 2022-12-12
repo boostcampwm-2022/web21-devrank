@@ -26,13 +26,13 @@ export class UserRepository {
     return this.userModel.findOne(filter).exec();
   }
 
-  async findOneByUsername(username: string): Promise<UserDto> {
-    return this.userModel.findOne({ username: username }).lean().exec();
+  async findOneByLowerUsername(lowerUsername: string): Promise<UserDto> {
+    return this.userModel.findOne({ lowerUsername }).lean().exec();
   }
 
-  async findOneByUsernameAndUpdateViews(username: string): Promise<UserDto> {
+  async findOneByLowerUsernameAndUpdateViews(lowerUsername: string): Promise<UserDto> {
     return this.userModel
-      .findOneAndUpdate({ username: username }, { $inc: { dailyViews: 1 } }, { new: true })
+      .findOneAndUpdate({ lowerUsername }, { $inc: { dailyViews: 1 } }, { new: true })
       .lean()
       .exec();
   }
@@ -42,9 +42,9 @@ export class UserRepository {
     return this.userModel.findOneAndUpdate(filter, user, { upsert: true, new: true }).lean().exec();
   }
 
-  async findAllByPrefixUsername(limit: number, username: string): Promise<UserDto[]> {
+  async findAllByPrefixLowerUsername(limit: number, lowerUsername: string): Promise<UserDto[]> {
     return this.userModel
-      .find({ username: { $regex: `^${username}` } })
+      .find({ lowerUsername: { $regex: `^${lowerUsername}` } })
       .limit(limit)
       .lean()
       .exec();
@@ -68,22 +68,22 @@ export class UserRepository {
     return result.map((item) => ({ name: item._id, count: item.count }));
   }
 
-  async isDuplicatedRequestIp(ip: string, username: string): Promise<boolean> {
-    return (await this.redis.sismember(ip, username)) !== 0;
+  async isDuplicatedRequestIp(ip: string, lowerUsername: string): Promise<boolean> {
+    return (await this.redis.sismember(ip, lowerUsername)) !== 0;
   }
 
-  async setDuplicatedRequestIp(ip: string, username: string): Promise<void> {
-    this.redis.sadd(ip, username);
+  async setDuplicatedRequestIp(ip: string, lowerUsername: string): Promise<void> {
+    this.redis.sadd(ip, lowerUsername);
     const timeToMidnight = Math.floor((new Date().setHours(23, 59, 59) - Date.now()) / 1000);
     this.redis.expire(ip, timeToMidnight);
   }
 
-  async setUpdateScoreDelayTime(username: string, seconds: number): Promise<void> {
-    this.redis.set(username, 0, 'EX', seconds);
+  async setUpdateScoreDelayTime(lowerUsername: string, seconds: number): Promise<void> {
+    this.redis.set(lowerUsername, 0, 'EX', seconds);
   }
 
-  async findUpdateScoreTimeToLive(username: string): Promise<number> {
-    const timeToLive = await this.redis.ttl(username);
+  async findUpdateScoreTimeToLive(lowerUsername: string): Promise<number> {
+    const timeToLive = await this.redis.ttl(lowerUsername);
     return timeToLive <= 0 ? 0 : timeToLive;
   }
 
@@ -91,10 +91,10 @@ export class UserRepository {
     page: number,
     limit: number,
     tier: string,
-    username: string,
+    lowerUsername: string,
   ): Promise<Pick<RankingPaginationDto, 'metadata'> & { users: UserDto[] }> {
     const tierOption = tier === 'all' ? {} : { tier: tier };
-    const usernameOption = username ? { username: { $regex: `^${username}` } } : {};
+    const usernameOption = lowerUsername ? { lowerUsername: { $regex: `^${lowerUsername}` } } : {};
 
     const result = (
       await this.userModel.aggregate([
@@ -122,5 +122,9 @@ export class UserRepository {
   async setCachedUserRank(scoreKey: string, scores: Rank): Promise<void> {
     this.redis.hset(scoreKey, scores);
     this.redis.expire(scoreKey, RANK_CACHE_DELAY);
+  }
+
+  async deleteCachedUserRank(scoreKey: string): Promise<void> {
+    this.redis.del(scoreKey);
   }
 }
