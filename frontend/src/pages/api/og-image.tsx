@@ -11,10 +11,21 @@ const font = fetch(new URL('../../../public/fonts/line-seed-kr-regular.woff', im
 
 export default async function handler(req: NextRequest) {
   const { searchParams } = req.nextUrl;
-  const username = searchParams.get('username');
+  const username = searchParams.get('username') as string;
   const image = searchParams.get('image') as string;
   const tier = searchParams.get('tier');
   const fontData = await font;
+
+  const usernameStyle =
+    username.length > 11
+      ? {
+          fontSize: 80,
+          width: 560,
+          textAlgin: 'center',
+        }
+      : {
+          fontSize: 90,
+        };
 
   return new ImageResponse(
     (
@@ -64,14 +75,7 @@ export default async function handler(req: NextRequest) {
                 height: '160px',
               }}
             />
-            <div
-              style={{
-                fontSize: 90,
-                color: '#FBFBFB',
-              }}
-            >
-              {username}
-            </div>
+            <div style={{ color: '#FBFBFB', wordBreak: 'break-all', ...usernameStyle }}>{username}</div>
           </div>
         </div>
       </div>
