@@ -21,6 +21,7 @@ function Profile({ username }: ProfileProps) {
   const MAX_COMMIT_STREAK = 368;
   const router = useRouter();
   const locale = router.locale as string;
+  requestTokenRefresh();
   const { data, refetch } = useQuery<ProfileUserResponse>(['profile', username], () =>
     requestUserInfoByUsername({ username, method: 'GET' }),
   );

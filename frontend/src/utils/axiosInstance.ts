@@ -13,7 +13,7 @@ instance.interceptors.response.use(
     // 응답와서 access token 있으면 Authorization Header에 저장
     const accessToken = res.data.accessToken;
     if (accessToken) {
-      instance.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+      axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
     }
 
     return res;
