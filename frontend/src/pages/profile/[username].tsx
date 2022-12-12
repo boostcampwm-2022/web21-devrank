@@ -30,7 +30,7 @@ function Profile({ username }: ProfileProps) {
     onSettled: () => refetch(),
   });
   const { t } = useTranslation(['profile', 'meta']);
-  
+
   const ogImage = `https://dreamdev.me/api/og-image/?username=${username}&tier=${data?.tier}&image=${data?.avatarUrl}`;
 
   return (
