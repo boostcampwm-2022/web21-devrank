@@ -1,4 +1,4 @@
-import { CubeRankType, HistoryType, OrganizationType, PinnedRepositoryType, RANK } from '@type/common';
+import { CubeRankType, HistoryType, OrganizationType, PinnedRepositoryType, RANK, ScoreHistory } from '@type/common';
 
 export interface UserByPrefixResponse {
   id: number;
@@ -68,6 +68,7 @@ export interface ProfileUserResponse {
   email: string;
   dailyViews: number;
   scoreDifference: number;
+  scoreHistory: ScoreHistory[];
   updateDelayTime: number;
   primaryLanguages: [string];
   history: HistoryType;
