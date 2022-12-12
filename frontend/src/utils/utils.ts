@@ -101,6 +101,15 @@ export const transScoreHistoryToLineChartData = (data: ScoreHistory[], tier: RAN
   ];
 };
 
+export const getLineChartMinMaxValue = (data: Serie[]) => {
+  const values = data[0].data.map((i) => i.y) as number[];
+  let min = Math.min(...values);
+  min = min <= 100 ? 0 : min - 100;
+  const max = Math.max(...values) + 100;
+
+  return { min, max };
+};
+
 interface QueryValidatorType {
   tier?: string | string[];
   username?: string | string[];
