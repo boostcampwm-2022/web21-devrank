@@ -1,5 +1,5 @@
-import { Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Controller, DefaultValuePipe, Get, ParseIntPipe, Query } from '@nestjs/common';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { RankingLanguageDto } from './dto/ranking-language.dto';
 import { RankingPaginationDto } from './dto/ranking-pagination.dto';
 import { RankingUserDto } from './dto/ranking-user.dto';
@@ -11,11 +11,11 @@ export class RankingController {
   constructor(private readonly rankingService: RankingService) {}
 
   @Get()
-  @ApiOperation({ summary: 'score기반의 전체 랭킹 리스트' })
+  @ApiOperation({ summary: 'score기반의 전체 랭킹 리스트)' })
   @ApiQuery({ name: 'page', required: false, description: '설정 안 할 경우 기본값 1' })
   @ApiQuery({ name: 'limit', required: false, description: '설정 안 할 경우 기본값 15' })
   @ApiQuery({ name: 'tier', required: false, description: '설정 안 할 경우 기본값 all' })
-  @ApiQuery({ name: 'username', required: false, description: `설정 안 할 경우 기본값 ''` })
+  @ApiQuery({ name: 'username', required: false, description: `설정 안 할 경우 기본값 '', 대소문자 구분 X` })
   @ApiResponse({
     status: 200,
     description: 'limit개로 페이지네이션된 유저 랭킹 리스트 및 pagination을 위한 메타 데이터',
@@ -27,7 +27,8 @@ export class RankingController {
     @Query('tier', new DefaultValuePipe('all')) tier: string,
     @Query('username', new DefaultValuePipe('')) username: string,
   ): Promise<RankingPaginationDto> {
-    const paginationRankings = await this.rankingService.getFilteredRankings(page, limit, tier, username);
+    const lowerUsername = username.toLowerCase();
+    const paginationRankings = await this.rankingService.getFilteredRankings(page, limit, tier, lowerUsername);
     return paginationRankings;
   }
 
