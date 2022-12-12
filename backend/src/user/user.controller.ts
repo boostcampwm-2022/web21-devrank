@@ -24,7 +24,7 @@ import { UserService } from './user.service';
 export class UserController {
   constructor(private readonly userService: UserService, private readonly configService: ConfigService) {}
   @Get('prefix')
-  @ApiOperation({ summary: '아이디의 prefix가 일치하는 유저들 목록 가져오기' })
+  @ApiOperation({ summary: '아이디의 prefix가 일치하는 유저들 목록 가져오기 (대소문자 구분 X)' })
   @ApiQuery({ name: 'limit', required: false, description: '설정 안 할 경우 기본값 5' })
   @ApiQuery({ name: 'username', required: false, description: `설정 안 할 경우 기본값 ''` })
   @ApiResponse({
@@ -40,11 +40,12 @@ export class UserController {
     if (!username) {
       throw new BadRequestException('username is required.');
     }
-    return this.userService.findAllByPrefixUsername(limit, username);
+    const lowerUsername = username.toLowerCase();
+    return this.userService.findAllByPrefixUsername(limit, lowerUsername);
   }
 
   @Get(':username')
-  @ApiOperation({ summary: '특정 유저 정보 가져오기(프로필 페이지)' })
+  @ApiOperation({ summary: '특정 유저 정보 가져오기(프로필 페이지) (대소문자 구분 X)' })
   @ApiResponse({
     status: 200,
     description: '특정 유저의 정보를 가져오고, 금일 조회하지 않은 IP주소라면 조회수도 +1 업데이트',
@@ -55,10 +56,11 @@ export class UserController {
     @RealIP() ip: string,
     @Param('username') username: string,
   ): Promise<UserProfileDto> {
+    const lowerUsername = username.toLowerCase();
     return this.userService.findOneByUsername(
       githubToken || this.configService.get('GITHUB_PERSONAL_ACCESS_TOKEN'),
       ip,
-      username,
+      lowerUsername,
     );
   }
 
@@ -71,17 +73,19 @@ export class UserController {
     @UserGithubId() id: string,
     @Param('username') username: string,
   ): Promise<UserProfileDto> {
+    const lowerUsername = username.toLowerCase();
     if (
-      (await this.userService.findUpdateScoreTimeToLive(username)) > 0 &&
-      (await this.userService.findOneByFilter({ username }))?.id !== id
+      (await this.userService.findUpdateScoreTimeToLive(lowerUsername)) > 0 &&
+      (await this.userService.findOneByFilter({ lowerUsername }))?.id !== id
     ) {
       throw new BadRequestException('user score has been updated recently.');
     }
     const user = await this.userService.updateUser(
-      username,
+      lowerUsername,
       githubToken || this.configService.get('GITHUB_PERSONAL_ACCESS_TOKEN'),
     );
-    await this.userService.setUpdateScoreDelayTime(username, UPDATE_DELAY_TIME);
+
+    await this.userService.setUpdateScoreDelayTime(lowerUsername, UPDATE_DELAY_TIME);
     user.updateDelayTime = UPDATE_DELAY_TIME + 3;
     return user;
   }
