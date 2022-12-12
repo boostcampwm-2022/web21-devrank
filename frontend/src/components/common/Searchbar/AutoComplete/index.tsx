@@ -15,15 +15,27 @@ interface AutoCompleteSearchbarProps {
   width: number;
   /** 검색 버튼 위치 (left | right) */
   submitAlign: SubmitAlign;
+  /** 검색 전에 실행할 함수 */
+  onBeforeSearch?: () => void;
 }
 
-function AutoCompleteSearchbar({ type = 'text', placeholder, width, submitAlign }: AutoCompleteSearchbarProps) {
+function AutoCompleteSearchbar({
+  type = 'text',
+  placeholder,
+  width,
+  submitAlign,
+  onBeforeSearch,
+}: AutoCompleteSearchbarProps) {
   const { input, setInput, onInputChange, inputReset } = useInput('');
   const { searchList, focusIdx, focusControlHandler } = useAutoComplete({ input, setInput, inputReset });
   const router = useRouter();
 
   const onSearch = (e: FormEvent) => {
     e.preventDefault();
+    if (onBeforeSearch) {
+      onBeforeSearch();
+    }
+    onBeforeSearch && onBeforeSearch();
     router.push(`/profile/${input}`);
     inputReset();
   };
