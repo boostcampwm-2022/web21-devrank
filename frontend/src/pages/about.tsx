@@ -95,18 +95,19 @@ function About() {
             <p>{t('about:score-calculate-method-5')}</p>
             <p>{t('about:score-calculate-method-6')}</p>
             <p>{t('about:score-calculate-method-7')}</p>
-            <br />
             <p>{t('about:score-calculate-method-8')}</p>
             <br />
-            <Strong>{t('about:score-calculate-method-9')}</Strong>
+            <p>{t('about:score-calculate-method-9')}</p>
             <br />
-            {t('about:score-calculate-method-10')}
+            <Strong>{t('about:score-calculate-method-10')}</Strong>
             <br />
             {t('about:score-calculate-method-11')}
             <br />
             {t('about:score-calculate-method-12')}
             <br />
             {t('about:score-calculate-method-13')}
+            <br />
+            {t('about:score-calculate-method-14')}
           </ScoreInfo>
         </Content>
         <Content>

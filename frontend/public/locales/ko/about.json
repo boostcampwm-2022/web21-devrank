@@ -13,12 +13,13 @@
   "score-calculate-method-3": "· 레포 가중치 = Star 개수",
   "score-calculate-method-4": "· 시간 가중치 = (1 / 1.0019) ^ 지난 일 수",
   "score-calculate-method-5": "커밋점수 = 개인레포 25개, 외부레포 25개의 레포점수 합",
-  "score-calculate-method-6": "유저활동점수 = 커밋점수 + 이슈점수",
-  "score-calculate-method-7": "팔로워점수 = 팔로워수 / 100",
-  "score-calculate-method-8": "유저점수 = 유저활동점수 + 팔로워점수",
-  "score-calculate-method-9": "⚠️ 주의",
-  "score-calculate-method-10": "· y = (1 / 1.0019) ^ x는 1년이 지났을때 시간가중치가 0.5가 되는 지수함수",
-  "score-calculate-method-11": "· 코드가 아닌 문서레포의 기여의 비정상적인 가중치를 제외하기 위하여 문서 위주 레포는 레포점수 0점",
-  "score-calculate-method-12": "· collaborator로 등록되지않은 조직 레포는 집계되지 않음",
-  "score-calculate-method-13": "· 외부레포는 star 순으로 정렬이 되지 않음"
+  "score-calculate-method-6": "활동점수 = 모든 커밋수 + 모든 이슈수 + 모든 PR수 + 모든 리뷰수 + 모든 레포생성수",
+  "score-calculate-method-7": "유저활동점수 = 커밋점수 + 이슈점수 + 활동점수",
+  "score-calculate-method-8": "유저개인점수 = 팔로워수 / 100",
+  "score-calculate-method-9": "유저점수 = 유저활동점수 + 유저개인점수",
+  "score-calculate-method-10": "⚠️ 주의",
+  "score-calculate-method-11": "· y = (1 / 1.0019) ^ x는 1년이 지났을때 시간가중치가 0.5가 되는 지수함수",
+  "score-calculate-method-12": "· 코드가 아닌 문서레포의 기여의 비정상적인 가중치를 제외하기 위하여 문서 위주 레포는 레포점수 0점",
+  "score-calculate-method-13": "· collaborator로 등록되지않은 조직 레포는 집계되지 않음",
+  "score-calculate-method-14": "· 외부레포는 star 순으로 정렬이 되지 않음"
 }
