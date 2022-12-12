@@ -4,16 +4,11 @@ import Head from 'next/head';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
-import { useQuery } from '@tanstack/react-query';
 import { Button } from '@components/common';
-import { requestTokenRefresh } from '@apis/auth';
 import { aldrich, lineSeedKR } from '@utils/fonts';
 import { ssgWrapper } from '@utils/wrapper';
 
 function NotFound() {
-  useQuery(['user'], () => requestTokenRefresh(), {
-    cacheTime: Infinity,
-  });
   const router = useRouter();
 
   const { t } = useTranslation(['404', 'meta']);

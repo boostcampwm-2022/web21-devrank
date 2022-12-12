@@ -3,7 +3,7 @@ import { useIsFetching, useQueryClient } from '@tanstack/react-query';
 
 function useQueryData(queryKey: unknown[]) {
   const queryClient = useQueryClient();
-  const isFetching = useIsFetching();
+  const isFetching = useIsFetching(queryKey);
 
   const queryData: any = useMemo(() => queryClient.getQueryData(queryKey), [isFetching, queryClient, queryKey]);
 
@@ -18,7 +18,7 @@ function useQueryData(queryKey: unknown[]) {
     [queryClient, queryKey],
   );
 
-  return { queryData, setQueryData, removeQueryData };
+  return { isFetching, queryData, setQueryData, removeQueryData };
 }
 
 export default useQueryData;
