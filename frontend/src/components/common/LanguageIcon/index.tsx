@@ -24,7 +24,6 @@ function LanguageIcon({ language, width = 50, height = 50 }: LanguageIconProps) 
         alt={transLang}
         width={width}
         height={height}
-        quality={100}
         onError={() => setIconUrl('/icons/default-language.svg')}
         title={language}
       />
