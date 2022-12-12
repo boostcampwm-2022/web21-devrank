@@ -21,6 +21,7 @@ function Header() {
     remove: removeUser,
   } = useQuery(['user'], () => requestTokenRefresh(), {
     enabled: router.pathname !== '/callback',
+    cacheTime: Infinity,
   });
 
   const { t } = useTranslation(['header', 'common']);
