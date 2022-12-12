@@ -20,7 +20,7 @@ function Header() {
   const router = useRouter();
 
   const onClickLoginButton = () => {
-    localStorage.setItem('login-pathname', window.location.pathname);
+    localStorage.setItem('login-pathname', router.asPath);
     window.location.assign(GITHUB_AUTH_REQUEST_URL);
   };
 
