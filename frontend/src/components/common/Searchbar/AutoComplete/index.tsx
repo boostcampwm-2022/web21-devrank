@@ -35,7 +35,6 @@ function AutoCompleteSearchbar({
     if (onBeforeSearch) {
       onBeforeSearch();
     }
-    onBeforeSearch && onBeforeSearch();
     router.push(`/profile/${input}`);
     inputReset();
   };
