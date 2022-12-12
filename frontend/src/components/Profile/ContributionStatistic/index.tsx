@@ -1,7 +1,10 @@
 import dynamic from 'next/dynamic';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
+import { RANK } from '@type/common';
 import { ProfileUserResponse } from '@type/response';
+import { TIER_OFFSET } from '@utils/constants';
 import {
+  getLineChartMinMaxValue,
   transContributionHistoryToLineChartData,
   transScoreHistoryToLineChartData,
   transToPieChartData,
@@ -15,19 +18,37 @@ interface ContributionStatisticProps {
 }
 
 function ContributionStatistic({ data }: ContributionStatisticProps) {
+  const theme = useTheme();
+  const pieChartData = transToPieChartData(data.history);
+  const contributionHistoryData = transContributionHistoryToLineChartData(data.history.contributionHistory, data.tier);
+  const scoreHistoryData = transScoreHistoryToLineChartData(data.scoreHistory, data.tier);
+  const { min, max } = getLineChartMinMaxValue(scoreHistoryData);
+
   return (
     <ChartContainer>
       <Chart>
         <ChartTitle>Contribution Statistics</ChartTitle>
-        <PieChart data={transToPieChartData(data.history)} />
+        <PieChart data={pieChartData} />
       </Chart>
       <Chart>
         <ChartTitle>Contribution History</ChartTitle>
-        <LineChart data={transContributionHistoryToLineChartData(data.history.contributionHistory, data.tier)} />
+        <LineChart data={contributionHistoryData} />
       </Chart>
       <Chart>
         <ChartTitle>Score History</ChartTitle>
-        <LineChart data={transScoreHistoryToLineChartData(data.scoreHistory, data.tier)} />
+        <LineChart
+          data={scoreHistoryData}
+          min={min}
+          max={max}
+          markers={Object.entries(TIER_OFFSET).map(([tier, score]) => ({
+            axis: 'y',
+            value: score,
+            lineStyle: { stroke: theme.colors[`${tier as RANK}2`], strokeWidth: 1, strokeDasharray: '4 4' },
+            legend: tier,
+            legendPosition: 'right',
+            textStyle: { fill: theme.colors[`${tier as RANK}2`], fontSize: 10, fontWeight: 'bold' },
+          }))}
+        />
       </Chart>
     </ChartContainer>
   );
