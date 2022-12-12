@@ -20,12 +20,14 @@ export const requestUserLogout = async () => {
 
 export const requestTokenRefresh = async (
   context?: GetServerSidePropsContext<ParsedUrlQuery, PreviewData>,
-): Promise<LoginResponse> => {
+): Promise<LoginResponse | null> => {
   if (context) axiosInstance.defaults.headers.common['Cookie'] = context.req.headers.cookie;
 
   const response = await axiosInstance.post('/auth/refresh');
 
+  if (!response) return null;
+
   if (context && response.headers['set-cookie']) context.res.setHeader('Set-Cookie', response.headers['set-cookie']);
 
-  return response?.data || null;
+  return response.data;
 };
