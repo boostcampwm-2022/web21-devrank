@@ -1,4 +1,4 @@
-import theme from './theme.json';
+import theme from '../theme.json';
 import { ResponsivePie } from '@nivo/pie';
 
 interface PieChartProps {

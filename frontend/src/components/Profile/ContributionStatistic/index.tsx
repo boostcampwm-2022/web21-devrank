@@ -2,6 +2,7 @@ import dynamic from 'next/dynamic';
 import styled, { useTheme } from 'styled-components';
 import { RANK } from '@type/common';
 import { ProfileUserResponse } from '@type/response';
+import { Tooltip } from '@components/Chart';
 import { TIER_OFFSET } from '@utils/constants';
 import {
   getLineChartMinMaxValue,
@@ -32,7 +33,12 @@ function ContributionStatistic({ data }: ContributionStatisticProps) {
       </Chart>
       <Chart>
         <ChartTitle>Contribution History</ChartTitle>
-        <LineChart data={contributionHistoryData} />
+        <LineChart
+          data={contributionHistoryData}
+          tooltip={(props) => (
+            <Tooltip>{`${props.point.data.y} contribution on ${props.point.data.xFormatted}`}</Tooltip>
+          )}
+        />
       </Chart>
       <Chart>
         <ChartTitle>Score History</ChartTitle>
@@ -46,8 +52,9 @@ function ContributionStatistic({ data }: ContributionStatisticProps) {
             lineStyle: { stroke: theme.colors[`${tier as RANK}2`], strokeWidth: 1, strokeDasharray: '4 4' },
             legend: tier,
             legendPosition: 'right',
-            textStyle: { fill: theme.colors[`${tier as RANK}2`], fontSize: 10, fontWeight: 'bold' },
+            textStyle: { fill: theme.colors[`${tier as RANK}2`], fontSize: 12, fontWeight: 'bold' },
           }))}
+          tooltip={(props) => <Tooltip>{`${props.point.data.y} scores on ${props.point.data.xFormatted}`}</Tooltip>}
         />
       </Chart>
     </ChartContainer>

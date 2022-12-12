@@ -1,16 +1,16 @@
-import styled from 'styled-components';
-import theme from './theme.json';
+import theme from '../theme.json';
 import { CartesianMarkerProps } from '@nivo/core';
-import { DatumValue, ResponsiveLine, Serie } from '@nivo/line';
+import { DatumValue, PointTooltip, ResponsiveLine, Serie } from '@nivo/line';
 
 interface LineChartProps {
   data: Serie[];
   min?: number;
   max?: number;
   markers?: CartesianMarkerProps<DatumValue>[];
+  tooltip?: PointTooltip;
 }
 
-function LineChart({ data, min, max, markers }: LineChartProps) {
+function LineChart({ data, min, max, markers, tooltip }: LineChartProps) {
   return (
     <>
       <ResponsiveLine
@@ -39,7 +39,7 @@ function LineChart({ data, min, max, markers }: LineChartProps) {
           legendOffset: 48,
           legendPosition: 'middle',
         }}
-        tooltip={(props) => <Tooltip>{`${props.point.data.y} contribution on ${props.point.data.xFormatted}`}</Tooltip>}
+        tooltip={tooltip}
         enablePoints={false}
         useMesh={true}
         enableSlices={false}
@@ -50,9 +50,3 @@ function LineChart({ data, min, max, markers }: LineChartProps) {
 }
 
 export default LineChart;
-
-const Tooltip = styled.div`
-  background-color: ${({ theme }) => theme.colors.gray7};
-  padding: 10px;
-  border-radius: 8px;
-`;
