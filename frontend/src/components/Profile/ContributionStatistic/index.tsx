@@ -1,7 +1,11 @@
 import dynamic from 'next/dynamic';
 import styled from 'styled-components';
 import { ProfileUserResponse } from '@type/response';
-import { transToLineChartData, transToPieChartData } from '@utils/utils';
+import {
+  transContributionHistoryToLineChartData,
+  transScoreHistoryToLineChartData,
+  transToPieChartData,
+} from '@utils/utils';
 
 const PieChart = dynamic(() => import('@components/Chart/PieChart'), { ssr: false });
 const LineChart = dynamic(() => import('@components/Chart/LineChart'), { ssr: false });
@@ -19,7 +23,11 @@ function ContributionStatistic({ data }: ContributionStatisticProps) {
       </Chart>
       <Chart>
         <ChartTitle>Contribution History</ChartTitle>
-        <LineChart data={transToLineChartData(data.history.contributionHistory, data.tier)} />
+        <LineChart data={transContributionHistoryToLineChartData(data.history.contributionHistory, data.tier)} />
+      </Chart>
+      <Chart>
+        <ChartTitle>Score History</ChartTitle>
+        <LineChart data={transScoreHistoryToLineChartData(data.scoreHistory, data.tier)} />
       </Chart>
     </ChartContainer>
   );
