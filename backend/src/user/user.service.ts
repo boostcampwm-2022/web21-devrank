@@ -48,7 +48,9 @@ export class UserService {
       user = await this.userRepository.createOrUpdate(user);
     }
     await this.userRepository.createOrUpdate(user);
-    const { totalRank, tierRank } = await this.getUserRelativeRanking(user);
+
+    const { totalRank, tierRank } =
+      (await this.getUserRelativeRanking(user)) || (await this.setUserRelativeRanking(user));
     this.userRepository.setDuplicatedRequestIp(ip, username);
     user.updateDelayTime = await this.userRepository.findUpdateScoreTimeToLive(username);
     user.totalRank = totalRank;
@@ -82,7 +84,8 @@ export class UserService {
       pinnedRepositories,
     };
     user = await this.userRepository.createOrUpdate(updatedUser);
-    const { totalRank, tierRank } = await this.getUserRelativeRanking(user);
+
+    const { totalRank, tierRank } = await this.setUserRelativeRanking(user);
     const userWithRank: UserProfileDto = {
       ...user,
       totalRank,
@@ -110,6 +113,7 @@ export class UserService {
           updateUser.scoreDifference = 0;
         }
         this.userRepository.createOrUpdate(updateUser);
+        this.userRepository.deleteCachedUserRank(updateUser.username + '&');
       } catch {
         logger.error(`can't update user ${user.username}`);
       }
@@ -348,11 +352,15 @@ export class UserService {
     };
   }
 
-  async getUserRelativeRanking(user: UserDto): Promise<Rank> {
+  async getUserRelativeRanking(user: UserDto): Promise<Rank | false> {
     const cachedRanks = await this.userRepository.findCachedUserRank(user.id + '&');
     if (Object.keys(cachedRanks).length) {
       return cachedRanks;
     }
+    return false;
+  }
+
+  async setUserRelativeRanking(user: UserDto): Promise<Rank> {
     const users = await this.userRepository.findAll({}, true, ['username', 'tier', 'score']);
     let tierRank = 0;
     for (let rank = 0; rank < users.length; rank++) {
@@ -361,7 +369,7 @@ export class UserService {
           totalRank: rank + 1,
           tierRank: tierRank + 1,
         };
-        this.userRepository.setCachedUserRank(user.id + '&', rankInfo);
+        await this.userRepository.setCachedUserRank(user.id + '&', rankInfo);
         return rankInfo;
       }
       if (users[rank].tier === user.tier) {
