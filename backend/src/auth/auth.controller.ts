@@ -4,7 +4,7 @@ import { CurrentUser } from '@libs/common/decorators/current-user.decodator';
 import { BadRequestException, Body, Controller, Delete, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { LoginRequestDto } from './dto/login-request.dto';
 import { LoginResponseDto } from './dto/login-response-dto';
 import { RefreshGuard } from './guards/refresh-auth.guard';
@@ -56,6 +56,7 @@ export class AuthController {
     let user: UserDto = {
       id: userInfo.node_id,
       username: userInfo.login,
+      lowerUsername: userInfo.login.toLowerCase(),
       following: userInfo.following,
       followers: userInfo.followers,
       avatarUrl: userInfo.avatar_url,
@@ -68,10 +69,10 @@ export class AuthController {
     };
 
     try {
-      await this.userService.findOneByFilter({ username: user.username });
+      await this.userService.findOneByFilter({ lowerUsername: user.lowerUsername });
     } catch {
       await this.userService.createOrUpdate(user);
-      user = await this.userService.updateUser(user.username, githubToken);
+      user = await this.userService.updateUser(user.lowerUsername, githubToken);
       user.scoreHistory.push({ score: user.score, date: new Date() });
       await this.userService.createOrUpdate(user);
     }
