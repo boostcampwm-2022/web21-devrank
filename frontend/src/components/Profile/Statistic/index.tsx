@@ -1,7 +1,6 @@
 import dynamic from 'next/dynamic';
 import styled, { useTheme } from 'styled-components';
-import { RANK } from '@type/common';
-import { ProfileUserResponse } from '@type/response';
+import { HistoryType, RANK, ScoreHistory } from '@type/common';
 import { Tooltip } from '@components/Chart';
 import { TIER_OFFSET } from '@utils/constants';
 import {
@@ -15,14 +14,16 @@ const PieChart = dynamic(() => import('@components/Chart/PieChart'), { ssr: fals
 const LineChart = dynamic(() => import('@components/Chart/LineChart'), { ssr: false });
 
 interface ContributionStatisticProps {
-  data: ProfileUserResponse;
+  history: HistoryType;
+  scoreHistory: ScoreHistory[];
+  tier: RANK;
 }
 
-function Statistic({ data }: ContributionStatisticProps) {
+function Statistic({ history, scoreHistory, tier }: ContributionStatisticProps) {
   const theme = useTheme();
-  const pieChartData = transToPieChartData(data.history);
-  const contributionHistoryData = transContributionHistoryToLineChartData(data.history.contributionHistory, data.tier);
-  const scoreHistoryData = transScoreHistoryToLineChartData(data.scoreHistory, data.tier);
+  const pieChartData = transToPieChartData(history);
+  const contributionHistoryData = transContributionHistoryToLineChartData(history.contributionHistory, tier);
+  const scoreHistoryData = transScoreHistoryToLineChartData(scoreHistory, tier);
   const { min, max } = getLineChartMinMaxValue(scoreHistoryData);
 
   return (
