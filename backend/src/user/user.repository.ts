@@ -1,6 +1,6 @@
 import { RankingPaginationDto } from '@apps/ranking/dto/ranking-pagination.dto';
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
-import { RANK_CACHE_DELAY } from '@libs/consts';
+import { KR_TIME_DIFF, RANK_CACHE_DELAY } from '@libs/consts';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import Redis from 'ioredis';
@@ -74,8 +74,7 @@ export class UserRepository {
 
   async setDuplicatedRequestIp(ip: string, lowerUsername: string): Promise<void> {
     this.redis.sadd(ip, lowerUsername);
-    const now = new Date();
-    now.setHours(now.getHours() + 9);
+    const now = +new Date() + KR_TIME_DIFF;
 
     const midNight = new Date(new Date().setHours(23, 59, 59));
     midNight.setHours(midNight.getHours() + 9);
