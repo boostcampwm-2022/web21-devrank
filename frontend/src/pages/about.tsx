@@ -1,6 +1,7 @@
 import { GetStaticProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
+import Link from 'next/link';
 import React from 'react';
 import styled from 'styled-components';
 import { CubeIcon } from '@components/common';
@@ -107,18 +108,28 @@ function About() {
         </Content>
         <Content>
           <Title>Developed By</Title>
-          {DEVELOPER_INFORMATION.map(({ name, introduction, field, career }) => (
+          {DEVELOPER_INFORMATION.map(({ name, introduction, github, blog, email, field }) => (
             <Profile key={name}>
               <Name>
                 {name}
                 <div>
-                  <Image src='/icons/github.svg' alt='깃허브 아이콘' width={20} height={20} quality={100} />
-                  <Image src='/icons/link.svg' alt='링크 아이콘' width={20} height={20} quality={100} />
+                  <Link href={github} legacyBehavior>
+                    <a>
+                      <Image src='/icons/github.svg' alt='깃허브 아이콘' width={20} height={20} quality={100} />
+                    </a>
+                  </Link>
+                  {blog && (
+                    <Link href={blog} legacyBehavior>
+                      <a>
+                        <Image src='/icons/link.svg' alt='링크 아이콘' width={20} height={20} quality={100} />
+                      </a>
+                    </Link>
+                  )}
                 </div>
               </Name>
               <Description>
-                <li>&middot; 개발경력 : {career}</li>
                 <li>&middot; 담당 : {field}</li>
+                <li>&middot; 이메일: {email}</li>
                 <li>&middot; {introduction}</li>
               </Description>
             </Profile>
@@ -226,10 +237,10 @@ const Profile = styled.div`
 `;
 
 const Name = styled.div`
+  ${({ theme }) => theme.common.flexRow}
   font-size: ${({ theme }) => theme.fontSize.xl};
   color: ${({ theme }) => theme.colors.logo};
   margin-left: 20px;
-  ${({ theme }) => theme.common.flexCenter}
   gap: 10px;
 `;
 
