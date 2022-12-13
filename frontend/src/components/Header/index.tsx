@@ -3,23 +3,23 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Avatar, Button } from '@components/common';
 import Dropdown from '@components/common/Dropdown';
 import { requestTokenRefresh, requestUserLogout } from '@apis/auth';
 import { GITHUB_AUTH_REQUEST_URL } from '@utils/constants';
 
 function Header() {
+  const queryClient = useQueryClient();
+
   const { mutate: logout } = useMutation({
     mutationFn: requestUserLogout,
+    onSuccess: () => queryClient.invalidateQueries(['user']),
   });
+
   const router = useRouter();
 
-  const {
-    isLoading,
-    data: userData,
-    remove: removeUser,
-  } = useQuery(['user'], () => requestTokenRefresh(), {
+  const { isLoading, data: userData } = useQuery(['user'], () => requestTokenRefresh(), {
     enabled: router.pathname !== '/callback',
     cacheTime: Infinity,
   });
@@ -33,7 +33,6 @@ function Header() {
 
   const onClickLogoutButton = () => {
     logout();
-    removeUser();
   };
 
   return (
