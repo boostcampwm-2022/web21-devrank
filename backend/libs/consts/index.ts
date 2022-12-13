@@ -14,4 +14,4 @@ export const RANK_CACHE_DELAY = 12 * HOUR;
 
 export const GITHUB_API_DELAY = 1500; // ms
 
-export const KR_TIME_DIFF = 9 * 60 * 60 * 1000;
+export const KR_TIME_DIFF = 9 * HOUR * 1000; // ms
