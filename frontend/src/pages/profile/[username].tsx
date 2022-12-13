@@ -85,7 +85,7 @@ function Profile({ username }: ProfileProps) {
               </Paper>
               <Title>Stats</Title>
               <Paper>
-                <Statistic data={data} />
+                <Statistic history={data.history} scoreHistory={data.scoreHistory} tier={data.tier} />
               </Paper>
               <Title>Pinned Repositories</Title>
               <Paper>
