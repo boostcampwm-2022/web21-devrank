@@ -1,6 +1,7 @@
 import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import styled from 'styled-components';
@@ -66,27 +67,47 @@ function Profile({ username }: ProfileProps) {
               updateData: mutate,
               isLoading,
               isMine: userData?.username === username,
+              isInvalid: !data.history,
             }}
           />
-          <Title>EXP</Title>
-          <EXPbar tier={data.tier} exp={data.score} needExp={data.needExp} startExp={data.startExp} />
-          <ContributionHeader>
-            <Title>Contributions</Title>
-            <p>{`${t('maximum-continuous-commit-history')} : ${data.history.maxContinuousCount}${
-              data.history.maxContinuousCount >= MAX_COMMIT_STREAK ? `${t('day')}~` : t('day')
-            }`}</p>
-          </ContributionHeader>
-          <Paper>
-            <CommitHistory history={data.history} tier={data.tier} />
-          </Paper>
-          <Title>Stats</Title>
-          <Paper>
-            <Statistic data={data} />
-          </Paper>
-          <Title>Pinned Repositories</Title>
-          <Paper>
-            <PinnedRepository repositories={data.pinnedRepositories} />
-          </Paper>
+          {data.history ? (
+            <>
+              <Title>EXP</Title>
+              <EXPbar tier={data.tier} exp={data.score} needExp={data.needExp} startExp={data.startExp} />
+              <ContributionHeader>
+                <Title>Contributions</Title>
+                <p>{`${t('maximum-continuous-commit-history')} : ${data.history.maxContinuousCount}${
+                  data.history.maxContinuousCount >= MAX_COMMIT_STREAK ? `${t('day')}~` : t('day')
+                }`}</p>
+              </ContributionHeader>
+              <Paper>
+                <CommitHistory history={data.history} tier={data.tier} />
+              </Paper>
+              <Title>Stats</Title>
+              <Paper>
+                <Statistic data={data} />
+              </Paper>
+              <Title>Pinned Repositories</Title>
+              <Paper>
+                <PinnedRepository repositories={data.pinnedRepositories} />
+              </Paper>
+            </>
+          ) : (
+            <Alert>
+              <div>
+                <CubeImage
+                  src='/icons/cube/cube-small-invalid.svg'
+                  alt='큐브 이미지'
+                  width={250}
+                  height={240}
+                  quality={100}
+                  priority
+                />
+              </div>
+              <strong>Invalid User</strong>
+              <p>정보를 불러올 수 없는 유저입니다.</p>
+            </Alert>
+          )}
         </>
       )}
     </Container>
@@ -152,4 +173,38 @@ const ContributionHeader = styled.div`
     font-weight: ${({ theme }) => theme.fontWeight.bold};
     margin: 80px 20px 10px;
   }
+`;
+
+const Alert = styled.div`
+  ${({ theme }) => theme.common.flexCenterColumn};
+  width: 100%;
+  background-color: ${({ theme }) => theme.colors.black4};
+  margin-top: 60px;
+  position: relative;
+  height: 600px;
+
+  div {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  strong {
+    z-index: 1;
+    font-size: 50px;
+    margin-bottom: 44px;
+  }
+
+  p {
+    z-index: 1;
+    font-size: 28px;
+  }
+`;
+
+const CubeImage = styled(Image)`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 `;
