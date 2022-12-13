@@ -129,9 +129,7 @@ export const getServerSideProps: GetServerSideProps = ssrWrapper(
     const query = queryValidator({ tier, username, page });
     await Promise.allSettled([
       queryClient.prefetchQuery(['user'], () => requestTokenRefresh(context)),
-      queryClient.prefetchQuery(['ranking', CUBE_RANK.ALL, ''], () =>
-        requestTopRankingByScore({ limit: COUNT_PER_PAGE }),
-      ),
+      queryClient.prefetchQuery(['ranking', CUBE_RANK.ALL], () => requestTopRankingByScore({ limit: COUNT_PER_PAGE })),
     ]);
 
     return {
