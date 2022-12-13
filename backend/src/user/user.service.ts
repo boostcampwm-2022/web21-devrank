@@ -36,13 +36,8 @@ export class UserService {
     if (!user) {
       try {
         user = await this.updateUser(lowerUsername, githubToken);
-        if (!user.scoreHistory) {
-          user.scoreHistory = [];
-        }
-        user.scoreHistory.push({ date: new Date(), score: user.score });
-        user = await this.userRepository.createOrUpdate(user);
       } catch {
-        throw new HttpException(`can't update this user.`, HttpStatus.NO_CONTENT);
+        throw new HttpException(`can't update this user.`, HttpStatus.SERVICE_UNAVAILABLE);
       }
     }
     const { totalRank, tierRank } =
@@ -79,18 +74,19 @@ export class UserService {
       organizations,
       pinnedRepositories,
     };
-    if (!updatedUser.scoreHistory) {
-      updatedUser.scoreHistory = [];
+
+    if (!updatedUser?.scoreHistory?.length) {
+      updatedUser.scoreHistory = [{ date: new Date(), score: updatedUser.score }];
     }
     const KR_TIME_DIFF = 9 * 60 * 60 * 1000;
     const utc = updatedUser.scoreHistory[updatedUser.scoreHistory.length - 1].date.getTime();
-    if (new Date(utc + KR_TIME_DIFF).getDate() == new Date().getDate()) {
+    if (new Date(utc + KR_TIME_DIFF).getDate() === new Date().getDate()) {
       updatedUser.scoreHistory.pop();
+      updatedUser.scoreHistory.push({
+        date: new Date(),
+        score: updatedUser.score,
+      });
     }
-    updatedUser.scoreHistory.push({
-      date: new Date(),
-      score: updatedUser.score,
-    });
     if (updatedUser.scoreHistory.length > 1) {
       updatedUser.scoreDifference =
         updatedUser.score - updatedUser.scoreHistory[updatedUser.scoreHistory.length - 2].score;
@@ -274,7 +270,7 @@ export class UserService {
         primaryLanguages: Array.from(languagesScore.keys()).slice(0, 3),
       };
     } catch {
-      throw new HttpException(`can't update this user.`, HttpStatus.NO_CONTENT);
+      throw new HttpException(`can't update this user.`, HttpStatus.SERVICE_UNAVAILABLE);
     }
   }
 
