@@ -20,6 +20,7 @@ function LineChart({ data, min, max, markers, tooltip }: LineChartProps) {
         margin={{ top: 60, right: 60, bottom: 60, left: 60 }}
         curve='monotoneX'
         enableArea={true}
+        areaBaselineValue={min || 0}
         xScale={{
           type: 'time',
           format: '%Y-%m-%d',
