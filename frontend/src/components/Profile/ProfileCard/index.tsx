@@ -124,7 +124,7 @@ function ProfileCard({ profileData }: ProfileCardProps) {
         <CubeLogo tier={tier} size={'sm'} isInvalid={isInvalid} />
         {isInvalid ? (
           <RankText>
-            <p>등수를 표시할 수 없습니다.</p>
+            <p>{t('profile:invalid-rank')}</p>
           </RankText>
         ) : (
           <RankText>

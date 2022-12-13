@@ -105,7 +105,7 @@ function Profile({ username }: ProfileProps) {
                 />
               </div>
               <strong>Invalid User</strong>
-              <p>정보를 불러올 수 없는 유저입니다.</p>
+              <p>{t('profile:invalid-user')}</p>
             </Alert>
           )}
         </>
