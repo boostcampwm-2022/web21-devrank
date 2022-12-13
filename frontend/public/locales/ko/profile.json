@@ -6,5 +6,7 @@
   "user-update-delay": "초 후 업데이트 가능합니다.",
   "day": "일",
   "total": "전체",
-  "rank": "등급"
+  "rank": "등급",
+  "invalid-user": "정보를 가져올 수 없는 유저입니다",
+  "invalid-rank": "등수를 표시할 수 없습니다"
 }
