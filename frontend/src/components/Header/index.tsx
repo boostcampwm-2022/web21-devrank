@@ -2,7 +2,6 @@ import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
 import styled from 'styled-components';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Avatar, Button } from '@components/common';
@@ -32,7 +31,7 @@ function Header() {
     window.location.assign(GITHUB_AUTH_REQUEST_URL);
   };
 
-  const onClickLogoutButton = async () => {
+  const onClickLogoutButton = () => {
     logout();
   };
 
