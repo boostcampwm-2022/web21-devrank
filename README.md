@@ -8,8 +8,8 @@
 ![redis](https://img.shields.io/badge/redis-6.2.5-%23DC382D?style=flat&logo=Redis)
 ![mongoDB](https://img.shields.io/badge/mongoDB-5.0.14-%2347A248?style=flat&logo=MongoDB)
 ![docker](https://img.shields.io/badge/docker-20.10.21-%232496ED?style=flat&logo=Docker)
-![React](https://img.shields.io/badge/18.2.0-react-%2361DAFB?style=flat&logo=React)
-![Next.js](https://img.shields.io/badge/13.0.3-next-%23000000?style=flat&logo=Next.js)
+![React](https://img.shields.io/badge/react-18.2.0-%2361DAFB?style=flat&logo=React)
+![Next.js](https://img.shields.io/badge/next-13.0.3-%23000000?style=flat&logo=Next.js)
 
 </div>
 
