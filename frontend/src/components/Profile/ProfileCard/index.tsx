@@ -28,6 +28,7 @@ interface ProfileCardProps {
     updateData: () => void;
     isLoading: boolean;
     isMine: boolean;
+    isInvalid: boolean;
   };
 }
 
@@ -53,6 +54,7 @@ function ProfileCard({ profileData }: ProfileCardProps) {
     updateData,
     isLoading,
     isMine,
+    isInvalid,
   } = profileData;
 
   const { t } = useTranslation(['profile', 'tier']);
@@ -119,18 +121,24 @@ function ProfileCard({ profileData }: ProfileCardProps) {
         )}
       </ProfileInfos>
       <ProfileRank>
-        <CubeLogo tier={tier} size={'sm'} />
-        <div>
-          <p>
-            {t('profile:total')}&nbsp;{totalRank}
-            {getRankingUnit(locale, totalRank)}
-          </p>
-          <p>
-            <ColorPoint color={CUBE_COLOR_MAP[tier]}>{t(`tier:${tier}`)}</ColorPoint>
-            &nbsp;{tierRank}
-            {getRankingUnit(locale, tierRank)}
-          </p>
-        </div>
+        <CubeLogo tier={tier} size={'sm'} isInvalid={isInvalid} />
+        {isInvalid ? (
+          <RankText>
+            <p>등수를 표시할 수 없습니다.</p>
+          </RankText>
+        ) : (
+          <RankText>
+            <p>
+              {t('profile:total')}&nbsp;{totalRank}
+              {getRankingUnit(locale, totalRank)}
+            </p>
+            <p>
+              <ColorPoint color={CUBE_COLOR_MAP[tier]}>{t(`tier:${tier}`)}</ColorPoint>
+              &nbsp;{tierRank}
+              {getRankingUnit(locale, tierRank)}
+            </p>
+          </RankText>
+        )}
       </ProfileRank>
     </Paper>
   );
@@ -172,15 +180,14 @@ const ProfileInfos = styled.ul`
 const ProfileRank = styled.div`
   max-width: 300px;
   width: 100%;
-  div {
-    margin-top: 20px;
-    ${({ theme }) => theme.common.flexCenterColumn};
-    p {
-      margin-top: 8px;
-    }
-  }
+  ${({ theme }) => theme.common.flexCenterColumn};
+`;
 
-  transform: translateZ(-50);
+const RankText = styled.div`
+  margin-top: 20px;
+  p {
+    margin-top: 8px;
+  }
 `;
 
 const ImageStyle = {

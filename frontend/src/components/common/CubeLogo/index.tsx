@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import React from 'react';
 import styled, { css, keyframes } from 'styled-components';
 import { CubeRankType } from '@type/common';
@@ -7,6 +8,7 @@ type sizeType = 'sm' | 'lg';
 interface CubeLogoProps {
   size: sizeType;
   tier: CubeRankType;
+  isInvalid?: boolean;
 }
 
 interface StyledSVGProps {
@@ -67,21 +69,32 @@ const CUBE_PATH_LIST = [
   'M258.05 95.2628L257.925 130.472L290.049 147.733L320.512 129.625L321.629 94.4603L288.931 78.2781L258.05 95.2628Z',
 ];
 
-function CubeLogo({ size, tier }: CubeLogoProps) {
+function CubeLogo({ size, tier, isInvalid = false }: CubeLogoProps) {
   return (
     <Container>
       <Shadow size={size} />
-      <Svg
-        width={SIZE_MAP[size].width}
-        height={SIZE_MAP[size].height}
-        viewBox='0 0 574 232'
-        fill='none'
-        xmlns='http://www.w3.org/2000/svg'
-      >
-        {CUBE_PATH_LIST.map((d) => (
-          <Path key={d} d={d} tier={tier} />
-        ))}
-      </Svg>
+      {isInvalid ? (
+        <InvalidSvg
+          src='/icons/cube/cube-small-invalid.svg'
+          alt='큐브 이미지'
+          width={160}
+          height={160}
+          quality={100}
+          priority
+        />
+      ) : (
+        <Svg
+          width={SIZE_MAP[size].width}
+          height={SIZE_MAP[size].height}
+          viewBox='0 0 574 232'
+          fill='none'
+          xmlns='http://www.w3.org/2000/svg'
+        >
+          {CUBE_PATH_LIST.map((d) => (
+            <Path key={d} d={d} tier={tier} />
+          ))}
+        </Svg>
+      )}
     </Container>
   );
 }
@@ -157,6 +170,11 @@ const Shadow = styled.div<StyledShadowProps>`
 `;
 
 const Svg = styled.svg`
+  animation: ${floating} 4s cubic-bezier(0.28, 0, 0.44, 0.99) infinite;
+`;
+
+const InvalidSvg = styled(Image)`
+  z-index: 1;
   animation: ${floating} 4s cubic-bezier(0.28, 0, 0.44, 0.99) infinite;
 `;
 
