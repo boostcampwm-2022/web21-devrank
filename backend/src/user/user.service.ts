@@ -37,7 +37,7 @@ export class UserService {
       try {
         user = await this.updateUser(lowerUsername, githubToken);
       } catch {
-        throw new HttpException(`can't update this user.`, HttpStatus.SERVICE_UNAVAILABLE);
+        throw new HttpException(`can't update user ${lowerUsername}.`, HttpStatus.SERVICE_UNAVAILABLE);
       }
     }
     const { totalRank, tierRank } =
@@ -270,7 +270,7 @@ export class UserService {
         primaryLanguages: Array.from(languagesScore.keys()).slice(0, 3),
       };
     } catch {
-      throw new HttpException(`can't update this user.`, HttpStatus.SERVICE_UNAVAILABLE);
+      throw new HttpException(`can't update user ${lowerUsername}.`, HttpStatus.SERVICE_UNAVAILABLE);
     }
   }
 
