@@ -26,6 +26,14 @@ export const getDate = (dateString: string) => {
   return { year, month, date, day };
 };
 
+export const getKSTDateString = (date: Date) => {
+  const utc = date.getTime() + date.getTimezoneOffset() * 60 * 1000;
+  const KR_TIME_DIFF = 9 * 60 * 60 * 1000;
+  const kst_date = new Date(utc + KR_TIME_DIFF);
+
+  return `${kst_date.getFullYear()}-${kst_date.getMonth() + 1}-${kst_date.getDate()}`;
+};
+
 export const getProfileDescription = (locale: string, data: ProfileUserResponse) => {
   const { t } = useTranslation();
   const { tier, score, totalRank, tierRank, primaryLanguages } = data;
@@ -96,7 +104,7 @@ export const transScoreHistoryToLineChartData = (data: ScoreHistory[], tier: RAN
     {
       id: 'contribution',
       color: theme.colors[`${tier}2`],
-      data: data.map((value) => ({ x: value.date.slice(0, 10), y: value.score })),
+      data: data.map((value) => ({ x: getKSTDateString(new Date(value.date)), y: value.score })),
     },
   ];
 };
