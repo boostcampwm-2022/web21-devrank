@@ -32,32 +32,28 @@ export class UserService {
   }
 
   async findOneByUsername(githubToken: string, ip: string, lowerUsername: string): Promise<UserProfileDto> {
-    let user = null;
-    if (await this.userRepository.isDuplicatedRequestIp(ip, lowerUsername)) {
-      user = await this.userRepository.findOneByLowerUsername(lowerUsername);
-    } else {
-      user = await this.userRepository.findOneByLowerUsernameAndUpdateViews(lowerUsername);
-    }
-
+    let user = await this.userRepository.findOneByLowerUsername(lowerUsername);
     if (!user) {
-      user = await this.updateUser(lowerUsername, githubToken);
-      if (!user.scoreHistory) {
-        user.scoreHistory = [];
+      try {
+        user = await this.updateUser(lowerUsername, githubToken);
+        if (!user.scoreHistory) {
+          user.scoreHistory = [];
+        }
+        user.scoreHistory.push({ date: new Date(), score: user.score });
+        user = await this.userRepository.createOrUpdate(user);
+      } catch {
+        throw new HttpException(`can't update this user.`, HttpStatus.NO_CONTENT);
       }
-      user.scoreHistory.push({ date: new Date(), score: user.score });
-      user = await this.userRepository.createOrUpdate(user);
     }
-    await this.userRepository.createOrUpdate(user);
-
     const { totalRank, tierRank } =
       (await this.getUserRelativeRanking(user)) || (await this.setUserRelativeRanking(user));
+    if (!(await this.userRepository.isDuplicatedRequestIp(ip, lowerUsername)) && user.history) {
+      user.dailyViews += 1;
+      await this.userRepository.createOrUpdate(user);
+    }
     this.userRepository.setDuplicatedRequestIp(ip, lowerUsername);
     user.updateDelayTime = await this.userRepository.findUpdateScoreTimeToLive(lowerUsername);
-    user.totalRank = totalRank;
-    user.tierRank = tierRank;
-    user.startExp = getStartExp(user.score);
-    user.needExp = getNeedExp(user.score);
-    return user;
+    return { ...user, totalRank, tierRank, startExp: getStartExp(user.score), needExp: getNeedExp(user.score) };
   }
 
   async findAllByPrefixUsername(limit: number, lowerUsername: string): Promise<AutoCompleteDto[]> {

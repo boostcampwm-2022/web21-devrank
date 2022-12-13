@@ -6,6 +6,7 @@ import {
   Controller,
   DefaultValuePipe,
   Get,
+  NotFoundException,
   Param,
   ParseIntPipe,
   Patch,
@@ -74,18 +75,15 @@ export class UserController {
     @Param('username') username: string,
   ): Promise<UserProfileDto> {
     const lowerUsername = username.toLowerCase();
-    if (
-      (await this.userService.findUpdateScoreTimeToLive(lowerUsername)) > 0 &&
-      (await this.userService.findOneByFilter({ lowerUsername }))?.id !== id
-    ) {
+    const targetUser = await this.userService.findOneByFilter({ lowerUsername });
+    if ((await this.userService.findUpdateScoreTimeToLive(lowerUsername)) > 0 && targetUser?.id !== id) {
       throw new BadRequestException('user score has been updated recently.');
     }
+    await this.userService.setUpdateScoreDelayTime(lowerUsername, UPDATE_DELAY_TIME);
     const user = await this.userService.updateUser(
       lowerUsername,
       githubToken || this.configService.get('GITHUB_PERSONAL_ACCESS_TOKEN'),
     );
-
-    await this.userService.setUpdateScoreDelayTime(lowerUsername, UPDATE_DELAY_TIME);
     user.updateDelayTime = UPDATE_DELAY_TIME + 3;
     return user;
   }
