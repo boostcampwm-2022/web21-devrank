@@ -82,11 +82,11 @@ export class UserService {
     const utc = updatedUser.scoreHistory[updatedUser.scoreHistory.length - 1].date.getTime();
     if (new Date(utc + KR_TIME_DIFF).getDate() === new Date().getDate()) {
       updatedUser.scoreHistory.pop();
-      updatedUser.scoreHistory.push({
-        date: new Date(),
-        score: updatedUser.score,
-      });
     }
+    updatedUser.scoreHistory.push({
+      date: new Date(),
+      score: updatedUser.score,
+    });
     if (updatedUser.scoreHistory.length > 1) {
       updatedUser.scoreDifference =
         updatedUser.score - updatedUser.scoreHistory[updatedUser.scoreHistory.length - 2].score;
