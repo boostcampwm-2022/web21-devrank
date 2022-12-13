@@ -24,9 +24,9 @@ function NotFound() {
         <div>
           <h2>{t('404:user-not-found')}</h2>
           <CubeImage
-            src='/icons/cube-large-background.svg'
+            src='/icons/cube/cube-small-invalid.svg'
             alt='큐브 이미지'
-            width={220}
+            width={250}
             height={250}
             quality={100}
             priority
@@ -69,6 +69,7 @@ const Container = styled.div`
 `;
 
 const CubeImage = styled(Image)`
+  z-index: -1;
   position: absolute;
   top: 50%;
   left: 50%;

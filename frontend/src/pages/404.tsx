@@ -22,7 +22,7 @@ function NotFound() {
         <div>
           <h2>Oops!</h2>
           <CubeImage
-            src='/icons/cube-large-background.svg'
+            src='/icons/cube/cube-small-invalid.svg'
             alt='큐브 이미지'
             width={220}
             height={250}
@@ -68,6 +68,7 @@ const Container = styled.div`
 
 const CubeImage = styled(Image)`
   position: absolute;
+  z-index: -1;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);

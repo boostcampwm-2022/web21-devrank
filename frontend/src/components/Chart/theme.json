@@ -29,7 +29,7 @@
     "legend": {
       "text": {
         "fontSize": 14,
-        "fontWeight": 700,
+        "fontWeight": 400,
         "fill": "#FBFBFB"
       }
     },
@@ -39,7 +39,8 @@
         "strokeWidth": 1
       },
       "text": {
-        "fontSize": 14,
+        "fontSize": 12,
+        "fontWeight": 100,
         "fill": "#FBFBFB"
       }
     }

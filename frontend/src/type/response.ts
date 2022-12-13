@@ -71,7 +71,7 @@ export interface ProfileUserResponse {
   scoreHistory: ScoreHistory[];
   updateDelayTime: number;
   primaryLanguages: [string];
-  history: HistoryType;
+  history?: HistoryType;
   pinnedRepositories: PinnedRepositoryType[];
   organizations: OrganizationType[];
   totalRank: number;

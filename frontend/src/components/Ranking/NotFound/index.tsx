@@ -11,7 +11,7 @@ function NotFound() {
     <Container className={aldrich.className}>
       <div>
         <CubeImage
-          src='/icons/cube-large-background.svg'
+          src='/icons/cube/cube-small-invalid.svg'
           alt='큐브 이미지'
           width={220}
           height={250}
@@ -44,6 +44,7 @@ const Container = styled.div`
   }
 `;
 const CubeImage = styled(Image)`
+  z-index: -1;
   position: absolute;
   top: 40%;
   left: 50%;

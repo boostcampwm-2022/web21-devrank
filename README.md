@@ -1,5 +1,7 @@
 # <img src="https://user-images.githubusercontent.com/79798443/206173852-a4baafe3-5de7-4afa-b494-f630d5170d54.svg"/> Devrank <img src="https://user-images.githubusercontent.com/79798443/206173852-a4baafe3-5de7-4afa-b494-f630d5170d54.svg"/>
 
+[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fboostcampwm-2022%2Fweb21-devrank&count_bg=%23C455F9&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)
+
 ![Frame 12023](https://user-images.githubusercontent.com/79798443/206137429-5cb1d269-4bec-4aaa-85ad-053ae564c625.png)
 
 **_Devrank_** 는 게임과 유사한 등급 시스템과 랭킹을 제공하여, Github 활동시 사용자에게 성취감을 주고 오픈소스 활동을 장려하는 서비스 입니다.

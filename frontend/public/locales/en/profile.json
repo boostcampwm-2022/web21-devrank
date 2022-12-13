@@ -6,5 +6,7 @@
   "user-update-delay": "You can update it in",
   "day": "day",
   "total": "Total",
-  "rank": "Rank"
+  "rank": "Rank",
+  "invalid-user": "This user cannot get information",
+  "invalid-rank": "Unable to get the rank"
 }
