@@ -83,6 +83,24 @@ export class UserService {
       organizations,
       pinnedRepositories,
     };
+    if (!updatedUser.scoreHistory) {
+      updatedUser.scoreHistory = [];
+    }
+    const KR_TIME_DIFF = 9 * 60 * 60 * 1000;
+    const utc = updatedUser.scoreHistory[updatedUser.scoreHistory.length - 1].date.getTime();
+    if (new Date(utc + KR_TIME_DIFF).getDate() == new Date().getDate()) {
+      updatedUser.scoreHistory.pop();
+    }
+    updatedUser.scoreHistory.push({
+      date: new Date(),
+      score: updatedUser.score,
+    });
+    if (updatedUser.scoreHistory.length > 1) {
+      updatedUser.scoreDifference =
+        updatedUser.score - updatedUser.scoreHistory[updatedUser.scoreHistory.length - 2].score;
+    } else {
+      updatedUser.scoreDifference = 0;
+    }
     user = await this.userRepository.createOrUpdate(updatedUser);
     const { totalRank, tierRank } = await this.setUserRelativeRanking(user);
     const userWithRank: UserProfileDto = {
@@ -102,15 +120,6 @@ export class UserService {
       await sleep(GITHUB_API_DELAY);
       try {
         const updateUser = await this.updateUser(user.lowerUsername, githubToken);
-        if (!updateUser.scoreHistory) updateUser.scoreHistory = [];
-        if (updateUser.scoreHistory.length) updateUser.scoreHistory.pop();
-        updateUser.scoreHistory.push({ date: new Date(), score: updateUser.score });
-        if (updateUser.scoreHistory.length > 1) {
-          updateUser.scoreDifference =
-            updateUser.score - updateUser.scoreHistory[updateUser.scoreHistory.length - 2].score;
-        } else {
-          updateUser.scoreDifference = 0;
-        }
         this.userRepository.createOrUpdate(updateUser);
         this.userRepository.deleteCachedUserRank(updateUser.lowerUsername + '&');
       } catch {
@@ -126,17 +135,6 @@ export class UserService {
       await sleep(GITHUB_API_DELAY);
       try {
         const updatedUser = await this.updateUser(user.lowerUsername, githubToken);
-        if (!updatedUser.scoreHistory) updatedUser.scoreHistory = [];
-        updatedUser.scoreHistory.push({
-          date: new Date(),
-          score: updatedUser.score,
-        });
-        if (updatedUser.scoreHistory.length > 1) {
-          updatedUser.scoreDifference =
-            updatedUser.score - updatedUser.scoreHistory[updatedUser.scoreHistory.length - 2].score;
-        } else {
-          updatedUser.scoreDifference = 0;
-        }
         updatedUser.dailyViews = 0;
         this.userRepository.createOrUpdate(updatedUser);
       } catch {
@@ -202,20 +200,16 @@ export class UserService {
         username: lowerUsername,
         id,
       });
-
       const personalResponse: any = await octokit.graphql(nonForkRepositoryQuery, {
         username: lowerUsername,
         id,
       });
-
       const followersResponse: any = await octokit.graphql(followersQuery, {
         username: lowerUsername,
       });
-
       const issuesResponse: any = await octokit.graphql(issueQuery, {
         username: lowerUsername,
       });
-
       let languagesScore = new Map();
       function getCommitScore(acc: number, repository) {
         if (!repository.defaultBranchRef) {
