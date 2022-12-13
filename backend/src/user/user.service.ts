@@ -47,7 +47,7 @@ export class UserService {
     }
     const { totalRank, tierRank } =
       (await this.getUserRelativeRanking(user)) || (await this.setUserRelativeRanking(user));
-    if (!(await this.userRepository.isDuplicatedRequestIp(ip, lowerUsername))) {
+    if (!(await this.userRepository.isDuplicatedRequestIp(ip, lowerUsername)) && user.history) {
       user.dailyViews += 1;
       await this.userRepository.createOrUpdate(user);
     }
