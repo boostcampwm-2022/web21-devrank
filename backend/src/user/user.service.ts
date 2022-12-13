@@ -37,7 +37,7 @@ export class UserService {
       try {
         user = await this.updateUser(lowerUsername, githubToken);
       } catch {
-        throw new HttpException(`can't update this user.`, HttpStatus.SERVICE_UNAVAILABLE);
+        throw new HttpException(`can't update user ${lowerUsername}.`, HttpStatus.SERVICE_UNAVAILABLE);
       }
     }
     const { totalRank, tierRank } =
@@ -82,11 +82,11 @@ export class UserService {
     const utc = updatedUser.scoreHistory[updatedUser.scoreHistory.length - 1].date.getTime();
     if (new Date(utc + KR_TIME_DIFF).getDate() === new Date().getDate()) {
       updatedUser.scoreHistory.pop();
-      updatedUser.scoreHistory.push({
-        date: new Date(),
-        score: updatedUser.score,
-      });
     }
+    updatedUser.scoreHistory.push({
+      date: new Date(),
+      score: updatedUser.score,
+    });
     if (updatedUser.scoreHistory.length > 1) {
       updatedUser.scoreDifference =
         updatedUser.score - updatedUser.scoreHistory[updatedUser.scoreHistory.length - 2].score;
@@ -270,7 +270,7 @@ export class UserService {
         primaryLanguages: Array.from(languagesScore.keys()).slice(0, 3),
       };
     } catch {
-      throw new HttpException(`can't update this user.`, HttpStatus.SERVICE_UNAVAILABLE);
+      throw new HttpException(`can't update user ${lowerUsername}.`, HttpStatus.SERVICE_UNAVAILABLE);
     }
   }
 
