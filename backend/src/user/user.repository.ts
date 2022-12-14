@@ -119,9 +119,8 @@ export class UserRepository {
     return this.redis.hgetall(scoreKey) as unknown as Rank;
   }
 
-  async setCachedUserRank(scoreKey: string, scores: Rank): Promise<void> {
-    this.redis.hset(scoreKey, scores);
-    this.redis.expire(scoreKey, RANK_CACHE_DELAY);
+  async updateCachedUserRank(tier: string, score: number, lowerUsername: string): Promise<void> {
+    Promise.all([this.redis.zadd('all&', score, lowerUsername), this.redis.zadd(`${tier}&`, score, lowerUsername)]);
   }
 
   async deleteCachedUserRank(scoreKey: string): Promise<void> {
