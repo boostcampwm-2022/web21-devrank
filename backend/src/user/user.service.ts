@@ -6,7 +6,6 @@ import { AutoCompleteDto } from './dto/auto-complete.dto';
 import { History } from './dto/history.dto';
 import { OrganizationDto } from './dto/organization.dto';
 import { PinnedRepositoryDto } from './dto/pinned-repository.dto';
-import { Rank } from './dto/rank.dto';
 import { UserDto } from './dto/user.dto';
 import { UserProfileDto } from './dto/user.profile.dto';
 import {
@@ -91,7 +90,11 @@ export class UserService {
       updatedUser.scoreDifference = 0;
     }
     user = await this.userRepository.createOrUpdate(updatedUser);
-    const { totalRank, tierRank } = await this.setUserRelativeRanking(user);
+    if (prevTier !== user.tier) {
+      await this.userRepository.deleteCachedUserRank(prevTier, lowerUsername);
+    }
+    await this.userRepository.updateCachedUserRank(user.tier, user.score, lowerUsername);
+    const [totalRank, tierRank] = await this.userRepository.findCachedUserRank(user.tier, lowerUsername);
     const userWithRank: UserProfileDto = {
       ...user,
       totalRank,
@@ -110,7 +113,6 @@ export class UserService {
       try {
         const updateUser = await this.updateUser(user.lowerUsername, githubToken);
         this.userRepository.createOrUpdate(updateUser);
-        this.userRepository.deleteCachedUserRank(updateUser.lowerUsername + '&');
       } catch {
         logger.error(`can't update user ${user.lowerUsername}`);
       }
