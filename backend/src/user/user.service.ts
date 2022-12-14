@@ -336,30 +336,4 @@ export class UserService {
       }),
     };
   }
-
-  async getUserRelativeRanking(user: UserDto): Promise<Rank | false> {
-    const cachedRanks = await this.userRepository.findCachedUserRank(user.id + '&');
-    if (Object.keys(cachedRanks).length) {
-      return cachedRanks;
-    }
-    return false;
-  }
-
-  async setUserRelativeRanking(user: UserDto): Promise<Rank> {
-    const users = await this.userRepository.findAll({}, true, ['lowerUsername', 'tier', 'score']);
-    let tierRank = 0;
-    for (let rank = 0; rank < users.length; rank++) {
-      if (users[rank].lowerUsername === user.lowerUsername) {
-        const rankInfo = {
-          totalRank: rank + 1,
-          tierRank: tierRank + 1,
-        };
-        await this.userRepository.setCachedUserRank(user.id + '&', rankInfo);
-        return rankInfo;
-      }
-      if (users[rank].tier === user.tier) {
-        tierRank += 1;
-      }
-    }
-  }
 }
