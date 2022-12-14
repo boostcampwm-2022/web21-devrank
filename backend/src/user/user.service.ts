@@ -1,4 +1,4 @@
-import { GITHUB_API_DELAY } from '@libs/consts';
+import { GITHUB_API_DELAY, KR_TIME_DIFF } from '@libs/consts';
 import { getNeedExp, getStartExp, getTier, logger } from '@libs/utils';
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { Octokit } from '@octokit/core';
@@ -78,7 +78,7 @@ export class UserService {
     if (!updatedUser?.scoreHistory?.length) {
       updatedUser.scoreHistory = [{ date: new Date(), score: updatedUser.score }];
     }
-    const KR_TIME_DIFF = 9 * 60 * 60 * 1000;
+
     const utc = updatedUser.scoreHistory[updatedUser.scoreHistory.length - 1].date.getTime();
     if (new Date(utc + KR_TIME_DIFF).getDate() === new Date(new Date().getTime() + KR_TIME_DIFF).getDate()) {
       updatedUser.scoreHistory.pop();
