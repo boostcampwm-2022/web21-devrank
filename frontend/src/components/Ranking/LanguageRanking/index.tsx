@@ -16,7 +16,11 @@ function LanguageRanking() {
   return (
     <>
       <h3>{t('index:most-programming-lang-top-3')}</h3>
-      <RankingTable width={'512px'} columnWidthList={['13%', '56%', '31%']} columnAlignList={['left', 'left', 'right']}>
+      <RankingTable
+        width={'512px'}
+        columnWidthList={['15%', '55%', '30%']}
+        columnAlignList={['center', 'left', 'right']}
+      >
         <RankingTable.Head>
           <RankingTable.Element>{t('common:table-programming-lang')}</RankingTable.Element>
           <RankingTable.Element />

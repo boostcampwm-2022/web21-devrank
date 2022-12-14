@@ -112,10 +112,6 @@ const Container = styled.table<StyledContainer>`
         color: ${(props) => props.theme.colors.gray6};
         font-size: ${(props) => props.theme.fontSize.md};
 
-        &:first-of-type {
-          padding-left: 20px;
-        }
-
         &:last-of-type {
           padding-right: 20px;
         }
@@ -137,7 +133,6 @@ const Container = styled.table<StyledContainer>`
         &:first-of-type {
           border-top-left-radius: 8px;
           border-bottom-left-radius: 8px;
-          padding-left: 20px;
         }
 
         &:last-of-type {
