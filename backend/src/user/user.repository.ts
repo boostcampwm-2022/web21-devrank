@@ -99,7 +99,7 @@ export class UserRepository {
     const result = (
       await this.userModel.aggregate([
         { $match: { ...tierOption, ...usernameOption } },
-        { $sort: { score: -1 } },
+        { $sort: { score: -1, lowerUsername: -1 } },
         {
           $facet: {
             metadata: [
