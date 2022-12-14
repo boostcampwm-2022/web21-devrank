@@ -34,14 +34,10 @@ export class UserService {
   async findOneByUsername(githubToken: string, ip: string, lowerUsername: string): Promise<UserProfileDto> {
     let user = await this.userRepository.findOneByLowerUsername(lowerUsername);
     if (!user) {
-      try {
-        user = await this.updateUser(lowerUsername, githubToken);
-      } catch {
-        throw new HttpException(`can't update user ${lowerUsername}.`, HttpStatus.SERVICE_UNAVAILABLE);
-      }
+      user = await this.updateUser(lowerUsername, githubToken);
     }
-    const { totalRank, tierRank } =
-      (await this.getUserRelativeRanking(user)) || (await this.setUserRelativeRanking(user));
+
+    const [totalRank, tierRank] = await this.userRepository.findCachedUserRank(user.tier, lowerUsername);
     if (!(await this.userRepository.isDuplicatedRequestIp(ip, lowerUsername)) && user.history) {
       user.dailyViews += 1;
       await this.userRepository.createOrUpdate(user);
@@ -59,6 +55,7 @@ export class UserService {
   async updateUser(lowerUsername: string, githubToken: string): Promise<UserProfileDto> {
     let user = await this.getUserInfo(githubToken, lowerUsername);
     user = await this.userRepository.createOrUpdate(user);
+    const { tier: prevTier } = user;
     const octokit = new Octokit({
       auth: githubToken,
     });
