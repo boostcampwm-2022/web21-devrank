@@ -19,6 +19,11 @@ export class RankingService {
     if (!paginationResult?.metadata || paginationResult?.users.length === 0) {
       throw new NotFoundException('user not found.');
     }
+    for (const user of paginationResult.users) {
+      const [totalRank] = await this.userRepository.findCachedUserRank(user.tier, user.lowerUsername);
+      user.totalRank = totalRank;
+    }
+
     const lastPage = Math.ceil(paginationResult.metadata.total / limit);
     const lastPageGroupNumber = Math.ceil(lastPage / PAGE_UNIT_COUNT);
     const pageGroupNumber = Math.ceil(page / PAGE_UNIT_COUNT);
