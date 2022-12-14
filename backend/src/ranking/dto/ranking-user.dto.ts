@@ -24,6 +24,9 @@ export class RankingUserDto {
   tier: string;
 
   @ApiProperty()
+  totalRank?: number;
+
+  @ApiProperty()
   primaryLanguages: string[];
 
   of(user: UserDto): RankingUserDto {
@@ -35,6 +38,7 @@ export class RankingUserDto {
     this.dailyViews = user.dailyViews;
     this.scoreDifference = user.scoreDifference;
     this.primaryLanguages = user.primaryLanguages;
+    this.totalRank = user.totalRank;
     return this;
   }
 }
