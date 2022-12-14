@@ -1,11 +1,9 @@
 import { RankingPaginationDto } from '@apps/ranking/dto/ranking-pagination.dto';
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
-import { RANK_CACHE_DELAY } from '@libs/consts';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import Redis from 'ioredis';
 import { Model } from 'mongoose';
-import { Rank } from './dto/rank.dto';
 import { UserDto } from './dto/user.dto';
 import { User } from './user.schema';
 
@@ -115,8 +113,11 @@ export class UserRepository {
     return { metadata: result.metadata[0], users: result.users };
   }
 
-  async findCachedUserRank(scoreKey: string): Promise<Rank> {
-    return this.redis.hgetall(scoreKey) as unknown as Rank;
+  async findCachedUserRank(tier: string, lowerUsername: string): Promise<[number, number]> {
+    return Promise.all([
+      this.redis.zrevrank('all&', lowerUsername).then((num) => (Number.isInteger(num) ? num + 1 : null)),
+      this.redis.zrevrank(`${tier}&`, lowerUsername).then((num) => (Number.isInteger(num) ? num + 1 : null)),
+    ]);
   }
 
   async updateCachedUserRank(tier: string, score: number, lowerUsername: string): Promise<void> {
