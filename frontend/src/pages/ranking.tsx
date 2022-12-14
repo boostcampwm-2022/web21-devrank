@@ -64,7 +64,7 @@ function Ranking({ tier, username, page }: RankingProps) {
         </SearchbarContainer>
         <RankingTable
           width={'100%'}
-          columnWidthList={['8%', '52%', '10%', '10%', '20%']}
+          columnWidthList={['10%', '50%', '10%', '10%', '20%']}
           columnAlignList={['center', 'left', 'left', 'left', 'center']}
         >
           <RankingTable.Head>
