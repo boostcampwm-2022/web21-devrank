@@ -123,7 +123,7 @@ export class UserRepository {
     Promise.all([this.redis.zadd('all&', score, lowerUsername), this.redis.zadd(`${tier}&`, score, lowerUsername)]);
   }
 
-  async deleteCachedUserRank(scoreKey: string): Promise<void> {
-    this.redis.del(scoreKey);
+  async deleteCachedUserRank(tier: string, lowerUsername: string): Promise<void> {
+    this.redis.zrem(`${tier}&`, lowerUsername);
   }
 }
