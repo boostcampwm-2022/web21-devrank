@@ -35,7 +35,7 @@ export const getKSTDateString = (date: Date) => {
 };
 
 export const getProfileDescription = (locale: string, data: ProfileUserResponse) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation(['profile', 'tier']);
   const { tier, score, totalRank, tierRank, primaryLanguages } = data;
   const languageStr = primaryLanguages.join(', ');
 
