@@ -7,7 +7,7 @@ import {
   getLineChartMinMaxValue,
   transContributionHistoryToLineChartData,
   transScoreHistoryToLineChartData,
-  transToPieChartData,
+  useTransToPieChartData,
 } from '@utils/utils';
 
 const PieChart = dynamic(() => import('@components/Chart/PieChart'), { ssr: false });
@@ -21,9 +21,9 @@ interface ContributionStatisticProps {
 
 function Statistic({ history, scoreHistory, tier }: ContributionStatisticProps) {
   const theme = useTheme();
-  const pieChartData = transToPieChartData(history);
   const contributionHistoryData = transContributionHistoryToLineChartData(history.contributionHistory, tier);
   const scoreHistoryData = transScoreHistoryToLineChartData(scoreHistory, tier);
+  const pieChartData = useTransToPieChartData(history);
   const { min, max } = getLineChartMinMaxValue(scoreHistoryData);
 
   return (

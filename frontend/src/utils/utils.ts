@@ -48,7 +48,7 @@ export const getProfileDescription = (locale: string, data: ProfileUserResponse)
   );
 };
 
-export const transToPieChartData = (data: HistoryType) => {
+export const useTransToPieChartData = (data: HistoryType) => {
   const theme = useTheme();
 
   return [
