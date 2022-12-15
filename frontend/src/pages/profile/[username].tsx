@@ -1,12 +1,10 @@
 import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Image from 'next/image';
-import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import styled from 'styled-components';
 import { useQueryData } from '@hooks';
-import { QueryClient, dehydrate, useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { ProfileUserResponse } from '@type/response';
 import { CommitHistory, EXPbar, PinnedRepository, ProfileCard, Statistic } from '@components/Profile';
 import { Paper } from '@components/common';
@@ -14,6 +12,7 @@ import HeadMeta from '@components/common/HeadMeta';
 import { requestTokenRefresh } from '@apis/auth';
 import { requestUserInfoByUsername } from '@apis/users';
 import { getProfileDescription } from '@utils/utils';
+import { ssrWrapper } from '@utils/wrapper';
 
 interface ProfileProps {
   username: string;
@@ -21,8 +20,6 @@ interface ProfileProps {
 
 function Profile({ username }: ProfileProps) {
   const MAX_COMMIT_STREAK = 368;
-  const router = useRouter();
-  const locale = router.locale as string;
 
   const { data, refetch } = useQuery<ProfileUserResponse>(['profile', username], () =>
     requestUserInfoByUsername({ username, method: 'GET' }),
@@ -40,14 +37,15 @@ function Profile({ username }: ProfileProps) {
   useEffect(() => {
     requestTokenRefresh();
   }, []);
+
   return (
     <Container>
       {data && (
         <>
           <HeadMeta
-            title={`${username}${t('meta:profile-title')}`}
+            title={t('meta:profile-title', { username })}
             image={`https://dreamdev.me/api/og-image/?username=${username}&tier=${data.tier}&image=${data.avatarUrl}`}
-            description={getProfileDescription(locale, data)}
+            description={getProfileDescription(data)}
           />
           <ProfileCard
             profileData={{
@@ -116,40 +114,23 @@ function Profile({ username }: ProfileProps) {
 
 export default Profile;
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const username = context.query.username as string;
+export const getServerSideProps: GetServerSideProps = ssrWrapper(
+  ['common', 'header', 'footer', 'tier', 'ranking', 'profile', 'meta'],
+  async (context, queryClient) => {
+    const username = context.query.username as string;
 
-  const queryClient = new QueryClient();
-  await Promise.allSettled([
-    queryClient.prefetchQuery(['user'], () => requestTokenRefresh(context)),
-    queryClient.prefetchQuery(['profile', username], () => requestUserInfoByUsername({ username, method: 'GET' })),
-  ]);
+    await Promise.allSettled([
+      queryClient.prefetchQuery(['user'], () => requestTokenRefresh(context)),
+      queryClient.prefetchQuery(['profile', username], () => requestUserInfoByUsername({ username, method: 'GET' })),
+    ]);
 
-  if (queryClient.getQueryData(['profile', username])) {
-    return {
-      props: {
-        username,
-        dehydratedState: dehydrate(queryClient),
-        ...(await serverSideTranslations(context.locale as string, [
-          'common',
-          'header',
-          'footer',
-          'tier',
-          'ranking',
-          'profile',
-          'meta',
-        ])),
-      },
-    };
-  } else {
-    return {
-      redirect: {
-        destination: '/profile/404',
-        permanent: false,
-      },
-    };
-  }
-};
+    if (!queryClient.getQueryData(['profile', username])) {
+      throw { url: '/profile/404' };
+    }
+
+    return { username };
+  },
+);
 
 const Container = styled.div`
   ${({ theme }) => theme.common.flexColumn};

@@ -13,3 +13,5 @@ export const PAGE_UNIT_COUNT = 10;
 export const RANK_CACHE_DELAY = 12 * HOUR;
 
 export const GITHUB_API_DELAY = 1500; // ms
+
+export const KR_TIME_DIFF = 9 * HOUR * 1000; // ms

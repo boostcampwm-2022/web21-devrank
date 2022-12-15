@@ -20,6 +20,8 @@ export interface RankingResponse {
   avatarUrl: string;
   dailyViews: number;
   score: number;
+  totalRank: number;
+  tierRank: number;
   scoreDifference: number;
   primaryLanguages: string[];
 }

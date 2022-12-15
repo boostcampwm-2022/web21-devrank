@@ -1,12 +1,16 @@
 {
   "current-score": "현재 점수",
-  "register-wakatime-api-key": "Wakatime API Key를 등록해주세요",
-  "register-wakatime-button-label": "등록",
   "maximum-continuous-commit-history": "최대 연속 커밋 일수",
-  "user-update-delay": "초 후 업데이트 가능합니다.",
+  "user-update-delay": "<count>{{count}}</count>초 후 업데이트 가능합니다.",
   "day": "일",
-  "total": "전체",
-  "rank": "등급",
+  "total-rank_one": "전체: {{count}}등",
+  "total-rank_two": "전체: {{count}}등",
+  "total-rank_few": "전체: {{count}}등",
+  "total-rank_other": "전체: {{count}}등",
+  "tier-rank_one": "<tier>$t(tier:{{tier}})</tier>: {{count}}등",
+  "tier-rank_two": "<tier>$t(tier:{{tier}})</tier>: {{count}}등",
+  "tier-rank_few": "<tier>$t(tier:{{tier}})</tier>: {{count}}등",
+  "tier-rank_other": "<tier>$t(tier:{{tier}})</tier>: {{count}}등",
   "invalid-user": "정보를 가져올 수 없는 유저입니다",
   "invalid-rank": "등수를 표시할 수 없습니다"
 }

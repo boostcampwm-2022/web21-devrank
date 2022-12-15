@@ -1,9 +1,12 @@
-import { Children } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 type TextAlignType = 'center' | 'right' | 'left';
 
 interface HeadProps {
+  children?: React.ReactNode;
+}
+
+interface BodyProps {
   children?: React.ReactNode;
 }
 
@@ -32,6 +35,10 @@ interface StyledContainer {
   tdAlignList: TextAlignType[];
 }
 
+interface StyledRow {
+  isHover: boolean;
+}
+
 /**
  * Head 컴포넌트는 Ranking 컴포넌트의 자식 컴포넌트로 사용되어야 하고 Row 컴포넌트보다 먼저 사용되어야 합니다.
  */
@@ -44,10 +51,22 @@ function Head({ children }: HeadProps) {
 }
 
 /**
+ * Body 컴포넌트는 Ranking 컴포넌트의 자식 컴포넌트로 사용되어야 하고 Row 컴포넌트를 자식 컴포넌트로 가져야 합니다.
+ */
+function Body({ children }: BodyProps) {
+  return <tbody>{children}</tbody>;
+}
+
+/**
  * Row 컴포넌트는 Ranking 컴포넌트의 자식 컴포넌트로 사용되어야 합니다.
  */
 function Row({ children, onClick }: RowProps) {
-  return <tr onClick={onClick}>{children}</tr>;
+  const isHover = !!onClick;
+  return (
+    <Tr onClick={onClick} isHover={isHover}>
+      {children}
+    </Tr>
+  );
 }
 
 /**
@@ -61,11 +80,9 @@ function Element({ children }: ElementProps) {
  * Ranking 컴포넌트는 Row와 Element 컴포넌트를 자식 컴포넌트로 가져야합니다.
  */
 function RankingTable({ width, columnWidthList, columnAlignList, children }: RankingProps) {
-  const doms = Children.toArray(children);
   return (
     <Container width={width} tdWidthList={columnWidthList} tdAlignList={columnAlignList}>
-      {doms[0]}
-      <tbody>{doms.slice(1)}</tbody>
+      {children}
     </Container>
   );
 }
@@ -73,6 +90,7 @@ function RankingTable({ width, columnWidthList, columnAlignList, children }: Ran
 RankingTable.Head = Head;
 RankingTable.Row = Row;
 RankingTable.Element = Element;
+RankingTable.Body = Body;
 
 export default RankingTable;
 
@@ -112,44 +130,40 @@ const Container = styled.table<StyledContainer>`
         color: ${(props) => props.theme.colors.gray6};
         font-size: ${(props) => props.theme.fontSize.md};
 
-        &:first-of-type {
-          padding-left: 20px;
-        }
-
         &:last-of-type {
           padding-right: 20px;
         }
       }
     }
   }
+`;
 
-  tbody {
-    tr {
-      padding: 0 15px;
-      background-color: ${(props) => props.theme.colors.black3};
-      transition: background-color 0.1s ease-in-out;
+const Tr = styled.tr<StyledRow>`
+  padding: 0 15px;
+  background-color: ${(props) => props.theme.colors.black3};
+  transition: background-color 0.1s ease-in-out;
+  td {
+    vertical-align: middle;
+    height: 76px;
+    font-size: ${(props) => props.theme.fontSize.lg};
+
+    &:first-of-type {
+      border-top-left-radius: 8px;
+      border-bottom-left-radius: 8px;
+    }
+
+    &:last-of-type {
+      border-top-right-radius: 8px;
+      border-bottom-right-radius: 8px;
+      padding-right: 20px;
+    }
+  }
+  ${(props) =>
+    props.isHover &&
+    css`
       cursor: pointer;
-      td {
-        vertical-align: middle;
-        height: 76px;
-        font-size: ${(props) => props.theme.fontSize.lg};
-
-        &:first-of-type {
-          border-top-left-radius: 8px;
-          border-bottom-left-radius: 8px;
-          padding-left: 20px;
-        }
-
-        &:last-of-type {
-          border-top-right-radius: 8px;
-          border-bottom-right-radius: 8px;
-          padding-right: 20px;
-        }
-      }
-
       &:hover {
         background-color: ${(props) => props.theme.colors.gray1};
       }
-    }
-  }
+    `}
 `;

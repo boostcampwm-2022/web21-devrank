@@ -21,5 +21,7 @@
   "score-calculate-method-11": "· y = (1 / 1.0019) ^ x is an exponential function whose time weight becomes 0.5 after one year",
   "score-calculate-method-12": "· To exclude unusual weights of contributions to non-code document reports document oriented repo has 0 repo score",
   "score-calculate-method-13": "· Organizational repos not registered as collaborators are not aggregated",
-  "score-calculate-method-14": "· External repos are not sorted in order of stars"
+  "score-calculate-method-14": "· External repos are not sorted in order of stars",
+  "role": "Role: {{role}}",
+  "email": "Email: {{email}}"
 }

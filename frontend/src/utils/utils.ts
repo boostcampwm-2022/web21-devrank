@@ -3,14 +3,10 @@ import { useTheme } from 'styled-components';
 import { Serie } from '@nivo/line';
 import { CubeRankType, DailyInfo, HistoryType, RANK, ScoreHistory } from '@type/common';
 import { ProfileUserResponse } from '@type/response';
-import { CUBE_RANK, DEVICON_URL, EXCEPTIONAL_LANGUAGE } from '@utils/constants';
+import { CUBE_RANK, LANGUAGE_ICON_URL, LANGUAGE_MAP } from '@utils/constants';
 
 export const languageToURL = (language: string): string => {
-  if (EXCEPTIONAL_LANGUAGE.includes(language)) {
-    return `${DEVICON_URL}${language}/${language}-plain.svg`;
-  } else {
-    return `${DEVICON_URL}${language}/${language}-original.svg`;
-  }
+  return `${LANGUAGE_ICON_URL}/file_type_${LANGUAGE_MAP[language] || language}.svg`;
 };
 
 export const numberCompactFormatter = (num: number): string => {
@@ -34,21 +30,21 @@ export const getKSTDateString = (date: Date) => {
   return `${kst_date.getFullYear()}-${kst_date.getMonth() + 1}-${kst_date.getDate()}`;
 };
 
-export const getProfileDescription = (locale: string, data: ProfileUserResponse) => {
-  const { t } = useTranslation();
+export const getProfileDescription = (data: ProfileUserResponse) => {
+  const { t } = useTranslation(['meta', 'ranking']);
   const { tier, score, totalRank, tierRank, primaryLanguages } = data;
-  const languageStr = primaryLanguages.join(', ');
+  const languages = primaryLanguages.join(', ');
 
-  return (
-    `${t('profile:rank')}: ${tier} / ` +
-    `${t('profile:current-score')}: ${score} / ` +
-    `${t('profile:total')}: ${totalRank}${getRankingUnit(locale, totalRank)} / ` +
-    `${t(`tier:${tier}`)}: ${tierRank}${getRankingUnit(locale, tierRank)} / ` +
-    languageStr
-  );
+  return t('meta:profile-description', {
+    tier,
+    score,
+    totalRank: t('ranking:rank', { count: Number(totalRank), ordinal: true }),
+    tierRank: t('ranking:rank', { count: Number(tierRank), ordinal: true }),
+    languages,
+  });
 };
 
-export const transToPieChartData = (data: HistoryType) => {
+export const useTransToPieChartData = (data: HistoryType) => {
   const theme = useTheme();
 
   return [
@@ -85,7 +81,7 @@ export const transToPieChartData = (data: HistoryType) => {
   ];
 };
 
-export const transContributionHistoryToLineChartData = (data: { [key: string]: DailyInfo }, tier: RANK): Serie[] => {
+export const useTransContributionHistoryToLineChartData = (data: { [key: string]: DailyInfo }, tier: RANK): Serie[] => {
   const theme = useTheme();
 
   return [
@@ -97,7 +93,7 @@ export const transContributionHistoryToLineChartData = (data: { [key: string]: D
   ];
 };
 
-export const transScoreHistoryToLineChartData = (data: ScoreHistory[], tier: RANK): Serie[] => {
+export const useTransScoreHistoryToLineChartData = (data: ScoreHistory[], tier: RANK): Serie[] => {
   const theme = useTheme();
 
   return [
@@ -125,31 +121,8 @@ interface QueryValidatorType {
 }
 
 export const queryValidator = ({ tier, username, page }: QueryValidatorType) => {
+  if (tier === undefined && username === undefined && page === undefined) return { tier: 'all', username: '', page: 1 };
   if (!tier || !Object.values(CUBE_RANK).includes(tier as CubeRankType)) return false;
   if (!page || page.toString().match(/\D/)) return false;
   return { tier, username: username || '', page: Number(page) };
-};
-
-export const getRankingUnit = (locale: string, rank: number) => {
-  if (locale === 'ko') return '등';
-
-  const rankFirstUint = rank % 10;
-  const rankSecondUint = rank % 100;
-  switch (rankSecondUint) {
-    case 11:
-    case 12:
-    case 13:
-      return 'th';
-    default:
-      switch (rankFirstUint) {
-        case 1:
-          return 'st';
-        case 2:
-          return 'nd';
-        case 3:
-          return 'rd';
-        default:
-          return 'th';
-      }
-  }
 };

@@ -55,16 +55,12 @@ function Ranking({ tier, username, page }: RankingProps) {
       <Container>
         <Filterbar active={tier} setActive={setTier} />
         <SearchbarContainer>
-          {username !== '' && (
-            <SearchInfo>
-              {router.locale === 'ko' ? `"${username}"${t('search-user')}` : `${t('search-user')} "${username}"`}
-            </SearchInfo>
-          )}
+          {username !== '' && <SearchInfo>{t('ranking:search-user', { username })}</SearchInfo>}
           <RankingSearchbar placeholder={t('ranking:search-placeholder')} width={200} onSearch={setUsername} />
         </SearchbarContainer>
         <RankingTable
           width={'100%'}
-          columnWidthList={['8%', '52%', '10%', '10%', '20%']}
+          columnWidthList={['10%', '50%', '10%', '10%', '20%']}
           columnAlignList={['center', 'left', 'left', 'left', 'center']}
         >
           <RankingTable.Head>
@@ -74,31 +70,35 @@ function Ranking({ tier, username, page }: RankingProps) {
             <RankingTable.Element>{t('common:table-score')}</RankingTable.Element>
             <RankingTable.Element>{t('common:table-tech-stack')}</RankingTable.Element>
           </RankingTable.Head>
-          {data?.users.map(({ id, username, avatarUrl, tier, score, primaryLanguages }, index) => (
-            <RankingTable.Row key={id} onClick={() => searchUser(username)}>
-              <RankingTable.Element>
-                <GrayText>{(page - 1) * COUNT_PER_PAGE + index + 1}</GrayText>
-              </RankingTable.Element>
-              <RankingTable.Element>
-                <Avatar src={avatarUrl} name={username} />
-              </RankingTable.Element>
-              <RankingTable.Element>
-                <CubeIcon tier={tier} />
-              </RankingTable.Element>
-              <RankingTable.Element>
-                <GrayText>{score?.toLocaleString()}</GrayText>
-              </RankingTable.Element>
-              <RankingTable.Element>
-                <TechStackList>
-                  {primaryLanguages.map((lang) => (
-                    <li key={lang}>
-                      <LanguageIcon language={lang} width={35} height={35} />
-                    </li>
-                  ))}
-                </TechStackList>
-              </RankingTable.Element>
-            </RankingTable.Row>
-          ))}
+          <RankingTable.Body>
+            {data?.users.map(
+              ({ id, username, avatarUrl, tier: eachTier, score, primaryLanguages, totalRank, tierRank }) => (
+                <RankingTable.Row key={id} onClick={() => searchUser(username)}>
+                  <RankingTable.Element>
+                    <GrayText>{tier === 'all' ? totalRank : tierRank}</GrayText>
+                  </RankingTable.Element>
+                  <RankingTable.Element>
+                    <Avatar src={avatarUrl} name={username} />
+                  </RankingTable.Element>
+                  <RankingTable.Element>
+                    <CubeIcon tier={eachTier} />
+                  </RankingTable.Element>
+                  <RankingTable.Element>
+                    <GrayText>{score?.toLocaleString()}</GrayText>
+                  </RankingTable.Element>
+                  <RankingTable.Element>
+                    <TechStackList>
+                      {primaryLanguages.map((lang) => (
+                        <li key={lang}>
+                          <LanguageIcon language={lang} width={35} height={35} />
+                        </li>
+                      ))}
+                    </TechStackList>
+                  </RankingTable.Element>
+                </RankingTable.Row>
+              ),
+            )}
+          </RankingTable.Body>
         </RankingTable>
         {isLoading && Array.from({ length: COUNT_PER_PAGE }).map((_, index) => <RankingSkeleton key={index} />)}
         {isError && <NotFound />}
@@ -127,18 +127,17 @@ export const getServerSideProps: GetServerSideProps = ssrWrapper(
   async (context, queryClient) => {
     const { tier, username, page } = context.query;
     const query = queryValidator({ tier, username, page });
+
     await Promise.allSettled([
       queryClient.prefetchQuery(['user'], () => requestTokenRefresh(context)),
       queryClient.prefetchQuery(['ranking', CUBE_RANK.ALL], () => requestTopRankingByScore({ limit: COUNT_PER_PAGE })),
     ]);
 
-    return {
-      data: query,
-      redirect: {
-        trigger: !query,
-        url: '/404',
-      },
-    };
+    if (!query) {
+      throw { url: '/404' };
+    }
+
+    return query;
   },
 );
 

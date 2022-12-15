@@ -1,11 +1,10 @@
 import { RankingPaginationDto } from '@apps/ranking/dto/ranking-pagination.dto';
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
-import { RANK_CACHE_DELAY } from '@libs/consts';
+import { KR_TIME_DIFF, RANK_CACHE_DELAY } from '@libs/consts';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import Redis from 'ioredis';
 import { Model } from 'mongoose';
-import { Rank } from './dto/rank.dto';
 import { UserDto } from './dto/user.dto';
 import { User } from './user.schema';
 
@@ -74,7 +73,12 @@ export class UserRepository {
 
   async setDuplicatedRequestIp(ip: string, lowerUsername: string): Promise<void> {
     this.redis.sadd(ip, lowerUsername);
-    const timeToMidnight = Math.floor((new Date().setHours(23, 59, 59) - Date.now()) / 1000);
+    const now = +new Date() + KR_TIME_DIFF;
+
+    const midNight = new Date(new Date().setHours(23, 59, 59));
+    midNight.setHours(midNight.getHours() + 9);
+
+    const timeToMidnight = Math.floor((+midNight - +now) / 1000);
     this.redis.expire(ip, timeToMidnight);
   }
 
@@ -95,11 +99,11 @@ export class UserRepository {
   ): Promise<Pick<RankingPaginationDto, 'metadata'> & { users: UserDto[] }> {
     const tierOption = tier === 'all' ? {} : { tier: tier };
     const usernameOption = lowerUsername ? { lowerUsername: { $regex: `^${lowerUsername}` } } : {};
-
     const result = (
       await this.userModel.aggregate([
         { $match: { ...tierOption, ...usernameOption } },
-        { $sort: { score: -1 } },
+        { $project: { id: 1, username: 1, lowerUsername: 1, avatarUrl: 1, tier: 1, score: 1, primaryLanguages: 1 } },
+        { $sort: { score: -1, lowerUsername: -1 } },
         {
           $facet: {
             metadata: [
@@ -115,16 +119,18 @@ export class UserRepository {
     return { metadata: result.metadata[0], users: result.users };
   }
 
-  async findCachedUserRank(scoreKey: string): Promise<Rank> {
-    return this.redis.hgetall(scoreKey) as unknown as Rank;
+  async findCachedUserRank(tier: string, lowerUsername: string): Promise<[number, number]> {
+    return Promise.all([
+      this.redis.zrevrank('all&', lowerUsername).then((num) => (Number.isInteger(num) ? num + 1 : null)),
+      this.redis.zrevrank(`${tier}&`, lowerUsername).then((num) => (Number.isInteger(num) ? num + 1 : null)),
+    ]);
   }
 
-  async setCachedUserRank(scoreKey: string, scores: Rank): Promise<void> {
-    this.redis.hset(scoreKey, scores);
-    this.redis.expire(scoreKey, RANK_CACHE_DELAY);
+  async updateCachedUserRank(tier: string, score: number, lowerUsername: string): Promise<void> {
+    Promise.all([this.redis.zadd('all&', score, lowerUsername), this.redis.zadd(`${tier}&`, score, lowerUsername)]);
   }
 
-  async deleteCachedUserRank(scoreKey: string): Promise<void> {
-    this.redis.del(scoreKey);
+  async deleteCachedUserRank(tier: string, lowerUsername: string): Promise<void> {
+    this.redis.zrem(`${tier}&`, lowerUsername);
   }
 }

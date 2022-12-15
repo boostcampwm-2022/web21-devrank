@@ -9,14 +9,12 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { ParsedUrlQuery } from 'querystring';
 import { QueryClient, dehydrate } from '@tanstack/react-query';
 
-interface Redirect {
-  trigger: boolean;
+interface Redirectable {
   url: string;
 }
 
-export interface PropsData {
-  data: any;
-  redirect: Redirect;
+function isErrorRedirectable(error: unknown): error is Redirectable {
+  return typeof error === 'object' && Object.prototype.hasOwnProperty.call(error, 'url');
 }
 
 export function ssrWrapper(
@@ -24,36 +22,36 @@ export function ssrWrapper(
   callback?: (
     context: GetServerSidePropsContext<ParsedUrlQuery, PreviewData>,
     queryClient: QueryClient,
-  ) => Promise<PropsData>,
+  ) => Promise<object | void>,
 ): GetServerSideProps {
   return async (context) => {
-    const queryClient = new QueryClient();
-    let propsData: PropsData = {
-      data: {},
-      redirect: {
-        trigger: false,
-        url: '',
-      },
-    };
+    try {
+      const queryClient = new QueryClient();
+      let propsData: object | void;
 
-    if (callback) propsData = await callback(context, queryClient);
+      if (callback) {
+        propsData = await callback(context, queryClient);
+      }
 
-    if (propsData.redirect.trigger) {
       return {
-        redirect: {
-          destination: propsData.redirect.url,
-          permanent: false,
+        props: {
+          ...propsData,
+          dehydratedState: dehydrate(queryClient),
+          ...(await serverSideTranslations(context.locale as string, namespaces)),
         },
       };
-    }
+    } catch (error) {
+      if (isErrorRedirectable(error)) {
+        return {
+          redirect: {
+            destination: error.url,
+            permanent: false,
+          },
+        };
+      }
 
-    return {
-      props: {
-        ...propsData.data,
-        dehydratedState: dehydrate(queryClient),
-        ...(await serverSideTranslations(context.locale as string, namespaces)),
-      },
-    };
+      return Promise.reject(error);
+    }
   };
 }
 
@@ -62,35 +60,35 @@ export function ssgWrapper(
   callback?: (
     context: GetStaticPropsContext<ParsedUrlQuery, PreviewData>,
     queryClient: QueryClient,
-  ) => Promise<PropsData>,
+  ) => Promise<object | void>,
 ): GetStaticProps {
   return async (context) => {
-    const queryClient = new QueryClient();
-    let propsData: PropsData = {
-      data: {},
-      redirect: {
-        trigger: false,
-        url: '',
-      },
-    };
+    try {
+      const queryClient = new QueryClient();
+      let propsData: object | void;
 
-    if (callback) propsData = await callback(context, queryClient);
+      if (callback) {
+        propsData = await callback(context, queryClient);
+      }
 
-    if (propsData.redirect.trigger) {
       return {
-        redirect: {
-          destination: propsData.redirect.url,
-          permanent: false,
+        props: {
+          ...propsData,
+          dehydratedState: dehydrate(queryClient),
+          ...(await serverSideTranslations(context.locale as string, namespaces)),
         },
       };
-    }
+    } catch (error) {
+      if (isErrorRedirectable(error)) {
+        return {
+          redirect: {
+            destination: error.url,
+            permanent: false,
+          },
+        };
+      }
 
-    return {
-      props: {
-        ...propsData.data,
-        dehydratedState: dehydrate(queryClient),
-        ...(await serverSideTranslations(context.locale as string, namespaces)),
-      },
-    };
+      return Promise.reject(error);
+    }
   };
 }

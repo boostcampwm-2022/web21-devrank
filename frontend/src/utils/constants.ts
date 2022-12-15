@@ -1,8 +1,6 @@
 import { RANK } from '@type/common';
 
-export const EXCEPTIONAL_LANGUAGE = ['rust'];
-
-export const DEVICON_URL = 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/';
+export const LANGUAGE_ICON_URL = 'https://raw.githubusercontent.com/vscode-icons/vscode-icons/master/icons';
 
 export const DEVRANK_REPOSITORY_URL = 'https://github.com/boostcampwm-2022/web21-devrank';
 
@@ -27,12 +25,19 @@ export const KEYBOARD_KEY = {
 export const LANGUAGE_MAP: {
   [key: string]: string;
 } = {
-  'c++': 'cplusplus',
-  'c#': 'csharp',
-  html: 'html5',
-  css: 'css3',
+  c: 'c3',
+  'c++': 'cpp3',
+  'c#': 'csharp2',
+  groovy: 'groovy2',
   vimscript: 'vim',
   jupyternotebook: 'jupyter',
+  javascript: 'js_official',
+  typescript: 'typescript_official',
+  dart: 'dartlang',
+  'objective-c': 'objectivec',
+  'asp.net': 'asp',
+  hcl: 'hashicorp',
+  rust: 'light_rust',
 };
 
 export const CUBE_RANK = {
@@ -51,7 +56,7 @@ export const DEVELOPER_INFORMATION = [
     name: '장우석',
     github: 'https://github.com/wkddntjr1123',
     blog: 'https://wkddntjr1123.github.io/',
-    field: 'Backend',
+    role: 'Backend',
     email: 'wkddntjr1123@gmail.com',
     introduction: '함께 일하고싶은 개발자 장우석입니다. 커피☕ 사주세요!',
   },
@@ -59,7 +64,7 @@ export const DEVELOPER_INFORMATION = [
     name: '강시온',
     github: 'https://github.com/Yaminyam',
     blog: 'https://velog.io/@siontama',
-    field: 'Backend',
+    role: 'Backend',
     email: 'siontama@gmail.com',
     introduction: '개발자를 위한 개발자 강시온 입니다',
   },
@@ -67,7 +72,7 @@ export const DEVELOPER_INFORMATION = [
     name: '정윤규',
     github: 'https://github.com/asdf99245',
     blog: '',
-    field: 'Frontend',
+    role: 'Frontend',
     email: 'asdf99245@naver.com',
     introduction: '사용자를 먼저 이해하는 프론트엔드 엔지니어 정윤규입니다.',
   },
@@ -75,7 +80,7 @@ export const DEVELOPER_INFORMATION = [
     name: '정성윤',
     github: 'https://github.com/tunggary',
     blog: '',
-    field: 'Frontend',
+    role: 'Frontend',
     email: 'tunggary2@navr.com',
     introduction: '최적화에 관심이 많은 프론트엔드 개발자 정성윤입니다.',
   },

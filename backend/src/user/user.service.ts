@@ -1,4 +1,4 @@
-import { GITHUB_API_DELAY } from '@libs/consts';
+import { GITHUB_API_DELAY, KR_TIME_DIFF } from '@libs/consts';
 import { getNeedExp, getStartExp, getTier, logger } from '@libs/utils';
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { Octokit } from '@octokit/core';
@@ -6,7 +6,6 @@ import { AutoCompleteDto } from './dto/auto-complete.dto';
 import { History } from './dto/history.dto';
 import { OrganizationDto } from './dto/organization.dto';
 import { PinnedRepositoryDto } from './dto/pinned-repository.dto';
-import { Rank } from './dto/rank.dto';
 import { UserDto } from './dto/user.dto';
 import { UserProfileDto } from './dto/user.profile.dto';
 import {
@@ -34,14 +33,10 @@ export class UserService {
   async findOneByUsername(githubToken: string, ip: string, lowerUsername: string): Promise<UserProfileDto> {
     let user = await this.userRepository.findOneByLowerUsername(lowerUsername);
     if (!user) {
-      try {
-        user = await this.updateUser(lowerUsername, githubToken);
-      } catch {
-        throw new HttpException(`can't update user ${lowerUsername}.`, HttpStatus.SERVICE_UNAVAILABLE);
-      }
+      user = await this.updateUser(lowerUsername, githubToken);
     }
-    const { totalRank, tierRank } =
-      (await this.getUserRelativeRanking(user)) || (await this.setUserRelativeRanking(user));
+
+    const [totalRank, tierRank] = await this.userRepository.findCachedUserRank(user.tier, lowerUsername);
     if (!(await this.userRepository.isDuplicatedRequestIp(ip, lowerUsername)) && user.history) {
       user.dailyViews += 1;
       await this.userRepository.createOrUpdate(user);
@@ -59,6 +54,7 @@ export class UserService {
   async updateUser(lowerUsername: string, githubToken: string): Promise<UserProfileDto> {
     let user = await this.getUserInfo(githubToken, lowerUsername);
     user = await this.userRepository.createOrUpdate(user);
+    const { tier: prevTier } = user;
     const octokit = new Octokit({
       auth: githubToken,
     });
@@ -78,7 +74,7 @@ export class UserService {
     if (!updatedUser?.scoreHistory?.length) {
       updatedUser.scoreHistory = [{ date: new Date(), score: updatedUser.score }];
     }
-    const KR_TIME_DIFF = 9 * 60 * 60 * 1000;
+
     const utc = updatedUser.scoreHistory[updatedUser.scoreHistory.length - 1].date.getTime();
     if (new Date(utc + KR_TIME_DIFF).getDate() === new Date(new Date().getTime() + KR_TIME_DIFF).getDate()) {
       updatedUser.scoreHistory.pop();
@@ -94,7 +90,11 @@ export class UserService {
       updatedUser.scoreDifference = 0;
     }
     user = await this.userRepository.createOrUpdate(updatedUser);
-    const { totalRank, tierRank } = await this.setUserRelativeRanking(user);
+    if (prevTier !== user.tier) {
+      await this.userRepository.deleteCachedUserRank(prevTier, lowerUsername);
+    }
+    await this.userRepository.updateCachedUserRank(user.tier, user.score, lowerUsername);
+    const [totalRank, tierRank] = await this.userRepository.findCachedUserRank(user.tier, lowerUsername);
     const userWithRank: UserProfileDto = {
       ...user,
       totalRank,
@@ -113,7 +113,6 @@ export class UserService {
       try {
         const updateUser = await this.updateUser(user.lowerUsername, githubToken);
         this.userRepository.createOrUpdate(updateUser);
-        this.userRepository.deleteCachedUserRank(updateUser.lowerUsername + '&');
       } catch {
         logger.error(`can't update user ${user.lowerUsername}`);
       }
@@ -335,31 +334,5 @@ export class UserService {
         return repo;
       }),
     };
-  }
-
-  async getUserRelativeRanking(user: UserDto): Promise<Rank | false> {
-    const cachedRanks = await this.userRepository.findCachedUserRank(user.id + '&');
-    if (Object.keys(cachedRanks).length) {
-      return cachedRanks;
-    }
-    return false;
-  }
-
-  async setUserRelativeRanking(user: UserDto): Promise<Rank> {
-    const users = await this.userRepository.findAll({}, true, ['lowerUsername', 'tier', 'score']);
-    let tierRank = 0;
-    for (let rank = 0; rank < users.length; rank++) {
-      if (users[rank].lowerUsername === user.lowerUsername) {
-        const rankInfo = {
-          totalRank: rank + 1,
-          tierRank: tierRank + 1,
-        };
-        await this.userRepository.setCachedUserRank(user.id + '&', rankInfo);
-        return rankInfo;
-      }
-      if (users[rank].tier === user.tier) {
-        tierRank += 1;
-      }
-    }
   }
 }

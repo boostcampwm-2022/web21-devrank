@@ -34,22 +34,24 @@ function OverallRanking({ searchUser }: OverallRankingProps) {
           <RankingTable.Element>{t('common:table-user')}</RankingTable.Element>
           <RankingTable.Element>{t('common:table-score')}</RankingTable.Element>
         </RankingTable.Head>
-        {rankingByScore?.users.map(({ id, tier, avatarUrl, username, score }, idx) => (
-          <RankingTable.Row key={id} onClick={() => searchUser(username)}>
-            <RankingTable.Element>
-              <CubeIcon tier={tier} />
-            </RankingTable.Element>
-            <RankingTable.Element>
-              <span> {idx < 3 ? <Image src={MEDAL_IMG[idx]} width={20} height={30} alt='medal' /> : idx + 1}</span>
-            </RankingTable.Element>
-            <RankingTable.Element>
-              <Avatar src={avatarUrl} name={username} />
-            </RankingTable.Element>
-            <RankingTable.Element>
-              <span>{score.toLocaleString()}</span>
-            </RankingTable.Element>
-          </RankingTable.Row>
-        ))}
+        <RankingTable.Body>
+          {rankingByScore?.users.map(({ id, tier, avatarUrl, username, score }, idx) => (
+            <RankingTable.Row key={id} onClick={() => searchUser(username)}>
+              <RankingTable.Element>
+                <CubeIcon tier={tier} />
+              </RankingTable.Element>
+              <RankingTable.Element>
+                <span> {idx < 3 ? <Image src={MEDAL_IMG[idx]} width={20} height={30} alt='medal' /> : idx + 1}</span>
+              </RankingTable.Element>
+              <RankingTable.Element>
+                <Avatar src={avatarUrl} name={username} />
+              </RankingTable.Element>
+              <RankingTable.Element>
+                <span>{score.toLocaleString()}</span>
+              </RankingTable.Element>
+            </RankingTable.Row>
+          ))}
+        </RankingTable.Body>
       </RankingTable>
     </>
   );
