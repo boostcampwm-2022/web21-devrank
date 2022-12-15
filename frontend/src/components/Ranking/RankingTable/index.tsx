@@ -1,9 +1,12 @@
-import { Children } from 'react';
 import styled, { css } from 'styled-components';
 
 type TextAlignType = 'center' | 'right' | 'left';
 
 interface HeadProps {
+  children?: React.ReactNode;
+}
+
+interface BodyProps {
   children?: React.ReactNode;
 }
 
@@ -48,6 +51,13 @@ function Head({ children }: HeadProps) {
 }
 
 /**
+ * Body 컴포넌트는 Ranking 컴포넌트의 자식 컴포넌트로 사용되어야 하고 Row 컴포넌트를 자식 컴포넌트로 가져야 합니다.
+ */
+function Body({ children }: BodyProps) {
+  return <tbody>{children}</tbody>;
+}
+
+/**
  * Row 컴포넌트는 Ranking 컴포넌트의 자식 컴포넌트로 사용되어야 합니다.
  */
 function Row({ children, onClick }: RowProps) {
@@ -70,11 +80,9 @@ function Element({ children }: ElementProps) {
  * Ranking 컴포넌트는 Row와 Element 컴포넌트를 자식 컴포넌트로 가져야합니다.
  */
 function RankingTable({ width, columnWidthList, columnAlignList, children }: RankingProps) {
-  const doms = Children.toArray(children);
   return (
     <Container width={width} tdWidthList={columnWidthList} tdAlignList={columnAlignList}>
-      {doms[0]}
-      <tbody>{doms.slice(1)}</tbody>
+      {children}
     </Container>
   );
 }
@@ -82,6 +90,7 @@ function RankingTable({ width, columnWidthList, columnAlignList, children }: Ran
 RankingTable.Head = Head;
 RankingTable.Row = Row;
 RankingTable.Element = Element;
+RankingTable.Body = Body;
 
 export default RankingTable;
 
