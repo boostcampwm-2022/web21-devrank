@@ -3,14 +3,10 @@ import { useTheme } from 'styled-components';
 import { Serie } from '@nivo/line';
 import { CubeRankType, DailyInfo, HistoryType, RANK, ScoreHistory } from '@type/common';
 import { ProfileUserResponse } from '@type/response';
-import { CUBE_RANK, DEVICON_URL, EXCEPTIONAL_LANGUAGE } from '@utils/constants';
+import { CUBE_RANK, LANGUAGE_ICON_URL, LANGUAGE_MAP } from '@utils/constants';
 
 export const languageToURL = (language: string): string => {
-  if (EXCEPTIONAL_LANGUAGE.includes(language)) {
-    return `${DEVICON_URL}${language}/${language}-plain.svg`;
-  } else {
-    return `${DEVICON_URL}${language}/${language}-original.svg`;
-  }
+  return `${LANGUAGE_ICON_URL}/file_type_${LANGUAGE_MAP[language] || language}.svg`;
 };
 
 export const numberCompactFormatter = (num: number): string => {

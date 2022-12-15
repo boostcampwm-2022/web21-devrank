@@ -24,7 +24,7 @@ const nextConfig = {
       // 외부 이미지 허용
       {
         protocol: 'https',
-        hostname: 'cdn.jsdelivr.net',
+        hostname: 'raw.githubusercontent.com',
       },
       {
         protocol: 'https',

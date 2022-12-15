@@ -1,8 +1,6 @@
 import { RANK } from '@type/common';
 
-export const EXCEPTIONAL_LANGUAGE = ['rust'];
-
-export const DEVICON_URL = 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/';
+export const LANGUAGE_ICON_URL = 'https://raw.githubusercontent.com/vscode-icons/vscode-icons/master/icons';
 
 export const DEVRANK_REPOSITORY_URL = 'https://github.com/boostcampwm-2022/web21-devrank';
 
@@ -27,12 +25,18 @@ export const KEYBOARD_KEY = {
 export const LANGUAGE_MAP: {
   [key: string]: string;
 } = {
-  'c++': 'cplusplus',
-  'c#': 'csharp',
-  html: 'html5',
-  css: 'css3',
+  c: 'c3',
+  'c++': 'cpp3',
+  'c#': 'csharp2',
+  groovy: 'groovy2',
   vimscript: 'vim',
   jupyternotebook: 'jupyter',
+  javascript: 'js_official',
+  typescript: 'typescript_official',
+  dart: 'dartlang',
+  'objective-c': 'objectivec',
+  'asp.net': 'asp',
+  hcl: 'hashicorp',
 };
 
 export const CUBE_RANK = {
