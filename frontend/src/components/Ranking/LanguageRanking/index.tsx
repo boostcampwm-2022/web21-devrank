@@ -26,17 +26,19 @@ function LanguageRanking() {
           <RankingTable.Element />
           <RankingTable.Element>{t('common:table-user-num')}</RankingTable.Element>
         </RankingTable.Head>
-        {rankingByProgrammingLang?.map(({ language, count }) => (
-          <RankingTable.Row key={language}>
-            <RankingTable.Element>
-              <LanguageIcon language={language} width={30} height={30} />
-            </RankingTable.Element>
-            <RankingTable.Element>{language}</RankingTable.Element>
-            <RankingTable.Element>
-              <span>{count}</span>
-            </RankingTable.Element>
-          </RankingTable.Row>
-        ))}
+        <RankingTable.Body>
+          {rankingByProgrammingLang?.map(({ language, count }) => (
+            <RankingTable.Row key={language}>
+              <RankingTable.Element>
+                <LanguageIcon language={language} width={30} height={30} />
+              </RankingTable.Element>
+              <RankingTable.Element>{language}</RankingTable.Element>
+              <RankingTable.Element>
+                <span>{count}</span>
+              </RankingTable.Element>
+            </RankingTable.Row>
+          ))}
+        </RankingTable.Body>
       </RankingTable>
     </>
   );
