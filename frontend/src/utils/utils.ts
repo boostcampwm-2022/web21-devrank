@@ -125,6 +125,7 @@ interface QueryValidatorType {
 }
 
 export const queryValidator = ({ tier, username, page }: QueryValidatorType) => {
+  if (tier === undefined && username === undefined && page === undefined) return { tier: 'all', username: '', page: 1 };
   if (!tier || !Object.values(CUBE_RANK).includes(tier as CubeRankType)) return false;
   if (!page || page.toString().match(/\D/)) return false;
   return { tier, username: username || '', page: Number(page) };
