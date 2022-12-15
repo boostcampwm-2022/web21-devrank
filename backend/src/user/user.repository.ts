@@ -5,7 +5,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import Redis from 'ioredis';
 import { Model } from 'mongoose';
-import { Rank } from './dto/rank.dto';
 import { UserDto } from './dto/user.dto';
 import { User } from './user.schema';
 
@@ -104,7 +103,7 @@ export class UserRepository {
     const result = (
       await this.userModel.aggregate([
         { $match: { ...tierOption, ...usernameOption } },
-        { $sort: { score: -1 } },
+        { $sort: { score: -1, lowerUsername: -1 } },
         {
           $facet: {
             metadata: [
@@ -120,16 +119,18 @@ export class UserRepository {
     return { metadata: result.metadata[0], users: result.users };
   }
 
-  async findCachedUserRank(scoreKey: string): Promise<Rank> {
-    return this.redis.hgetall(scoreKey) as unknown as Rank;
+  async findCachedUserRank(tier: string, lowerUsername: string): Promise<[number, number]> {
+    return Promise.all([
+      this.redis.zrevrank('all&', lowerUsername).then((num) => (Number.isInteger(num) ? num + 1 : null)),
+      this.redis.zrevrank(`${tier}&`, lowerUsername).then((num) => (Number.isInteger(num) ? num + 1 : null)),
+    ]);
   }
 
-  async setCachedUserRank(scoreKey: string, scores: Rank): Promise<void> {
-    this.redis.hset(scoreKey, scores);
-    this.redis.expire(scoreKey, RANK_CACHE_DELAY);
+  async updateCachedUserRank(tier: string, score: number, lowerUsername: string): Promise<void> {
+    Promise.all([this.redis.zadd('all&', score, lowerUsername), this.redis.zadd(`${tier}&`, score, lowerUsername)]);
   }
 
-  async deleteCachedUserRank(scoreKey: string): Promise<void> {
-    this.redis.del(scoreKey);
+  async deleteCachedUserRank(tier: string, lowerUsername: string): Promise<void> {
+    this.redis.zrem(`${tier}&`, lowerUsername);
   }
 }
