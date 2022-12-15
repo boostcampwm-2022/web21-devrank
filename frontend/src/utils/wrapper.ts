@@ -22,12 +22,12 @@ export function ssrWrapper(
   callback?: (
     context: GetServerSidePropsContext<ParsedUrlQuery, PreviewData>,
     queryClient: QueryClient,
-  ) => Promise<object>,
+  ) => Promise<object | void>,
 ): GetServerSideProps {
   return async (context) => {
     try {
       const queryClient = new QueryClient();
-      let propsData: object | undefined;
+      let propsData: object | void;
 
       if (callback) {
         propsData = await callback(context, queryClient);
@@ -57,12 +57,15 @@ export function ssrWrapper(
 
 export function ssgWrapper(
   namespaces: string[],
-  callback?: (context: GetStaticPropsContext<ParsedUrlQuery, PreviewData>, queryClient: QueryClient) => Promise<object>,
+  callback?: (
+    context: GetStaticPropsContext<ParsedUrlQuery, PreviewData>,
+    queryClient: QueryClient,
+  ) => Promise<object | void>,
 ): GetStaticProps {
   return async (context) => {
     try {
       const queryClient = new QueryClient();
-      let propsData: object | undefined;
+      let propsData: object | void;
 
       if (callback) {
         propsData = await callback(context, queryClient);
