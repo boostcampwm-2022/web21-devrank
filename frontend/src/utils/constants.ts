@@ -37,6 +37,7 @@ export const LANGUAGE_MAP: {
   'objective-c': 'objectivec',
   'asp.net': 'asp',
   hcl: 'hashicorp',
+  rust: 'light_rust',
 };
 
 export const CUBE_RANK = {
