@@ -123,18 +123,17 @@ export const getServerSideProps: GetServerSideProps = ssrWrapper(
   async (context, queryClient) => {
     const { tier, username, page } = context.query;
     const query = queryValidator({ tier, username, page });
+
     await Promise.allSettled([
       queryClient.prefetchQuery(['user'], () => requestTokenRefresh(context)),
       queryClient.prefetchQuery(['ranking', CUBE_RANK.ALL], () => requestTopRankingByScore({ limit: COUNT_PER_PAGE })),
     ]);
 
-    return {
-      data: query,
-      redirect: {
-        trigger: !query,
-        url: '/404',
-      },
-    };
+    if (!query) {
+      throw { url: '/404' };
+    }
+
+    return query;
   },
 );
 

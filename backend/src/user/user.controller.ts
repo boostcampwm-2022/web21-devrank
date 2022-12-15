@@ -6,7 +6,6 @@ import {
   Controller,
   DefaultValuePipe,
   Get,
-  NotFoundException,
   Param,
   ParseIntPipe,
   Patch,

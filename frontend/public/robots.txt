@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /callback/
+Disallow: /404/
+Sitemap: https://dreamdev.me/sitemap.xml

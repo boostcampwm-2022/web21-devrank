@@ -78,6 +78,9 @@ export class UserDto {
   @ApiProperty({ type: History })
   history?: History;
 
+  @ApiProperty()
+  totalRank?: number;
+
   @ApiProperty({ isArray: true, type: PinnedRepositoryDto })
   pinnedRepositories?: PinnedRepositoryDto[];
 

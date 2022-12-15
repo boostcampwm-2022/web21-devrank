@@ -74,16 +74,6 @@ export class AuthService {
     await this.authRepository.create(id, refreshToken);
   }
 
-  // async replaceRefreshToken(id: string, refreshToken: string, githubToken: string): Promise<string> {
-  //   const storedRefreshToken = await this.authRepository.findRefreshTokenById(id);
-  //   if (refreshToken !== storedRefreshToken) {
-  //     throw new UnauthorizedException('invalid token.');
-  //   }
-  //   const newRefreshToken = this.issueRefreshToken(id, githubToken);
-  //   await this.authRepository.create(id, newRefreshToken);
-  //   return newRefreshToken;
-  // }
-
   async deleteRefreshToken(id: string): Promise<void> {
     await this.authRepository.delete(id);
   }
