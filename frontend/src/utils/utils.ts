@@ -34,18 +34,12 @@ export const getKSTDateString = (date: Date) => {
   return `${kst_date.getFullYear()}-${kst_date.getMonth() + 1}-${kst_date.getDate()}`;
 };
 
-export const getProfileDescription = (locale: string, data: ProfileUserResponse) => {
-  const { t } = useTranslation();
+export const getProfileDescription = (data: ProfileUserResponse) => {
+  const { t } = useTranslation(['meta']);
   const { tier, score, totalRank, tierRank, primaryLanguages } = data;
-  const languageStr = primaryLanguages.join(', ');
+  const languages = primaryLanguages.join(', ');
 
-  return (
-    `${t('profile:rank')}: ${tier} / ` +
-    `${t('profile:current-score')}: ${score} / ` +
-    `${t('profile:total')}: ${totalRank}${getRankingUnit(locale, totalRank)} / ` +
-    `${t(`tier:${tier}`)}: ${tierRank}${getRankingUnit(locale, tierRank)} / ` +
-    languageStr
-  );
+  return t('meta:profile-description', { tier, score, totalRank, tierRank, languages });
 };
 
 export const transToPieChartData = (data: HistoryType) => {
