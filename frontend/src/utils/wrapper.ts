@@ -8,6 +8,7 @@ import {
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { ParsedUrlQuery } from 'querystring';
 import { QueryClient, dehydrate } from '@tanstack/react-query';
+import axiosInstance from '@utils/axiosInstance';
 
 interface Redirectable {
   url: string;
@@ -25,6 +26,9 @@ export function ssrWrapper(
   ) => Promise<object | void>,
 ): GetServerSideProps {
   return async (context) => {
+    axiosInstance.defaults.headers.common['X-Forwarded-For'] = context.req.headers['X-Forwarded-For'];
+    axiosInstance.defaults.headers.common['x-forwarded-for'] = context.req.headers['x-forwarded-for'];
+
     try {
       const queryClient = new QueryClient();
       let propsData: object | void;
