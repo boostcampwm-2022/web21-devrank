@@ -3,7 +3,7 @@ import Link from 'next/link';
 import styled from 'styled-components';
 import { PinnedRepositoryType } from '@type/common';
 import { LanguageIcon } from '@components/common';
-import { numberCompactFormatter } from '@utils/utils';
+import { getCompactNumber } from '@utils/utils';
 
 interface PinnedRepositoryProps {
   repositories: PinnedRepositoryType[];
@@ -30,11 +30,11 @@ function PinnedRepository({ repositories }: PinnedRepositoryProps) {
               <Info>
                 <li>
                   <Image src={'/icons/star.svg'} alt='star' width={24} height={24} />
-                  {numberCompactFormatter(stargazerCount)}
+                  {getCompactNumber(stargazerCount)}
                 </li>
                 <li>
                   <Image src={'/icons/fork.svg'} alt='star' width={24} height={24} />
-                  {numberCompactFormatter(forkCount)}
+                  {getCompactNumber(forkCount)}
                 </li>
               </Info>
             </Meta>

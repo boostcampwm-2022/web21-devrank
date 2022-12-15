@@ -9,8 +9,12 @@ export const languageToURL = (language: string): string => {
   return `${LANGUAGE_ICON_URL}/file_type_${LANGUAGE_MAP[language] || language}.svg`;
 };
 
-export const numberCompactFormatter = (num: number): string => {
-  return new Intl.NumberFormat('en-US', { notation: 'compact' }).format(num);
+export const getCompactNumber = (num: number): string => {
+  return Intl.NumberFormat('en', { notation: 'compact' }).format(num);
+};
+
+export const getMonthLabel = (date: Date) => {
+  return Intl.DateTimeFormat('en', { month: 'short' }).format(date);
 };
 
 export const getDate = (dateString: string) => {

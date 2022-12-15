@@ -1,8 +1,7 @@
 import styled from 'styled-components';
 import { HistoryType, RANK } from '@type/common';
 import { colors } from '@styles/theme';
-import { MONTH_LABEL_MAPPING } from '@utils/constants';
-import { getDate } from '@utils/utils';
+import { getDate, getMonthLabel } from '@utils/utils';
 
 const COMMIT_LEFT_BOUNDARY = 5;
 
@@ -31,6 +30,7 @@ function CommitHistory({ history, tier }: CommitHistoryProps) {
         {historyBlocks.map(([dateString, { level, count }], idx) => {
           const weeks = (idx + firstDay) / 7;
           const { month, date, day } = getDate(dateString);
+
           let isMonthLabelChange = false;
           if (prevMonth !== month && day === 0) {
             isMonthLabelChange = true;
@@ -42,7 +42,7 @@ function CommitHistory({ history, tier }: CommitHistoryProps) {
               style={{ backgroundColor: level === 0 ? colors.commit0 : colors[`${tier}${level}`] }}
             >
               {date < 24 && day === 0 && isMonthLabelChange ? (
-                <MonthLabel>{MONTH_LABEL_MAPPING[month]}</MonthLabel>
+                <MonthLabel>{getMonthLabel(new Date(dateString))}</MonthLabel>
               ) : null}
               <ToolTip className='tooltip' weeks={weeks}>
                 <strong>{count || 'No'}</strong> contribution on <strong>{dateString}</strong>
@@ -164,7 +164,6 @@ const MonthLabel = styled.div`
 
 const DayLabel = styled.ul`
   position: absolute;
-  top: 0;
   left: -20px;
   font-size: 16px;
   height: 100%;
