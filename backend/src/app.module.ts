@@ -38,7 +38,6 @@ import { AppService } from './app.service';
     UserModule,
     RankingModule,
     BatchModule,
-    UserModule,
   ],
   controllers: [AppController],
   providers: [
