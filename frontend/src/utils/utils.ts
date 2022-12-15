@@ -85,7 +85,7 @@ export const useTransToPieChartData = (data: HistoryType) => {
   ];
 };
 
-export const transContributionHistoryToLineChartData = (data: { [key: string]: DailyInfo }, tier: RANK): Serie[] => {
+export const useTransContributionHistoryToLineChartData = (data: { [key: string]: DailyInfo }, tier: RANK): Serie[] => {
   const theme = useTheme();
 
   return [
