@@ -16,7 +16,6 @@ function About() {
     <>
       <HeadMeta title={t('meta:about-title')} description={t('meta:main-description')} />
       <Container>
-        {}
         <Logo>
           <Image src='/icons/logo-main.svg' alt='Devrank 로고' width={550} height={230} quality={100} priority />
         </Logo>
@@ -108,7 +107,7 @@ function About() {
         </Content>
         <Content>
           <Title>Developed By</Title>
-          {DEVELOPER_INFORMATION.map(({ name, introduction, github, blog, email, field }) => (
+          {DEVELOPER_INFORMATION.map(({ name, introduction, github, blog, email, role }) => (
             <Profile key={name}>
               <Name>
                 {name}
@@ -128,8 +127,8 @@ function About() {
                 </div>
               </Name>
               <Description>
-                <li>&middot; 담당 : {field}</li>
-                <li>&middot; 이메일: {email}</li>
+                <li>&middot; {t('about:role', { role })}</li>
+                <li>&middot; {t('about:email', { email })}</li>
                 <li>&middot; {introduction}</li>
               </Description>
             </Profile>
