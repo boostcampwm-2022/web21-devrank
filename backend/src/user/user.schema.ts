@@ -87,5 +87,6 @@ export const UserScheme = SchemaFactory.createForClass(User);
 UserScheme.index({ score: -1 });
 UserScheme.index({ scoreDifference: -1 });
 UserScheme.index({ dailyViews: -1 });
-UserScheme.index({ lowerUsername: 1, score: 1 });
-UserScheme.index({ tier: 1, lowerUsername: 1, score: 1 });
+UserScheme.index({ lowerUsername: 1, score: -1 });
+UserScheme.index({ score: -1, lowerUsername: 1 });
+UserScheme.index({ tier: 1, lowerUsername: 1, score: -1 });
