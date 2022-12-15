@@ -32,27 +32,29 @@ function RisingRanking({ searchUser }: RisingRankingProps) {
           <RankingTable.Element>{t('common:table-user')}</RankingTable.Element>
           <RankingTable.Element>{t('common:table-score')}</RankingTable.Element>
         </RankingTable.Head>
-        {rankingByRising?.map(({ id, tier, username, avatarUrl, scoreDifference }, idx) => (
-          <RankingTable.Row key={id} onClick={() => searchUser(username)}>
-            <RankingTable.Element>
-              <CubeIcon tier={tier} />
-            </RankingTable.Element>
-            <RankingTable.Element>{idx + 1}</RankingTable.Element>
-            <RankingTable.Element>
-              <Avatar src={avatarUrl} name={username} />
-            </RankingTable.Element>
-            <RankingTable.Element>
-              {scoreDifference > 0 ? (
-                <Change>
-                  <Image src='/icons/arrow-up.svg' width={16} height={16} alt='down' />
-                  <span>{numberCompactFormatter(scoreDifference)}</span>
-                </Change>
-              ) : (
-                <NotChange src='/icons/arrow-bar.svg' width={10} height={10} alt='not change' />
-              )}
-            </RankingTable.Element>
-          </RankingTable.Row>
-        ))}
+        <RankingTable.Body>
+          {rankingByRising?.map(({ id, tier, username, avatarUrl, scoreDifference }, idx) => (
+            <RankingTable.Row key={id} onClick={() => searchUser(username)}>
+              <RankingTable.Element>
+                <CubeIcon tier={tier} />
+              </RankingTable.Element>
+              <RankingTable.Element>{idx + 1}</RankingTable.Element>
+              <RankingTable.Element>
+                <Avatar src={avatarUrl} name={username} />
+              </RankingTable.Element>
+              <RankingTable.Element>
+                {scoreDifference > 0 ? (
+                  <Change>
+                    <Image src='/icons/arrow-up.svg' width={16} height={16} alt='down' />
+                    <span>{numberCompactFormatter(scoreDifference)}</span>
+                  </Change>
+                ) : (
+                  <NotChange src='/icons/arrow-bar.svg' width={10} height={10} alt='not change' />
+                )}
+              </RankingTable.Element>
+            </RankingTable.Row>
+          ))}
+        </RankingTable.Body>
       </RankingTable>
     </>
   );
