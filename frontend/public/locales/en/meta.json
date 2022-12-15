@@ -6,5 +6,6 @@
   "ranking-description": "Check the ranking of users using Devrank service!",
   "profile-title": "{{username}} | Devrank",
   "profile-description": "Rank: {{tier}} / Current score: {{score}} / Total: {{totalRank}} / $t(tier:{{tier}}): {{tierRank}} / {{languages}}",
-  "not-found-title": "Page Not Found | Devrank"
+  "not-found-title": "Page Not Found | Devrank",
+  "server-error-title": "Internal Server Error | Devrank"
 }
