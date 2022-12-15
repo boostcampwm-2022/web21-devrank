@@ -48,7 +48,7 @@ export const getProfileDescription = (locale: string, data: ProfileUserResponse)
   );
 };
 
-export const transToPieChartData = (data: HistoryType) => {
+export const useTransToPieChartData = (data: HistoryType) => {
   const theme = useTheme();
 
   return [
@@ -85,7 +85,7 @@ export const transToPieChartData = (data: HistoryType) => {
   ];
 };
 
-export const transContributionHistoryToLineChartData = (data: { [key: string]: DailyInfo }, tier: RANK): Serie[] => {
+export const useTransContributionHistoryToLineChartData = (data: { [key: string]: DailyInfo }, tier: RANK): Serie[] => {
   const theme = useTheme();
 
   return [
@@ -97,7 +97,7 @@ export const transContributionHistoryToLineChartData = (data: { [key: string]: D
   ];
 };
 
-export const transScoreHistoryToLineChartData = (data: ScoreHistory[], tier: RANK): Serie[] => {
+export const useTransScoreHistoryToLineChartData = (data: ScoreHistory[], tier: RANK): Serie[] => {
   const theme = useTheme();
 
   return [
