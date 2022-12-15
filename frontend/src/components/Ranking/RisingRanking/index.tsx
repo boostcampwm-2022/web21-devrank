@@ -6,7 +6,7 @@ import { RankingResponse } from '@type/response';
 import { RankingTable } from '@components/Ranking';
 import { Avatar, CubeIcon } from '@components/common';
 import { requestTopRankingByRising } from '@apis/ranking';
-import { numberCompactFormatter } from '@utils/utils';
+import { getCompactNumber } from '@utils/utils';
 
 interface RisingRankingProps {
   searchUser: (username: string) => void;
@@ -46,7 +46,7 @@ function RisingRanking({ searchUser }: RisingRankingProps) {
                 {scoreDifference > 0 ? (
                   <Change>
                     <Image src='/icons/arrow-up.svg' width={16} height={16} alt='down' />
-                    <span>{numberCompactFormatter(scoreDifference)}</span>
+                    <span>{getCompactNumber(scoreDifference)}</span>
                   </Change>
                 ) : (
                   <NotChange src='/icons/arrow-bar.svg' width={10} height={10} alt='not change' />
