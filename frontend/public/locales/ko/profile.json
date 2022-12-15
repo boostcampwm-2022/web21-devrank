@@ -3,7 +3,7 @@
   "register-wakatime-api-key": "Wakatime API Key를 등록해주세요",
   "register-wakatime-button-label": "등록",
   "maximum-continuous-commit-history": "최대 연속 커밋 일수",
-  "user-update-delay": "초 후 업데이트 가능합니다.",
+  "user-update-delay": "<count>{{count}}</count>초 후 업데이트 가능합니다.",
   "day": "일",
   "total": "전체",
   "rank": "등급",

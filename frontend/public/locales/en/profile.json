@@ -3,7 +3,7 @@
   "register-wakatime-api-key": "Register Wakatime API Key",
   "register-wakatime-button-label": "Register",
   "maximum-continuous-commit-history": "Maximum continuous commit history",
-  "user-update-delay": "You can update it in",
+  "user-update-delay": "You can update it in <count>{{count}}</count> seconds",
   "day": "day",
   "total": "Total",
   "rank": "Rank",

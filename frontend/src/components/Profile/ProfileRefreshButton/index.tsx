@@ -1,4 +1,4 @@
-import { useTranslation } from 'next-i18next';
+import { Trans } from 'next-i18next';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
@@ -12,7 +12,6 @@ interface ProfileRefreshButtonProps {
 }
 function ProfileRefreshButton({ updateDelayTime, updateData, isLoading, isMine }: ProfileRefreshButtonProps) {
   const [count, setCount] = useState(updateDelayTime);
-  const { t, i18n } = useTranslation('profile');
 
   useInterval(() => {
     setCount(count - 1);
@@ -28,18 +27,7 @@ function ProfileRefreshButton({ updateDelayTime, updateData, isLoading, isMine }
         <Image src='/icons/refresh.svg' width={32} height={32} alt='refresh' className='active' />
       ) : count > 0 && !isMine ? (
         <Timer>
-          {i18n.language === 'ko' ? (
-            <>
-              <span>{count}</span>
-              <p>{t('user-update-delay')}</p>
-            </>
-          ) : (
-            <>
-              <p>{t('user-update-delay')}</p>
-              <span>{count}</span>
-              <p>&nbsp;seconds</p>
-            </>
-          )}
+          <Trans i18nKey='profile:user-update-delay' values={{ count }} components={{ count: <span /> }} />
         </Timer>
       ) : (
         <Image src='/icons/refresh.svg' width={32} height={32} alt='refresh' onClick={updateData} />
@@ -70,7 +58,7 @@ const Timer = styled.div`
     font-weight: 700;
     text-align: end;
     margin-right: 1px;
-    width: 30px;
+    width: 25px;
   }
 `;
 
@@ -79,6 +67,7 @@ const Container = styled.div`
   width: max-content;
   height: 32px;
   cursor: pointer;
+
   .active {
     animation: ${rotation} 1s cubic-bezier(0.06, 0.14, 0.27, 0.96) infinite;
     cursor: not-allowed;
