@@ -45,7 +45,7 @@ function Profile({ username }: ProfileProps) {
       {data && (
         <>
           <HeadMeta
-            title={`${username}${t('meta:profile-title')}`}
+            title={t('meta:profile-title', { username })}
             image={`https://dreamdev.me/api/og-image/?username=${username}&tier=${data.tier}&image=${data.avatarUrl}`}
             description={getProfileDescription(locale, data)}
           />
