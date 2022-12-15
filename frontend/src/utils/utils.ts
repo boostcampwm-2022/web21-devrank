@@ -97,7 +97,7 @@ export const useTransContributionHistoryToLineChartData = (data: { [key: string]
   ];
 };
 
-export const transScoreHistoryToLineChartData = (data: ScoreHistory[], tier: RANK): Serie[] => {
+export const useTransScoreHistoryToLineChartData = (data: ScoreHistory[], tier: RANK): Serie[] => {
   const theme = useTheme();
 
   return [

@@ -5,8 +5,8 @@ import { Tooltip } from '@components/Chart';
 import { TIER_OFFSET } from '@utils/constants';
 import {
   getLineChartMinMaxValue,
-  transScoreHistoryToLineChartData,
   useTransContributionHistoryToLineChartData,
+  useTransScoreHistoryToLineChartData,
   useTransToPieChartData,
 } from '@utils/utils';
 
@@ -21,9 +21,9 @@ interface ContributionStatisticProps {
 
 function Statistic({ history, scoreHistory, tier }: ContributionStatisticProps) {
   const theme = useTheme();
-  const scoreHistoryData = transScoreHistoryToLineChartData(scoreHistory, tier);
   const pieChartData = useTransToPieChartData(history);
   const contributionHistoryData = useTransContributionHistoryToLineChartData(history.contributionHistory, tier);
+  const scoreHistoryData = useTransScoreHistoryToLineChartData(scoreHistory, tier);
   const { min, max } = getLineChartMinMaxValue(scoreHistoryData);
 
   return (
