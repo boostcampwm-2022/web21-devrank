@@ -81,6 +81,9 @@ export class UserDto {
   @ApiProperty()
   totalRank?: number;
 
+  @ApiProperty()
+  tierRank?: number;
+
   @ApiProperty({ isArray: true, type: PinnedRepositoryDto })
   pinnedRepositories?: PinnedRepositoryDto[];
 
