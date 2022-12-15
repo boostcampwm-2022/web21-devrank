@@ -1,5 +1,9 @@
 {
   "search-placeholder": "사용자명",
   "search-not-found": "사용자가 존재하지 않습니다.",
-  "search-user": "\"{{username}}\"에 대한 검색 결과 입니다."
+  "search-user": "\"{{username}}\"에 대한 검색 결과 입니다.",
+  "rank_one": "{{count}}등",
+  "rank_two": "{{count}}등",
+  "rank_few": "{{count}}등",
+  "rank_other": "{{count}}등"
 }

@@ -35,11 +35,17 @@ export const getKSTDateString = (date: Date) => {
 };
 
 export const getProfileDescription = (data: ProfileUserResponse) => {
-  const { t } = useTranslation(['meta']);
+  const { t } = useTranslation(['meta', 'ranking']);
   const { tier, score, totalRank, tierRank, primaryLanguages } = data;
   const languages = primaryLanguages.join(', ');
 
-  return t('meta:profile-description', { tier, score, totalRank, tierRank, languages });
+  return t('meta:profile-description', {
+    tier,
+    score,
+    totalRank: t('ranking:rank', { count: Number(totalRank), ordinal: true }),
+    tierRank: t('ranking:rank', { count: Number(tierRank), ordinal: true }),
+    languages,
+  });
 };
 
 export const transToPieChartData = (data: HistoryType) => {
@@ -122,28 +128,4 @@ export const queryValidator = ({ tier, username, page }: QueryValidatorType) => 
   if (!tier || !Object.values(CUBE_RANK).includes(tier as CubeRankType)) return false;
   if (!page || page.toString().match(/\D/)) return false;
   return { tier, username: username || '', page: Number(page) };
-};
-
-export const getRankingUnit = (locale: string, rank: number) => {
-  if (locale === 'ko') return '등';
-
-  const rankFirstUint = rank % 10;
-  const rankSecondUint = rank % 100;
-  switch (rankSecondUint) {
-    case 11:
-    case 12:
-    case 13:
-      return 'th';
-    default:
-      switch (rankFirstUint) {
-        case 1:
-          return 'st';
-        case 2:
-          return 'nd';
-        case 3:
-          return 'rd';
-        default:
-          return 'th';
-      }
-  }
 };
