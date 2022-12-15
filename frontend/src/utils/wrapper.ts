@@ -17,14 +17,17 @@ function isErrorRedirectable(error: unknown): error is Redirectable {
   return typeof error === 'object' && Object.prototype.hasOwnProperty.call(error, 'url');
 }
 
-export function ssrWrapper<T>(
+export function ssrWrapper(
   namespaces: string[],
-  callback?: (context: GetServerSidePropsContext<ParsedUrlQuery, PreviewData>, queryClient: QueryClient) => Promise<T>,
+  callback?: (
+    context: GetServerSidePropsContext<ParsedUrlQuery, PreviewData>,
+    queryClient: QueryClient,
+  ) => Promise<object>,
 ): GetServerSideProps {
   return async (context) => {
     try {
       const queryClient = new QueryClient();
-      let propsData: T | undefined;
+      let propsData: object | undefined;
 
       if (callback) {
         propsData = await callback(context, queryClient);
@@ -52,14 +55,14 @@ export function ssrWrapper<T>(
   };
 }
 
-export function ssgWrapper<T>(
+export function ssgWrapper(
   namespaces: string[],
-  callback?: (context: GetStaticPropsContext<ParsedUrlQuery, PreviewData>, queryClient: QueryClient) => Promise<T>,
+  callback?: (context: GetStaticPropsContext<ParsedUrlQuery, PreviewData>, queryClient: QueryClient) => Promise<object>,
 ): GetStaticProps {
   return async (context) => {
     try {
       const queryClient = new QueryClient();
-      let propsData: T | undefined;
+      let propsData: object | undefined;
 
       if (callback) {
         propsData = await callback(context, queryClient);
