@@ -1,5 +1,9 @@
 {
   "search-placeholder": "Username",
   "search-not-found": "User does not exist",
-  "search-user": "Search results for "
+  "search-user": "Search results for \"{{username}}\"",
+  "rank_one": "{{count}}st",
+  "rank_two": "{{count}}nd",
+  "rank_few": "{{count}}rd",
+  "rank_other": "{{count}}th"
 }

@@ -1,6 +1,5 @@
-import { useTranslation } from 'next-i18next';
+import { Trans, useTranslation } from 'next-i18next';
 import Image from 'next/image';
-import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import ProfileRefreshButton from '../ProfileRefreshButton';
 import { OrganizationType, RANK } from '@type/common';
@@ -8,7 +7,6 @@ import { ProfileLabel } from '@components/Profile';
 import { Avatar, Paper } from '@components/common';
 import CubeLogo from '@components/common/CubeLogo';
 import { CUBE_COLOR_MAP } from '@utils/constants';
-import { getRankingUnit } from '@utils/utils';
 
 interface ProfileCardProps {
   profileData: {
@@ -58,8 +56,6 @@ function ProfileCard({ profileData }: ProfileCardProps) {
   } = profileData;
 
   const { t } = useTranslation(['profile', 'tier']);
-  const router = useRouter();
-  const locale = router.locale as string;
 
   const gotoGithub = (username: string) => {
     window.location.href = `https://github.com/${username}`;
@@ -128,14 +124,14 @@ function ProfileCard({ profileData }: ProfileCardProps) {
           </RankText>
         ) : (
           <RankText>
+            <p>{t('profile:total-rank', { count: Number(totalRank), ordinal: true })}</p>
             <p>
-              {t('profile:total')}&nbsp;{totalRank}
-              {getRankingUnit(locale, totalRank)}
-            </p>
-            <p>
-              <ColorPoint color={CUBE_COLOR_MAP[tier]}>{t(`tier:${tier}`)}</ColorPoint>
-              &nbsp;{tierRank}
-              {getRankingUnit(locale, tierRank)}
+              <Trans
+                i18nKey='profile:tier-rank'
+                values={{ count: Number(tierRank), tier }}
+                tOptions={{ ordinal: true }}
+                components={{ tier: <ColorPoint color={CUBE_COLOR_MAP[tier]}></ColorPoint> }}
+              />
             </p>
           </RankText>
         )}
@@ -178,13 +174,16 @@ const ProfileInfos = styled.ul`
 `;
 
 const ProfileRank = styled.div`
+  ${({ theme }) => theme.common.flexCenterColumn};
   max-width: 300px;
   width: 100%;
-  ${({ theme }) => theme.common.flexCenterColumn};
 `;
 
 const RankText = styled.div`
+  ${({ theme }) => theme.common.flexCenterColumn};
+  font-weight: ${({ theme }) => theme.fontWeight.bold};
   margin-top: 20px;
+
   p {
     margin-top: 8px;
   }

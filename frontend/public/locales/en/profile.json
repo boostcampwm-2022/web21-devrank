@@ -1,12 +1,16 @@
 {
   "current-score": "Current score",
-  "register-wakatime-api-key": "Register Wakatime API Key",
-  "register-wakatime-button-label": "Register",
   "maximum-continuous-commit-history": "Maximum continuous commit history",
-  "user-update-delay": "You can update it in",
+  "user-update-delay": "You can update it in <count>{{count}}</count> seconds",
   "day": "day",
-  "total": "Total",
-  "rank": "Rank",
+  "total-rank_one": "Total: {{count}}st",
+  "total-rank_two": "Total: {{count}}nd",
+  "total-rank_few": "Total: {{count}}rd",
+  "total-rank_other": "Total: {{count}}th",
+  "tier-rank_one": "<tier>{{tier}}</tier>: {{count}}st",
+  "tier-rank_two": "<tier>$t(tier:{{tier}})</tier>: {{count}}nd",
+  "tier-rank_few": "<tier>$t(tier:{{tier}})</tier>: {{count}}rd",
+  "tier-rank_other": "<tier>$t(tier:{{tier}})</tier>: {{count}}th",
   "invalid-user": "This user cannot get information",
   "invalid-rank": "Unable to get the rank"
 }

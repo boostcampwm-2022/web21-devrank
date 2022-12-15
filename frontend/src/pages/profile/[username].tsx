@@ -1,7 +1,6 @@
 import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
-import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import styled from 'styled-components';
 import { useQueryData } from '@hooks';
@@ -21,8 +20,6 @@ interface ProfileProps {
 
 function Profile({ username }: ProfileProps) {
   const MAX_COMMIT_STREAK = 368;
-  const router = useRouter();
-  const locale = router.locale as string;
 
   const { data, refetch } = useQuery<ProfileUserResponse>(['profile', username], () =>
     requestUserInfoByUsername({ username, method: 'GET' }),
@@ -46,9 +43,9 @@ function Profile({ username }: ProfileProps) {
       {data && (
         <>
           <HeadMeta
-            title={`${username}${t('meta:profile-title')}`}
+            title={t('meta:profile-title', { username })}
             image={`https://dreamdev.me/api/og-image/?username=${username}&tier=${data.tier}&image=${data.avatarUrl}`}
-            description={getProfileDescription(locale, data)}
+            description={getProfileDescription(data)}
           />
           <ProfileCard
             profileData={{
