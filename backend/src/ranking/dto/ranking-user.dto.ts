@@ -27,18 +27,22 @@ export class RankingUserDto {
   totalRank?: number;
 
   @ApiProperty()
+  tierRank?: number;
+
+  @ApiProperty()
   primaryLanguages: string[];
 
   of(user: UserDto): RankingUserDto {
     this.id = user.id;
     this.username = user.username;
     this.avatarUrl = user.avatarUrl;
-    this.score = user.commitsScore + user.followersScore + user.issuesScore;
+    this.score = user.score;
     this.tier = user.tier;
     this.dailyViews = user.dailyViews;
     this.scoreDifference = user.scoreDifference;
     this.primaryLanguages = user.primaryLanguages;
     this.totalRank = user.totalRank;
+    this.tierRank = user.tierRank;
     return this;
   }
 }

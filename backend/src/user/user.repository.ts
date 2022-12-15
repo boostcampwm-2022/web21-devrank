@@ -99,10 +99,10 @@ export class UserRepository {
   ): Promise<Pick<RankingPaginationDto, 'metadata'> & { users: UserDto[] }> {
     const tierOption = tier === 'all' ? {} : { tier: tier };
     const usernameOption = lowerUsername ? { lowerUsername: { $regex: `^${lowerUsername}` } } : {};
-
     const result = (
       await this.userModel.aggregate([
         { $match: { ...tierOption, ...usernameOption } },
+        { $project: { id: 1, username: 1, lowerUsername: 1, avatarUrl: 1, tier: 1, score: 1, primaryLanguages: 1 } },
         { $sort: { score: -1, lowerUsername: -1 } },
         {
           $facet: {

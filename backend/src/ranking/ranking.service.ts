@@ -20,8 +20,9 @@ export class RankingService {
       throw new NotFoundException('user not found.');
     }
     for (const user of paginationResult.users) {
-      const [totalRank] = await this.userRepository.findCachedUserRank(user.tier, user.lowerUsername);
+      const [totalRank, tierRank] = await this.userRepository.findCachedUserRank(user.tier, user.lowerUsername);
       user.totalRank = totalRank;
+      user.tierRank = tierRank;
     }
 
     const lastPage = Math.ceil(paginationResult.metadata.total / limit);
