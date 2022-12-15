@@ -70,31 +70,33 @@ function Ranking({ tier, username, page }: RankingProps) {
             <RankingTable.Element>{t('common:table-score')}</RankingTable.Element>
             <RankingTable.Element>{t('common:table-tech-stack')}</RankingTable.Element>
           </RankingTable.Head>
-          {data?.users.map(({ id, username, avatarUrl, tier, score, primaryLanguages }, index) => (
-            <RankingTable.Row key={id} onClick={() => searchUser(username)}>
-              <RankingTable.Element>
-                <GrayText>{(page - 1) * COUNT_PER_PAGE + index + 1}</GrayText>
-              </RankingTable.Element>
-              <RankingTable.Element>
-                <Avatar src={avatarUrl} name={username} />
-              </RankingTable.Element>
-              <RankingTable.Element>
-                <CubeIcon tier={tier} />
-              </RankingTable.Element>
-              <RankingTable.Element>
-                <GrayText>{score?.toLocaleString()}</GrayText>
-              </RankingTable.Element>
-              <RankingTable.Element>
-                <TechStackList>
-                  {primaryLanguages.map((lang) => (
-                    <li key={lang}>
-                      <LanguageIcon language={lang} width={35} height={35} />
-                    </li>
-                  ))}
-                </TechStackList>
-              </RankingTable.Element>
-            </RankingTable.Row>
-          ))}
+          {data?.users.map(
+            ({ id, username, avatarUrl, tier: eachTier, score, primaryLanguages, totalRank, tierRank }) => (
+              <RankingTable.Row key={id} onClick={() => searchUser(username)}>
+                <RankingTable.Element>
+                  <GrayText>{tier === 'all' ? totalRank : tierRank}</GrayText>
+                </RankingTable.Element>
+                <RankingTable.Element>
+                  <Avatar src={avatarUrl} name={username} />
+                </RankingTable.Element>
+                <RankingTable.Element>
+                  <CubeIcon tier={eachTier} />
+                </RankingTable.Element>
+                <RankingTable.Element>
+                  <GrayText>{score?.toLocaleString()}</GrayText>
+                </RankingTable.Element>
+                <RankingTable.Element>
+                  <TechStackList>
+                    {primaryLanguages.map((lang) => (
+                      <li key={lang}>
+                        <LanguageIcon language={lang} width={35} height={35} />
+                      </li>
+                    ))}
+                  </TechStackList>
+                </RankingTable.Element>
+              </RankingTable.Row>
+            ),
+          )}
         </RankingTable>
         {isLoading && Array.from({ length: COUNT_PER_PAGE }).map((_, index) => <RankingSkeleton key={index} />)}
         {isError && <NotFound />}
