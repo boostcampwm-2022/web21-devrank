@@ -13,6 +13,8 @@ export const getCompactNumber = (num: number): string => {
   return Intl.NumberFormat('en', { notation: 'compact' }).format(num);
 };
 
+export const getMonthLabel = (date: Date) => {
+  return Intl.DateTimeFormat('en', { month: 'short' }).format(date);
 };
 
 export const getDate = (dateString: string) => {
