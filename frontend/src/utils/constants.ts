@@ -37,6 +37,7 @@ export const LANGUAGE_MAP: {
   dart: 'dartlang',
   'objective-c': 'objectivec',
   'asp.net': 'asp',
+  hcl: 'hashicorp',
 };
 
 export const CUBE_RANK = {
