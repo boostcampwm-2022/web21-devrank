@@ -1,5 +1,5 @@
 {
   "search-placeholder": "Username",
   "search-not-found": "User does not exist",
-  "search-user": "Search results for "
+  "search-user": "Search results for \"{{username}}\""
 }
