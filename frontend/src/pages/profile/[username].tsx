@@ -1,6 +1,7 @@
 import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
+import { AxiosError } from 'axios';
 import { useEffect } from 'react';
 import styled from 'styled-components';
 import { useQueryData } from '@hooks';
@@ -29,10 +30,20 @@ function Profile({ username }: ProfileProps) {
 
   const { mutate, isLoading } = useMutation<ProfileUserResponse>({
     mutationFn: () => requestUserInfoByUsername({ username, method: 'PATCH' }),
-    onError: () => alert('최근에 업데이트 했습니다.'),
+    onError: (err) => updateErrorHandler(err),
     onSettled: () => refetch(),
   });
+
   const { t } = useTranslation(['profile', 'meta']);
+  const updateErrorHandler = (err: unknown) => {
+    if (err instanceof AxiosError && err.response) {
+      if (err.response.status >= 500) {
+        alert('정보를 불러올 수 없는 유저입니다.');
+      } else if (err.response.status >= 400) {
+        alert('최근에 업데이트 했습니다. 잠시 후 다시 시도해주세요.');
+      }
+    }
+  };
 
   useEffect(() => {
     requestTokenRefresh();
