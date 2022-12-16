@@ -1,6 +1,6 @@
 import { Trans } from 'next-i18next';
 import Image from 'next/image';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { useInterval } from '@hooks/useInterval';
 
@@ -13,9 +13,9 @@ interface ProfileRefreshButtonProps {
 function ProfileRefreshButton({ updateDelayTime, updateData, isLoading, isMine }: ProfileRefreshButtonProps) {
   const [count, setCount] = useState(updateDelayTime);
 
-  useInterval(() => {
-    setCount(count - 1);
-  }, 1000);
+  const countDown = useCallback(() => setCount((prev) => prev - 1), []);
+
+  useInterval(countDown, 1000, count > 0);
 
   useEffect(() => {
     setCount(updateDelayTime);
