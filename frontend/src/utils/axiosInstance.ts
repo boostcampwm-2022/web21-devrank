@@ -34,6 +34,10 @@ instance.interceptors.response.use(
         }
       }
     }
+
+    if (originConfig.url.startsWith('/users/') && originConfig.method === 'patch') {
+      return Promise.reject(err);
+    }
   },
 );
 
