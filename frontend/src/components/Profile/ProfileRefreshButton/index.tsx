@@ -13,9 +13,13 @@ interface ProfileRefreshButtonProps {
 function ProfileRefreshButton({ updateDelayTime, updateData, isLoading, isMine }: ProfileRefreshButtonProps) {
   const [count, setCount] = useState(updateDelayTime);
 
-  useInterval(() => {
-    setCount(count - 1);
-  }, 1000);
+  useInterval(
+    () => {
+      setCount(count - 1);
+    },
+    1000,
+    count > 0,
+  );
 
   useEffect(() => {
     setCount(updateDelayTime);
