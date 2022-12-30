@@ -112,9 +112,7 @@ export const forkRepositoryQuery = `query repositories($username: String!, $id: 
           defaultBranchRef {
             target {
               ... on Commit {
-                history(author: {id: $id}, first: 100, since: ${new Date(
-                  new Date().getTime() - 5 * YEAR * 1000,
-                ).toISOString()}) {
+                history(author: {id: $id}, since: "${new Date(new Date().getTime() - 3 * YEAR * 1000).toISOString()}") {
                   nodes {
                     committedDate
                   }
