@@ -1,26 +1,17 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 
 interface CallbackType {
   (): void;
 }
 
-export function useInterval(callback: CallbackType, delay: number) {
-  const savedCallback = useRef<CallbackType>();
-
+export function useInterval(callback: CallbackType, delay: number, isActivate: boolean) {
   useEffect(() => {
-    if (callback) {
-      savedCallback.current = callback;
-    }
-  }, [callback]);
+    if (!isActivate) return;
 
-  useEffect(() => {
-    function tick() {
-      if (savedCallback.current) {
-        savedCallback.current();
-      }
-    }
+    const id = setInterval(callback, delay);
 
-    const id = setInterval(tick, delay);
-    return () => clearInterval(id);
-  }, [delay]);
+    return () => {
+      clearInterval(id);
+    };
+  }, [callback, delay, isActivate]);
 }

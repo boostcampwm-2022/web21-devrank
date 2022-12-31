@@ -1,3 +1,5 @@
+import { YEAR } from '@libs/consts';
+
 export const pinnedRepositoriesQuery = `query pinnedReposities($username: String!) {
   user(login: $username) {
     organizations(first:100) {
@@ -110,7 +112,7 @@ export const forkRepositoryQuery = `query repositories($username: String!, $id: 
           defaultBranchRef {
             target {
               ... on Commit {
-                history(author: {id: $id}, first: 100) {
+                history(author: {id: $id}, since: "${new Date(new Date().getTime() - 3 * YEAR * 1000).toISOString()}") {
                   nodes {
                     committedDate
                   }
