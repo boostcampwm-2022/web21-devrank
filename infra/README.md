@@ -25,3 +25,5 @@ sudo docker run -it --rm --name certbot \
 5. hooks.service를 등록합니다. [참고](https://118k.tistory.com/1055)
 6. initial-deploy.sh 실행하면 배포가 완료됩니다.
 7. 이후에는 github Repository의 Main 브랜치에 Merge가 발생하면 자동으로 배포가 됩니다!
+
+- 추가적으로 서버 인스턴스가 변경되었다면 dockerHub에서 웹훅설정을 변경해야합니다!
