@@ -27,3 +27,13 @@ sudo docker run -it --rm --name certbot \
 7. 이후에는 github Repository의 Main 브랜치에 Merge가 발생하면 자동으로 배포가 됩니다!
 
 - 추가적으로 서버 인스턴스가 변경되었다면 dockerHub에서 웹훅설정을 변경해야합니다!
+
+8. 추가적으로 ssl 인증서를 자동 갱신하도록 cron을 등록하시면 편리합니다!
+```
+#!/bin/bash
+
+docker run -it --rm --name certbot \
+  -v '/etc/letsencrypt:/etc/letsencrypt' \
+  -v '/var/lib/letsencrypt:/var/lib/letsencrypt' \
+  certbot/certbot renew --manual --preferred-challenges dns --server https://acme-v02.api.letsencrypt.org/directory
+```
