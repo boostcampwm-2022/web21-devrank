@@ -42,7 +42,7 @@
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.0.3",
     "ioredis": "^5.2.4",
-    "mongoose": "^6.7.2",
+    "mongoose": "^6.11.3",
     "nest-raven": "^9.0.0",
     "nest-winston": "^1.8.0",
     "nestjs-real-ip": "^2.2.0",
